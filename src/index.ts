@@ -4,7 +4,7 @@ import { spawnMystem } from './stemmer';
 import { Person } from './Profile';
 
 const { stemmer, killStemmer } = spawnMystem();
-const userData: { [sessionKey: string]: Person[] } = {}
+const userData: { [sessionKey: string]: Person[] } = {};
 
 startServer(
     async request => {
@@ -13,7 +13,7 @@ startServer(
         const sessionKey = `${userId}-${sessionId}`;
 
         if (!userData[sessionKey]) {
-            userData[userId] = []
+            userData[userId] = [];
         }
 
         const persons = userData[userId];
@@ -22,7 +22,7 @@ startServer(
             response: {
                 text: await dialog(request.request.command, {
                     stemmer,
-                    persons
+                    characters
                 }),
                 end_session: false
             },

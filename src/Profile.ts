@@ -1,4 +1,4 @@
 export type Person = {
-    nom: string
-    creat: string
+    nominative: string
+    accusative: string
 }

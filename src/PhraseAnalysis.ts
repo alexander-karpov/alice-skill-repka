@@ -21,6 +21,10 @@ export default class PhraseAnalysis {
         return new PhraseAnalysis([]);
     }
 
+    getAccusativeAsNomenative(): string {
+        return this.findLemmas(Gr.Accusative).join(' ')
+    }
+
     findNouns() {
         return this.findLemmas(Gr.Noun);
     }
@@ -145,5 +149,7 @@ export enum Gr {
     /**
      * Прошедшее
      */
-    Praet = 'прош'
+    Praet = 'прош',
+    /** Винительный падеж */
+    Accusative = 'вин'
 }

@@ -1,14 +1,97 @@
 import { spawn } from 'child_process';
-import PhraseAnalysis from './PhraseAnalysis';
 import { Readable, Writable } from 'stream';
+import { version } from 'punycode';
 
 //#region types
-export type Stemmer = (message: string) => Promise<PhraseAnalysis>;
+export type Stemmer = (message: string) => Promise<Token[]>;
 
 type PromiseResolvers = {
     resolve: (value: string) => void;
     reject: (reason: string) => void;
 };
+
+export type Token = {
+    analysis?: Lexeme[];
+    text: string;
+};
+
+export type Lexeme = { lex: string; gr: string };
+
+export enum Gr {
+    /**
+     * Прилагательное
+     */
+    A = 'A',
+    /**
+     * Наречие
+     */
+    ADV = 'ADV',
+    /**
+     * Местоименное наречие
+     */
+    ADVPRO = 'ADVPRO',
+    /**
+     * Числительное-прилагательное
+     */
+    ANUM = 'ANUM',
+    /**
+     * Местоимение-прилагательное
+     */
+    APRO = 'APRO',
+    /**
+     * Часть композита - сложного слова
+     */
+    COM = 'COM',
+    /**
+     * Союз
+     */
+    CONJ = 'CONJ',
+    /**
+     * Междометие
+     */
+    INTJ = 'INTJ',
+    /**
+     * Числительное
+     */
+    NUM = 'NUM',
+    /**
+     * Частица
+     */
+    PART = 'PART',
+    /**
+     * Предлог
+     */
+    PR = 'PR',
+    /**
+     * Существительное
+     */
+    Noun = 'S',
+    /**
+     * Местоимение-существительное
+     */
+    SPRO = 'SPRO',
+    /**
+     * Глагол
+     */
+    Verb = 'V',
+    /**
+     * Настоящее
+     */
+    Praes = 'наст',
+    /**
+     * Непрошедшее
+     */
+    Inpraes = 'непрош',
+    /**
+     * Прошедшее
+     */
+    Praet = 'прош',
+    /** Винительный падеж */
+    Accusative = 'вин',
+    Male = 'муж',
+    Famela = 'жен',
+    Neuter = 'сред'
+}
 //#endregion
 
 export function spawnMystem(): { stemmer: Stemmer; killStemmer: () => void } {
@@ -18,14 +101,12 @@ export function spawnMystem(): { stemmer: Stemmer; killStemmer: () => void } {
     const mystem = spawn('mystem', ['--format=json', '-ig', '-c']);
     const queue = ReadWriteStreamsQueue.create(mystem.stdin, mystem.stdout, mystem.stderr);
 
-    function stemmer(message: string): Promise<PhraseAnalysis> {
+    function stemmer(message: string): Promise<Token[]> {
         if (!message) {
-            return Promise.resolve(PhraseAnalysis.createEmpty());
+            return Promise.resolve([]);
         }
 
-        return queue
-            .process(message + '\n')
-            .then(output => PhraseAnalysis.create(JSON.parse(output)));
+        return queue.process(message + '\n').then<Token[]>(output => JSON.parse(output));
     }
 
     function killStemmer() {

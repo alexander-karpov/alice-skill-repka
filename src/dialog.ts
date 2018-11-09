@@ -1,36 +1,63 @@
 import * as _ from 'lodash';
 import { Stemmer } from './stemmer';
-import { Person } from './Profile';
+import { Character, isCharMale, isCharFamela } from './character';
+import { extractCharacter, createDedka } from './extractCharacter';
 
 //#region types
 export type DialogContext = {
     stemmer: Stemmer;
-    persons: Person[];
+    characters: Character[];
 };
 //#endregion
 
-
-export async function dialog(command: string, { stemmer, persons }: DialogContext) {
+export async function dialog(command: string, { stemmer, characters }: DialogContext) {
     const tokens = await stemmer(command);
-    const [newPersonNom] = tokens.findNouns();
-    const lastPerson = _.last(persons);
+    const newCharacter = extractCharacter(tokens);
+    const lastCharacter = _.last(characters);
 
-    if (!lastPerson) {
-        persons.push({ nom: 'дедка', creat: 'дедку' })
+    if (!lastCharacter) {
+        characters.push(createDedka());
         return 'Посадил дед репку. Выросла репка большая-пребольшая. Стал дед репку из земли тянуть. Тянет-потянет, вытянуть не может. Позвал дед... Кого?';
     }
 
-    if (!newPersonNom) {
-        return `Позвал ${lastPerson.nom}... Кого?`
+    if (!newCharacter) {
+        return `Позвал ${lastCharacter.noun.nominative}... Кого?`;
     }
 
-    persons.push({ nom: newPersonNom, creat: command.toLowerCase() })
+    characters.push(newCharacter);
+    return `${makeStory(characters)} ${makeStoryEnd(newCharacter, characters)}`;
+}
 
-    const pull: string[] = [];
-    _.reduceRight(persons, (who, pullWho) => {
-        pull.push(`${who.nom} за ${pullWho.creat},`);
-        return pullWho;
-    })
+function makeStory(characters: Character[]): string {
+    const story = _.reverse(toPairs(characters))
+        .map(pair => `${pair[1].noun.nominative} за ${pair[0].noun.accusative}`)
+        .join(', ');
 
-    return _.capitalize(pull.join(' ')) + ' дедка за репку — тянут-потянут, вытянуть не могут.';
+    return `${_.capitalize(story)}, дедка за репку — тянут-потянут,`;
+}
+
+function toPairs(characters: Character[]): [Character, Character][] {
+    const [first, ...rest] = characters;
+
+    if (!rest.length) {
+        return [];
+    }
+
+    return [[first, rest[0]], ...toPairs(rest)];
+}
+
+function makeStoryEnd(last: Character, characters: Character[]) {
+    const isLastMouse = last.noun.nominative === 'мышка';
+    const tooManyCharacters = characters.length === 10;
+
+    if (isLastMouse || tooManyCharacters) {
+        return '— вытянули репку!';
+    }
+
+    return `вытянуть не могут. ${makeCall(last)}`;
+}
+
+function makeCall(char: Character) {
+    const callWord = isCharMale(char) ? 'Позвал' : isCharFamela(char) ? 'Позвала' : 'Позвало';
+    return `${callWord} ${char.noun.nominative}...`;
 }
