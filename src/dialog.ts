@@ -48,7 +48,7 @@ function toPairs(characters: Character[]): [Character, Character][] {
 
 function makeStoryEnd(last: Character, characters: Character[]) {
     const isLastMouse = last.noun.nominative === 'мышка';
-    const tooManyCharacters = characters.length === 10;
+    const tooManyCharacters = characters.length >= 10;
 
     if (isLastMouse || tooManyCharacters) {
         return '— вытянули репку!';

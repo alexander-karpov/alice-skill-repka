@@ -6,7 +6,8 @@ type LexemeEx = Lexeme & { text: string };
 
 export function extractCharacter(tokens: Token[]): Character | undefined {
     const lexemes = tokensToLexemesEx(tokens);
-    const [nounAccusative] = filterLexemes(lexemes, [Gr.Noun, Gr.Accusative]);
+    const sorted = sortLexemes(lexemes, Gr.Animated);
+    const [nounAccusative] = filterLexemes(sorted, [Gr.Noun, Gr.Accusative]);
 
     if (!nounAccusative) {
         // Нет существительных в винительном падеже
@@ -37,6 +38,15 @@ export function createDedka(): Character {
 
 function filterLexemes(lexemes: LexemeEx[], grs: Gr[]): LexemeEx[] {
     return lexemes.filter(lex => grs.every(gr => lex.gr.includes(gr)));
+}
+
+function sortLexemes(lexemes: LexemeEx[], gr: Gr): LexemeEx[] {
+    return lexemes.slice().sort((a, b) => {
+        const isAIncludes = a.gr.includes(gr);
+        const isBIncludes = b.gr.includes(gr);
+
+        return Number(isBIncludes) - Number(isAIncludes);
+    });
 }
 
 function tokensToLexemesEx(tokens: Token[]): LexemeEx[] {

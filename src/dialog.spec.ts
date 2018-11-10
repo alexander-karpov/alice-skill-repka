@@ -61,6 +61,11 @@ test('Сохраняет первого названного героя', async 
     expect(await dialog('Дракона и бабку', ctx)).toMatch('Дракон за дедку');
 });
 
+test('Предпочтение одушевленным', async () => {
+    await dialog('', ctx);
+    expect(await dialog('Серёжку', ctx)).toMatch('Позвал сережка');
+});
+
 beforeEach(() => {
     ctx = { stemmer, characters: [] };
 });

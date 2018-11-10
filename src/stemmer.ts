@@ -89,7 +89,9 @@ export enum Gr {
     Accusative = 'вин',
     Male = 'муж',
     Famela = 'жен',
-    Neuter = 'сред'
+    Neuter = 'сред',
+    /** Одушевленное */
+    Animated = ',од'
 }
 //#endregion
 
