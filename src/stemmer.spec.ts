@@ -1,20 +1,5 @@
-import { spawnMystem, ReadWriteStreamsQueue } from './stemmer';
+import { ReadWriteStreamsQueue } from './stemmer';
 import { EventEmitter } from 'events';
-
-describe('Stemmer', () => {
-    const { stemmer, killStemmer } = spawnMystem();
-
-    test('возвращает основу слова', async () => {
-        const tokens = await stemmer('на дворе 42');
-
-        // expect(tokens.find(t => t.text === 'дворе')).toBe(true);
-        // expect(tokens.hasNumber()).toBe(true);
-    });
-
-    afterAll(() => {
-        killStemmer();
-    });
-});
 
 describe('ReadWriteStreamsQueue', () => {
     function createQueue() {
@@ -22,7 +7,7 @@ describe('ReadWriteStreamsQueue', () => {
         const errors = new EventEmitter();
 
         const queue = ReadWriteStreamsQueue.create(
-            { write() { } } as any,
+            { write() {} } as any,
             output as any,
             errors as any
         );

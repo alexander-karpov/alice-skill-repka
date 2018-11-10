@@ -73,11 +73,11 @@ export function startServer(handleRequest: RequestHandler, handleCLose: () => vo
             return console.log('Ошибка при старте сервера', err);
         }
 
-        console.log(`Alice MyCalories server is listening on ${SERVER_POST}`);
+        console.log(`Alice Repka server is listening on ${SERVER_POST}`);
     });
 
     server.on('close', () => {
-        console.log(`Alice Kolobok server is closing...`);
+        console.log(`Alice Repka server is closing...`);
         handleCLose();
     });
 

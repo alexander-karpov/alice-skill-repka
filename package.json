@@ -1,4 +1,7 @@
 {
+  "name": "alice-skill-repka",
+  "version": "0.1.0",
+  "main": "dist/index.js",
   "scripts": {
     "start": "nodemon --watch dist dist/index.js",
     "build": "rm -rf ./dist && tsc",

@@ -1,6 +1,5 @@
 import { spawn } from 'child_process';
 import { Readable, Writable } from 'stream';
-import { version } from 'punycode';
 
 //#region types
 export type Stemmer = (message: string) => Promise<Token[]>;
@@ -98,7 +97,7 @@ export function spawnMystem(): { stemmer: Stemmer; killStemmer: () => void } {
     /**
      * @see https://tech.yandex.ru/mystem/doc/
      */
-    const mystem = spawn('mystem', ['--format=json', '-ig', '-c']);
+    const mystem = spawn('mystem', ['--format=json', '-ig', '-c'], { detached: true });
     const queue = ReadWriteStreamsQueue.create(mystem.stdin, mystem.stdout, mystem.stderr);
 
     function stemmer(message: string): Promise<Token[]> {
