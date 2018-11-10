@@ -51,25 +51,34 @@ test('Средний род зовет на помошь', async () => {
     expect(await dialog('Чудище', ctx)).toMatch('Позвало чудище...');
 });
 
-test('[Дракон] за дедку', async () => {
-    await dialog('', ctx);
-
-    expect(await dialog('Страшного дракона', ctx)).toMatch('Дракон за дедку');
-});
-
 test('Сохраняет только героя в творительном падеже', async () => {
     await dialog('', ctx);
     expect(await dialog('Бутылка стола дракона', ctx)).toMatch('Дракон за дедку');
 });
 
-test('Сохраняет первого названного героя', async () => {
+test('Из двух предпочитает последнего', async () => {
     await dialog('', ctx);
-    expect(await dialog('Дракона и бабку', ctx)).toMatch('Дракон за дедку');
+    expect(await dialog('Дракона и бабку', ctx)).toMatch('Позвала бабка...');
 });
 
 test('Предпочтение одушевленным', async () => {
     await dialog('', ctx);
     expect(await dialog('Серёжку', ctx)).toMatch('Позвал сережка');
+});
+
+test('Не пропускает множественное число', async () => {
+    await dialog('', ctx);
+    expect(await dialog('Братьев', ctx)).toMatch('Позвал дедка...');
+});
+
+test('Сохраняет сказуемое', async () => {
+    await dialog('', ctx);
+    expect(await dialog('Маленького котёнка', ctx)).toMatch('Маленький котенок за дедку');
+});
+
+test('Не добавляет сказуемое, если оно совпадает с подлежащим', async () => {
+    await dialog('', ctx);
+    expect(await dialog('Маленького', ctx)).toMatch('Маленький за дедку');
 });
 
 beforeEach(() => {

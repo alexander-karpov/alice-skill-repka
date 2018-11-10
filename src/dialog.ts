@@ -1,7 +1,13 @@
 import * as _ from 'lodash';
 import { Stemmer } from './stemmer';
-import { Character, isCharMale, isCharFamela } from './character';
 import { extractCharacter, createDedka } from './extractCharacter';
+import {
+    Character,
+    isCharMale,
+    isCharFamela,
+    formatCharNominative,
+    formatCharAccusative
+} from './character';
 
 //#region types
 export type DialogContext = {
@@ -21,7 +27,7 @@ export async function dialog(command: string, { stemmer, characters }: DialogCon
     }
 
     if (!nextChar) {
-        return `Позвал ${currentChar.noun.nominative}... Кого?`;
+        return `Позвал ${formatCharNominative(currentChar)}... Кого?`;
     }
 
     characters.push(nextChar);
@@ -40,7 +46,7 @@ export async function dialog(command: string, { stemmer, characters }: DialogCon
 
 function formatStory(characters: Character[]): string {
     const story = _.reverse(toPairs(characters))
-        .map(pair => `${pair[1].noun.nominative} за ${pair[0].noun.accusative}`)
+        .map(pair => `${formatCharNominative(pair[1])} за ${formatCharAccusative(pair[0])}`)
         .join(', ');
 
     return `${_.capitalize(story)}, дедка за репку — тянут-потянут,`;
@@ -57,12 +63,15 @@ function toPairs(characters: Character[]): [Character, Character][] {
 }
 
 function formatCall(char: Character) {
-    const callWord = isCharMale(char) ? 'Позвал' : isCharFamela(char) ? 'Позвала' : 'Позвало';
-    return `${callWord} ${char.noun.nominative}...`;
+    return _.capitalize(`${formatCallWord(char)} ${formatCharNominative(char)}...`);
 }
 
 function isStoryOver(char: Character, characters: Character[]) {
     const isLastMouse = char.noun.nominative === 'мышка';
     const tooManyCharacters = characters.length >= 10;
     return isLastMouse || tooManyCharacters;
+}
+
+function formatCallWord(char: Character) {
+    return isCharMale(char) ? 'позвал' : isCharFamela(char) ? 'позвала' : 'позвало';
 }

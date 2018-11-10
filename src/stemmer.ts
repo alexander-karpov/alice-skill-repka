@@ -20,7 +20,7 @@ export enum Gr {
     /**
      * Прилагательное
      */
-    A = 'A',
+    Adjective = 'A',
     /**
      * Наречие
      */
@@ -86,7 +86,8 @@ export enum Gr {
      */
     Praet = 'прош',
     /** Винительный падеж */
-    Accusative = 'вин',
+    AccusativeSingle = 'вин,ед',
+    AccusativeMutliple = 'вин,мн',
     Male = 'муж',
     Famela = 'жен',
     Neuter = 'сред',
