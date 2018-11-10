@@ -12,23 +12,33 @@ export type DialogContext = {
 
 export async function dialog(command: string, { stemmer, characters }: DialogContext) {
     const tokens = await stemmer(command);
-    const newCharacter = extractCharacter(tokens);
-    const lastCharacter = _.last(characters);
+    const nextChar = extractCharacter(tokens);
+    const currentChar = _.last(characters);
 
-    if (!lastCharacter) {
+    if (!currentChar) {
         characters.push(createDedka());
         return 'Посадил дед репку. Выросла репка большая-пребольшая. Стал дед репку из земли тянуть. Тянет-потянет, вытянуть не может. Позвал дед... Кого?';
     }
 
-    if (!newCharacter) {
-        return `Позвал ${lastCharacter.noun.nominative}... Кого?`;
+    if (!nextChar) {
+        return `Позвал ${currentChar.noun.nominative}... Кого?`;
     }
 
-    characters.push(newCharacter);
-    return `${makeStory(characters)} ${makeStoryEnd(newCharacter, characters)}`;
+    characters.push(nextChar);
+
+    const story = [formatStory(characters)];
+
+    if (isStoryOver(nextChar, characters)) {
+        story.push('— вытянули репку! Какая интересная сказка. Хочешь послушать снова?');
+        characters.length = 0;
+    } else {
+        story.push(`вытянуть не могут. ${formatCall(nextChar)}`);
+    }
+
+    return story.join(' ');
 }
 
-function makeStory(characters: Character[]): string {
+function formatStory(characters: Character[]): string {
     const story = _.reverse(toPairs(characters))
         .map(pair => `${pair[1].noun.nominative} за ${pair[0].noun.accusative}`)
         .join(', ');
@@ -46,18 +56,13 @@ function toPairs(characters: Character[]): [Character, Character][] {
     return [[first, rest[0]], ...toPairs(rest)];
 }
 
-function makeStoryEnd(last: Character, characters: Character[]) {
-    const isLastMouse = last.noun.nominative === 'мышка';
-    const tooManyCharacters = characters.length >= 10;
-
-    if (isLastMouse || tooManyCharacters) {
-        return '— вытянули репку!';
-    }
-
-    return `вытянуть не могут. ${makeCall(last)}`;
-}
-
-function makeCall(char: Character) {
+function formatCall(char: Character) {
     const callWord = isCharMale(char) ? 'Позвал' : isCharFamela(char) ? 'Позвала' : 'Позвало';
     return `${callWord} ${char.noun.nominative}...`;
+}
+
+function isStoryOver(char: Character, characters: Character[]) {
+    const isLastMouse = char.noun.nominative === 'мышка';
+    const tooManyCharacters = characters.length >= 10;
+    return isLastMouse || tooManyCharacters;
 }

@@ -30,6 +30,12 @@ test('Классическая сказка: конец [позвали мышк
     );
 });
 
+test('Повторное начало истории', async () => {
+    await dialog('', ctx);
+    expect(await dialog('Мышку', ctx)).toMatch('— вытянули репку!');
+    expect(await dialog('Да', ctx)).toMatch('Посадил дед репку');
+});
+
 test('Мужской род зовет на помошь', async () => {
     await dialog('', ctx);
     expect(await dialog('Дракона', ctx)).toMatch('Позвал дракон...');
