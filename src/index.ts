@@ -3,7 +3,7 @@ import { dialog } from './dialog';
 import { spawnMystem } from './stemmer';
 import { Character } from './character';
 
-export function startSkillServer() {
+export function startSkillServer({ port }) {
     const { stemmer, killStemmer } = spawnMystem();
     const userData: { [sessionKey: string]: Character[] } = {};
 
@@ -31,6 +31,7 @@ export function startSkillServer() {
                 version: request.version
             };
         },
-        () => killStemmer()
+        () => killStemmer(),
+        { port }
     );
 }

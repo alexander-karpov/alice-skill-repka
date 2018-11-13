@@ -41,9 +41,7 @@ export type WebhookResponse = {
 };
 //#endregion
 
-const SERVER_POST = 1234;
-
-export function startServer(handleRequest: RequestHandler, handleCLose: () => void) {
+export function startServer(handleRequest: RequestHandler, handleCLose: () => void, { port }) {
     const server = http.createServer((request, response) => {
         if (request.method !== 'POST') {
             response.writeHead(200);
@@ -68,12 +66,12 @@ export function startServer(handleRequest: RequestHandler, handleCLose: () => vo
         });
     });
 
-    server.listen(SERVER_POST, err => {
+    server.listen(port, err => {
         if (err) {
             return console.log('Ошибка при старте сервера', err);
         }
 
-        console.log(`Alice Repka server is listening on ${SERVER_POST}`);
+        console.log(`Alice Repka server is listening on ${port}`);
     });
 
     server.on('close', () => {
