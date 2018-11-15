@@ -14,10 +14,10 @@ export function startSkillServer({ port }) {
             const sessionKey = `${userId}-${sessionId}`;
 
             if (!userData[sessionKey]) {
-                userData[userId] = [];
+                userData[sessionKey] = [];
             }
 
-            const characters = userData[userId];
+            const characters = userData[sessionKey];
 
             return {
                 response: {
