@@ -86,13 +86,14 @@ export enum Gr {
      */
     Praet = 'прош',
     /** Винительный падеж */
-    AccusativeSingle = 'вин,ед',
-    AccusativeMutliple = 'вин,мн',
+    Accusative = 'вин',
+    Single = 'ед',
+    Mutliple = 'мн',
     Male = 'муж',
     Famela = 'жен',
     Neuter = 'сред',
     /** Одушевленное */
-    Animated = ',од'
+    Animated = 'од'
 }
 //#endregion
 

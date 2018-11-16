@@ -15,6 +15,9 @@ export type WebhookRequest = {
         markup: {
             dangerous_context: boolean;
         };
+        nlu: {
+            tokens: string[]; // Массив слов из произнесенной пользователем фразы.
+        };
     };
     session: {
         new: boolean; // пользователь начал новый разговор с навыком;

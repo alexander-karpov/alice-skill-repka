@@ -10,5 +10,5 @@
 ```
 
 ```
-const { startSkillSerter({ port: 1234 }) } = require('alice-skill-repka');
+const { startSkillServer({ port: 1234 }) } = require('alice-skill-repka');
 ```

@@ -1,31 +1,27 @@
-import { startServer } from './server';
-import { dialog } from './dialog';
+import { startServer, WebhookRequest } from './server';
+import { mainDialog } from './dialog';
 import { spawnMystem } from './stemmer';
-import { Character } from './character';
+import { SessionData, createSessionData } from './sessionData';
 
 export function startSkillServer({ port }) {
     const { stemmer, killStemmer } = spawnMystem();
-    const userData: { [sessionKey: string]: Character[] } = {};
+    const userData: { [sessionKey: string]: SessionData } = {};
 
     startServer(
         async request => {
-            const sessionId = request.session.session_id;
-            const userId = request.session.user_id;
-            const sessionKey = `${userId}-${sessionId}`;
+            const sessionKey = createSessionKey(request);
 
             if (!userData[sessionKey]) {
-                userData[sessionKey] = [];
+                userData[sessionKey] = createSessionData();
             }
 
-            const characters = userData[sessionKey];
+            const sessionData = userData[sessionKey];
+            const answer = await mainDialog(request.request.nlu.tokens, sessionData, { stemmer });
 
             return {
                 response: {
-                    text: await dialog(request.request.command, {
-                        stemmer,
-                        characters
-                    }),
-                    end_session: false
+                    text: answer.text,
+                    end_session: answer.endSession
                 },
                 session: request.session,
                 version: request.version
@@ -34,4 +30,10 @@ export function startSkillServer({ port }) {
         () => killStemmer(),
         { port }
     );
+}
+
+function createSessionKey(request: WebhookRequest) {
+    const sessionId = request.session.session_id;
+    const userId = request.session.user_id;
+    return `${userId}-${sessionId}`;
 }

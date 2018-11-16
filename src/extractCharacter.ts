@@ -6,10 +6,10 @@ type LexemeEx = Lexeme & { text: string };
 
 export function extractCharacter(tokens: Token[]): Character | undefined {
     const lexemes = tokensToLexemesEx(tokens);
+    const adjectives = filterLexemes(lexemes, [Gr.Adjective]);
     const animated = filterLexemes(lexemes, [Gr.Animated]);
     const nouns = filterLexemes(animated, [Gr.Noun]);
-    const adjectives = filterLexemes(animated, [Gr.Adjective]);
-    const [nounAccusative] = filterLexemes(_.reverse(nouns), [Gr.AccusativeSingle]);
+    const [nounAccusative] = filterLexemes(_.reverse(nouns), [Gr.Accusative, Gr.Single]);
 
     if (!nounAccusative) {
         return undefined;
@@ -26,7 +26,7 @@ export function extractCharacter(tokens: Token[]): Character | undefined {
 
 export function extractMultipleChars(tokens: Token[]): MultipleCharacters | undefined {
     const lexemes = tokensToLexemesEx(tokens);
-    const [noun] = filterLexemes(lexemes, [Gr.Noun, Gr.AccusativeMutliple]);
+    const [noun] = filterLexemes(lexemes, [Gr.Noun, Gr.Accusative, Gr.Mutliple]);
 
     if (!noun) {
         return undefined;
@@ -34,14 +34,7 @@ export function extractMultipleChars(tokens: Token[]): MultipleCharacters | unde
 
     return {
         nominativeSingle: noun.lex,
-        accusativeMutliple: noun.text
-    };
-}
-
-function lexemeToWord(lexeme: LexemeEx): Word {
-    return {
-        nominative: lexeme.lex,
-        accusative: lexeme.text
+        accusativeMutliple: cleanWord(noun.text)
     };
 }
 
@@ -53,18 +46,41 @@ export function createDedka(): Character {
     };
 }
 
-function filterLexemes(lexemes: LexemeEx[], grs: Gr[]): LexemeEx[] {
-    return lexemes.filter(lex => grs.every(gr => lex.gr.includes(gr)));
+function lexemeToWord(lexeme: LexemeEx): Word {
+    const accusative = cleanWord(lexeme.text);
+
+    // Для прилагательных женского рода нужно
+    // сохранять род в имен.падеже (стеммер приводит к муж.роду)
+    if (matchGrs(lexeme.gr, [Gr.Adjective, Gr.Famela])) {
+        return {
+            nominative: adjAcusativeToNomenative(accusative),
+            accusative
+        };
+    }
+
+    return {
+        nominative: lexeme.lex,
+        accusative
+    };
 }
 
-// function sortLexemes(lexemes: LexemeEx[], gr: Gr): LexemeEx[] {
-//     return lexemes.slice().sort((a, b) => {
-//         const isAIncludes = a.gr.includes(gr);
-//         const isBIncludes = b.gr.includes(gr);
+/**
+ * Веняет вин род прилагательного в имен
+ * Чёрную -> черная
+ * @param adj Черный
+ */
+function adjAcusativeToNomenative(adj: string): string {
+    const change = end => `${adj.substring(0, adj.length - 2)}${end}`;
+    return adj.endsWith('ую') ? change('ая') : change('яя');
+}
 
-//         return Number(isBIncludes) - Number(isAIncludes);
-//     });
-// }
+function cleanWord(raw: string) {
+    return raw.toLowerCase().replace('ё', 'е');
+}
+
+function filterLexemes(lexemes: LexemeEx[], grs: Gr[]): LexemeEx[] {
+    return lexemes.filter(lex => matchGrs(lex.gr, grs));
+}
 
 function tokensToLexemesEx(tokens: Token[]): LexemeEx[] {
     const lexemesEx: LexemeEx[][] = tokens.map(token =>
@@ -84,4 +100,9 @@ function extractGender(lexeme: LexemeEx): Gender {
     }
 
     return Gender.Neuter;
+}
+
+function matchGrs(gr: string, pattern: Gr[]) {
+    const splitted = gr.split(/=|,|\||\(/);
+    return pattern.every(p => splitted.includes(p));
 }
