@@ -66,11 +66,6 @@ describe('Story dialog', () => {
         expect(await act('Серёжку')).toMatch('Позвал сережка');
     });
 
-    test('Не пропускает множественное число', async () => {
-        await act('');
-        expect(await act('Братьев')).toMatch('Позвал дедка...');
-    });
-
     test('Сохраняет сказуемое', async () => {
         await act('');
         expect(await act('Маленького котёнка')).toMatch('Маленький котенок за дедку');
@@ -81,6 +76,11 @@ describe('Story dialog', () => {
     test('Не добавляет сказуемое, если оно совпадает с подлежащим', async () => {
         await act('');
         expect(await act('Маленького')).toMatch('Маленький за дедку');
+    });
+
+    test('Уникальная фраза на множ. число', async () => {
+        await act('');
+        expect(await act('котят')).toMatch('по одному');
     });
 
     beforeEach(() => {
@@ -114,6 +114,21 @@ describe('Main dialog', () => {
         await act('');
         await act('котика');
         expect(await act('что ты умеешь')).toMatch('Кого котик позвал на помощь?');
+    });
+
+    test('Повтор истории: подтверждение', async () => {
+        await act('');
+        expect(await act('мышку')).toMatch('вытянули репку');
+        expect(await act('да')).toMatch('Посадил дед репку');
+    });
+
+    test('Повтор истории: отказ', async () => {
+        await act('');
+        expect(await act('мышку')).toMatch('вытянули репку');
+        const { text, endSession } = await mainDialog(['нет'], sessionData, deps);
+
+        expect(text).toMatch('конец');
+        expect(endSession).toEqual(true);
     });
 
     beforeEach(() => {

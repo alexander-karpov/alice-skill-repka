@@ -15,11 +15,6 @@ export type Character = {
     gender: Gender;
 };
 
-export type MultipleCharacters = {
-    nominativeSingle: string;
-    accusativeMutliple: string;
-};
-
 export function isCharMale(char: Character) {
     return char.gender === Gender.Male;
 }

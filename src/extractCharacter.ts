@@ -1,11 +1,8 @@
 import * as _ from 'lodash';
-import { Character, Word, Gender, MultipleCharacters } from './character';
-import { Token, Gr } from './stemmer';
+import { Character, Word, Gender } from './character';
+import { Lexeme, Gr, filterLexemes, matchGrs } from './stemmer';
 
-type LexemeEx = { lex: string; gr: string[]; text: string };
-
-export function extractCharacter(tokens: Token[]): Character | undefined {
-    const lexemes = tokensToLexemesEx(tokens);
+export function extractCharacter(lexemes: Lexeme[]): Character | undefined {
     const adjectives = filterLexemes(lexemes, [Gr.Adjective]);
     const animated = filterLexemes(lexemes, [Gr.Animated]);
     const nouns = filterLexemes(animated, [Gr.Noun]);
@@ -24,20 +21,6 @@ export function extractCharacter(tokens: Token[]): Character | undefined {
     };
 }
 
-export function extractMultipleChars(tokens: Token[]): MultipleCharacters | undefined {
-    const lexemes = tokensToLexemesEx(tokens);
-    const [noun] = filterLexemes(lexemes, [Gr.Noun, Gr.Accusative, Gr.Mutliple]);
-
-    if (!noun) {
-        return undefined;
-    }
-
-    return {
-        nominativeSingle: noun.lex,
-        accusativeMutliple: noun.text
-    };
-}
-
 export function createDedka(): Character {
     return {
         subject: { nominative: 'дедка', accusative: 'дедку' },
@@ -46,7 +29,7 @@ export function createDedka(): Character {
     };
 }
 
-function lexemeToWord(lexeme: LexemeEx): Word {
+function lexemeToWord(lexeme: Lexeme): Word {
     const accusative = lexeme.text;
 
     // Для прилагательных женского рода нужно
@@ -83,27 +66,7 @@ function attrAcusativeToNomenative(attr: string): string {
     return attr.endsWith('ую') ? change('ая') : change('яя');
 }
 
-function filterLexemes(lexemes: LexemeEx[], grs: Gr[]): LexemeEx[] {
-    return lexemes.filter(lex => matchGrs(lex.gr, grs));
-}
-
-function tokensToLexemesEx(tokens: Token[]): LexemeEx[] {
-    function clean(raw: string) {
-        return raw.toLowerCase().replace('ё', 'е');
-    }
-
-    const lexemesEx: LexemeEx[][] = tokens.map(token =>
-        (token.analysis || []).map(lex => ({
-            lex: lex.lex,
-            gr: lex.gr.split(/=|,|\||\(/),
-            text: clean(token.text)
-        }))
-    );
-
-    return _.flatten(lexemesEx);
-}
-
-function extractGender(lexeme: LexemeEx): Gender {
+function extractGender(lexeme: Lexeme): Gender {
     if (lexeme.gr.includes(Gr.Male)) {
         return Gender.Male;
     }
@@ -113,8 +76,4 @@ function extractGender(lexeme: LexemeEx): Gender {
     }
 
     return Gender.Neuter;
-}
-
-function matchGrs(gr: string[], pattern: Gr[]) {
-    return pattern.every(p => gr.includes(p));
 }

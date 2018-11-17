@@ -3,15 +3,27 @@ import { formatCharNominative, Character, isCharMale, isCharFamela } from './cha
 import { SessionData } from './sessionData';
 
 export function help(sessionData: SessionData) {
-    const char = _.last(sessionData.chars);
+    const called = whoCalled(sessionData);
     const about = 'Я рассказываю сказку про репку, а вы помогаете мне вспомнить персонажей.';
 
+    return `${about} ${called}`;
+}
+
+export function onlyOneCharMayCome(sessionData: SessionData) {
+    const answer = `Я точно помню, в этой сказке все приходили по одному.`;
+    const called = whoCalled(sessionData);
+
+    return `${answer} ${called}`;
+}
+
+export function whoCalled(sessionData: SessionData) {
+    const char = _.last(sessionData.chars);
+
     if (char) {
-        const call = `Кого ${formatCharNominative(char)} ${formatCallWord(char)} на помощь?`;
-        return `${about} ${call}`;
+        return `Кого ${formatCharNominative(char)} ${formatCallWord(char)} на помощь?`;
     }
 
-    return about;
+    return '';
 }
 
 function formatCallWord(char: Character) {

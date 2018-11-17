@@ -3,6 +3,7 @@ import { Stemmer } from './stemmer';
 import { extractCharacter, createDedka } from './extractCharacter';
 import { SessionData, Dialogs } from './sessionData';
 import * as answers from './answers';
+import { hasMultipleChars } from './intents';
 
 import {
     Character,
@@ -58,9 +59,13 @@ export async function storyDialog(
     { stemmer }: DialogDependencies
 ) {
     const { chars } = sessionData;
+    const lexemes = await stemmer(command);
 
-    const tokens = await stemmer(command);
-    const nextChar = extractCharacter(tokens);
+    if (hasMultipleChars(lexemes)) {
+        return answers.onlyOneCharMayCome(sessionData);
+    }
+
+    const nextChar = extractCharacter(lexemes);
     const currentChar = _.last(chars);
 
     if (!currentChar) {
