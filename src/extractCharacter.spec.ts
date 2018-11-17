@@ -15,30 +15,33 @@ describe('Extract character', () => {
 
     test('Всегда удаляет Ё (стеммер её удаляет)', async () => {
         const char = await act('Котёнка');
-        expect(char.noun.accusative).toEqual('котенка');
+        expect(char.subject.accusative).toEqual('котенка');
     });
 
     test('Прилагательное муж.', async () => {
         const char = await act('Белого котёнка');
-        expect(char.adjectives).toHaveLength(1);
+        expect(char.attributes).toHaveLength(1);
     });
 
     test('Прилагательное жен.', async () => {
         const char = await act('Чёрную кошечку');
-        expect(char.adjectives).toHaveLength(1);
+        expect(char.attributes).toHaveLength(1);
     });
 
     test('И - это не прилагательное.', async () => {
         const char = await act('И кошечку');
-        expect(char.adjectives).toHaveLength(0);
+        expect(char.attributes).toHaveLength(0);
     });
 
     test('Приводит прилагательное к роду существительного', async () => {
         const char = await act('Чёрную кошечку');
-        expect(char.adjectives.map(w => w.nominative)).toEqual(['черная']);
+        expect(char.attributes.map(w => w.nominative)).toEqual(['черная']);
 
         const char2 = await act('Мягкую черепашку');
-        expect(char2.adjectives.map(w => w.nominative)).toEqual(['мягкая']);
+        expect(char2.attributes.map(w => w.nominative)).toEqual(['мягкая']);
+
+        const char3 = await act('Страшное чудище');
+        expect(char3.attributes.map(w => w.nominative)).toEqual(['страшное']);
     });
 
     beforeAll(() => {

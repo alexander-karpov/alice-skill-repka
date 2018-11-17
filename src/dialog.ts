@@ -109,7 +109,7 @@ function formatCall(char: Character) {
 }
 
 function isStoryOver(char: Character, characters: Character[]) {
-    const isLastMouse = char.noun.nominative === 'мышка';
+    const isLastMouse = char.subject.nominative === 'мышка';
     const tooManyCharacters = characters.length >= 10;
     return isLastMouse || tooManyCharacters;
 }

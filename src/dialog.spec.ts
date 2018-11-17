@@ -73,8 +73,9 @@ describe('Story dialog', () => {
 
     test('Сохраняет сказуемое', async () => {
         await act('');
-        expect(await act('маленького котёнка')).toMatch('Маленький котенок за дедку');
+        expect(await act('Маленького котёнка')).toMatch('Маленький котенок за дедку');
         expect(await act('Старую бабку')).toMatch('Старая бабка за маленького котенка');
+        expect(await act('Страшное чудище')).toMatch('Страшное чудище за старую бабку');
     });
 
     test('Не добавляет сказуемое, если оно совпадает с подлежащим', async () => {
@@ -112,7 +113,7 @@ describe('Main dialog', () => {
     test('что ты умеешь / помошь (в ходе повествования)', async () => {
         await act('');
         await act('котика');
-        expect(await act('что ты умеешь')).toMatch('Кого позвал котик на помощь?');
+        expect(await act('что ты умеешь')).toMatch('Кого котик позвал на помощь?');
     });
 
     beforeEach(() => {

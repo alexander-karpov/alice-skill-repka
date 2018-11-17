@@ -10,8 +10,8 @@ export enum Gender {
 }
 
 export type Character = {
-    noun: Word;
-    adjectives: Word[];
+    subject: Word;
+    attributes: Word[];
     gender: Gender;
 };
 
@@ -29,11 +29,11 @@ export function isCharFamela(char: Character) {
 }
 
 export function formatCharNominative(char: Character) {
-    const adj = char.adjectives.map(a => a.nominative).join(' ');
-    return adj ? `${adj} ${char.noun.nominative}` : char.noun.nominative;
+    const adj = char.attributes.map(a => a.nominative).join(' ');
+    return adj ? `${adj} ${char.subject.nominative}` : char.subject.nominative;
 }
 
 export function formatCharAccusative(char: Character) {
-    const adj = char.adjectives.map(a => a.accusative).join(' ');
-    return adj ? `${adj} ${char.noun.accusative}` : char.noun.accusative;
+    const adj = char.attributes.map(a => a.accusative).join(' ');
+    return adj ? `${adj} ${char.subject.accusative}` : char.subject.accusative;
 }

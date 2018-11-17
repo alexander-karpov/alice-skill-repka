@@ -7,7 +7,7 @@ export function help(sessionData: SessionData) {
     const about = 'Я рассказываю сказку про репку, а вы помогаете мне вспомнить персонажей.';
 
     if (char) {
-        const call = `Кого ${formatCallWord(char)} ${formatCharNominative(char)} на помощь?`;
+        const call = `Кого ${formatCharNominative(char)} ${formatCallWord(char)} на помощь?`;
         return `${about} ${call}`;
     }
 
