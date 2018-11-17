@@ -1,4 +1,4 @@
-import { storyDialog, DialogDependencies } from './dialog';
+import { storyDialog, mainDialog, DialogDependencies } from './dialog';
 import { spawnMystem } from './stemmer';
 import { SessionData, createSessionData } from './sessionData';
 
@@ -80,6 +80,39 @@ describe('Story dialog', () => {
     test('Не добавляет сказуемое, если оно совпадает с подлежащим', async () => {
         await act('');
         expect(await act('Маленького')).toMatch('Маленький за дедку');
+    });
+
+    beforeEach(() => {
+        sessionData = createSessionData();
+    });
+
+    beforeAll(() => {
+        const spawned = spawnMystem();
+        deps = { stemmer: spawned.stemmer };
+        killStemmer = spawned.killStemmer;
+    });
+
+    afterAll(() => killStemmer());
+});
+
+describe('Main dialog', () => {
+    let killStemmer: () => void;
+    let deps: DialogDependencies;
+    let sessionData: SessionData;
+
+    async function act(command: string): Promise<string> {
+        const { text } = await mainDialog(command.split(' '), sessionData, deps);
+        return text;
+    }
+
+    test('что ты умеешь / помошь', async () => {
+        expect(await act('что ты умеешь')).toMatch('рассказываю сказку про репку');
+    });
+
+    test('что ты умеешь / помошь (в ходе повествования)', async () => {
+        await act('');
+        await act('котика');
+        expect(await act('что ты умеешь')).toMatch('Кого позвал котик на помощь?');
     });
 
     beforeEach(() => {

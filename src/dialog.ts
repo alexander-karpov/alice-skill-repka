@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import { Stemmer } from './stemmer';
 import { extractCharacter, createDedka } from './extractCharacter';
 import { SessionData, Dialogs } from './sessionData';
+import * as answers from './answers';
 
 import {
     Character,
@@ -27,6 +28,12 @@ export async function mainDialog(
     sessionData: SessionData,
     deps: DialogDependencies
 ): Promise<DialogResult> {
+    const commandText = command.join(' ');
+
+    if (commandText === 'что ты умеешь' || commandText === 'помошь') {
+        return { text: answers.help(sessionData), endSession: false };
+    }
+
     if (sessionData.currentDialog === Dialogs.RepeatQuestion) {
         const [firstToken, secondToken] = command;
 
