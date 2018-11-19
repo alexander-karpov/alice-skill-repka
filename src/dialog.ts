@@ -75,7 +75,7 @@ export async function storyDialog(
     }
 
     if (!nextChar) {
-        return `Позвал ${formatCharNominative(currentChar)}... Кого?`;
+        return answers.whoCalled(sessionData);
     }
 
     chars.push(nextChar);

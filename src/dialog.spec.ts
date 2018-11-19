@@ -83,6 +83,18 @@ describe('Story dialog', () => {
         expect(await act('котят')).toMatch('по одному');
     });
 
+    test('Правильно склоняет фразу переспрашивания героя', async () => {
+        await act('');
+        await act('внука');
+        expect(await act('ракета')).toMatch('Кого внук позвал');
+
+        await act('Бабку');
+        expect(await act('ракета')).toMatch('Кого бабка позвала');
+
+        await act('чудище');
+        expect(await act('ракета')).toMatch('Кого чудище позвало');
+    });
+
     beforeEach(() => {
         sessionData = createSessionData();
     });
