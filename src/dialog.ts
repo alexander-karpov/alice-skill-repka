@@ -75,7 +75,7 @@ export async function storyDialog(
     }
 
     if (!nextChar) {
-        return answers.whoCalled(sessionData);
+        return `Это не похоже на персонажа сказки. ${answers.whoCalled(sessionData)}`;
     }
 
     chars.push(nextChar);
