@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import { startServer, WebhookRequest } from './server';
 import { mainDialog } from './dialog';
 import { spawnMystem } from './stemmer';
@@ -9,6 +10,7 @@ export function startSkillServer({ port }) {
 
     startServer(
         async request => {
+            const random100 = _.random(100, false);
             const sessionKey = createSessionKey(request);
 
             if (!userData[sessionKey]) {
@@ -16,7 +18,10 @@ export function startSkillServer({ port }) {
             }
 
             const sessionData = userData[sessionKey];
-            const answer = await mainDialog(request.request.nlu.tokens, sessionData, { stemmer });
+            const answer = await mainDialog(request.request.nlu.tokens, sessionData, {
+                stemmer,
+                random100
+            });
 
             return {
                 response: {

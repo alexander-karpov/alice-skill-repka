@@ -16,6 +16,7 @@ import {
 //#region types
 export type DialogDependencies = {
     stemmer: Stemmer;
+    random100: number;
 };
 
 export type DialogResult = {
@@ -56,7 +57,7 @@ export async function mainDialog(
 export async function storyDialog(
     command: string,
     sessionData: SessionData,
-    { stemmer }: DialogDependencies
+    { stemmer, random100 }: DialogDependencies
 ) {
     const { chars } = sessionData;
     const lexemes = await stemmer(command);
@@ -70,7 +71,7 @@ export async function storyDialog(
 
     if (!currentChar) {
         chars.push(createDedka());
-        return 'Посадил дед репку. Выросла репка большая-пребольшая. Стал дед репку из земли тянуть. Тянет-потянет, вытянуть не может. Позвал дед... Кого?';
+        return answers.storyBegin(random100);
     }
 
     if (!nextChar) {

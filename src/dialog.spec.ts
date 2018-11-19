@@ -12,7 +12,7 @@ describe('Story dialog', () => {
     }
 
     test('Классическая сказка: история', async () => {
-        expect(await act('')).toMatch('Посадил дед репку');
+        expect(await act('')).toMatch('осадил дед репку');
     });
 
     test('Классическая сказка: история', async () => {
@@ -89,7 +89,7 @@ describe('Story dialog', () => {
 
     beforeAll(() => {
         const spawned = spawnMystem();
-        deps = { stemmer: spawned.stemmer };
+        deps = { stemmer: spawned.stemmer, random100: 0 };
         killStemmer = spawned.killStemmer;
     });
 
@@ -119,7 +119,7 @@ describe('Main dialog', () => {
     test('Повтор истории: подтверждение', async () => {
         await act('');
         expect(await act('мышку')).toMatch('вытянули репку');
-        expect(await act('да')).toMatch('Посадил дед репку');
+        expect(await act('да')).toMatch('осадил дед репку');
     });
 
     test('Повтор истории: отказ', async () => {
@@ -137,7 +137,7 @@ describe('Main dialog', () => {
 
     beforeAll(() => {
         const spawned = spawnMystem();
-        deps = { stemmer: spawned.stemmer };
+        deps = { stemmer: spawned.stemmer, random100: 0 };
         killStemmer = spawned.killStemmer;
     });
 

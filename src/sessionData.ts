@@ -10,10 +10,9 @@ export type SessionData = {
     currentDialog: Dialogs;
 };
 
-export function createSessionData() {
+export function createSessionData(): SessionData {
     return {
         chars: [],
-        currentDialog: Dialogs.Story,
-        isExitRequested: false
+        currentDialog: Dialogs.Story
     };
 }
