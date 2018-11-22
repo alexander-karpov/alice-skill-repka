@@ -69,12 +69,13 @@ export async function storyDialog(
     const nextChar = extractCharacter(lexemes);
     const currentChar = _.last(chars);
 
-    if (sessionData.isNewSession) {
-        return `${answers.intro(random100)} ${answers.storyBegin(random100)}`;
-    }
-
     if (!currentChar) {
         chars.push(createDedka());
+    }
+
+    if (sessionData.isNewSession) {
+        return `${answers.intro(random100)} ${answers.storyBegin(random100)}`;
+    } else if (!currentChar) {
         return answers.storyBegin(random100);
     }
 

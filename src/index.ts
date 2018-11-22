@@ -20,8 +20,6 @@ export function startSkillServer({ port }) {
             const sessionData = userData[sessionKey];
             sessionData.isNewSession = request.session.new;
 
-            console.log(request.request.nlu.tokens.join(' '));
-
             const answer = await mainDialog(request.request.nlu.tokens, sessionData, {
                 stemmer,
                 random100
