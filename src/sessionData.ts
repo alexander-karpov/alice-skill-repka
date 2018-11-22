@@ -8,11 +8,13 @@ export enum Dialogs {
 export type SessionData = {
     chars: Character[];
     currentDialog: Dialogs;
+    isNewSession: boolean;
 };
 
 export function createSessionData(): SessionData {
     return {
         chars: [],
-        currentDialog: Dialogs.Story
+        currentDialog: Dialogs.Story,
+        isNewSession: false
     };
 }

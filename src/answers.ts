@@ -1,11 +1,14 @@
 import * as _ from 'lodash';
 import { formatCharNominative, Character, isCharMale, isCharFamela } from './character';
 import { SessionData } from './sessionData';
+import { sample } from './utils';
 
-const ABOUT_GROWING =
+const REPKA_GROWING =
     'Выросла репка большая-пребольшая. Стал дед репку из земли тянуть. Тянет-потянет, вытянуть не может. Позвал дед... Кого?';
 
 const GRANTFATHER_PLANT_LOW = 'посадил дед репку';
+const ABOUT_SKILL =
+    'Я рассказываю сказку про репку, а вы называете персонажей. Помогите дедке вытянуть репку.';
 
 export function storyBegin(random100: number) {
     const cases = [
@@ -23,14 +26,17 @@ export function storyBegin(random100: number) {
         `${_.capitalize(GRANTFATHER_PLANT_LOW)}.`
     ];
 
-    return `${cases[random100 % cases.length]} ${ABOUT_GROWING}`;
+    return `${sample(cases, random100)} ${REPKA_GROWING}`;
+}
+
+export function intro(random100: number) {
+    const beforeAbout = ['Хорошо.', 'Давайте.', 'С удовольствием!'];
+    return `${sample(beforeAbout, random100)} ${ABOUT_SKILL}`;
 }
 
 export function help(sessionData: SessionData) {
     const called = whoCalled(sessionData);
-    const about = 'Я рассказываю сказку про репку, а вы помогаете мне вспомнить персонажей.';
-
-    return `${about} ${called}`;
+    return `${ABOUT_SKILL} ${called}`;
 }
 
 export function onlyOneCharMayCome(sessionData: SessionData) {
