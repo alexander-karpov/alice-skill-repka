@@ -32,7 +32,7 @@ export async function mainDialog(
 ): Promise<DialogResult> {
     const commandText = command.join(' ');
 
-    if (commandText === 'что ты умеешь' || commandText === 'помошь') {
+    if (commandText === 'что ты умеешь' || commandText === 'помощь') {
         return { text: answers.help(sessionData), endSession: false };
     }
 
