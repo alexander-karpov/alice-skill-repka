@@ -2,16 +2,20 @@ import * as _ from 'lodash';
 import { startServer, WebhookRequest } from './server';
 import { mainDialog } from './dialog';
 import { spawnMystem } from './stemmer';
+import { openLogFile, appendToLog, closeLogFile } from './logger';
 import { SessionData, createSessionData } from './sessionData';
 
-export function startSkillServer({ port }) {
+export function startSkillServer({ port, logsDir }: { port: number; logsDir: string }) {
     const { stemmer, killStemmer } = spawnMystem();
+    const logFile = openLogFile(logsDir);
     const userData: { [sessionKey: string]: SessionData } = {};
 
     startServer(
         async request => {
             const random100 = _.random(100, false);
             const sessionKey = createSessionKey(request);
+
+            appendToLog(logFile, request.request.nlu.tokens.join(' '));
 
             if (!userData[sessionKey]) {
                 userData[sessionKey] = createSessionData();
@@ -34,7 +38,10 @@ export function startSkillServer({ port }) {
                 version: request.version
             };
         },
-        () => killStemmer(),
+        () => {
+            killStemmer();
+            closeLogFile(logFile);
+        },
         { port }
     );
 }
