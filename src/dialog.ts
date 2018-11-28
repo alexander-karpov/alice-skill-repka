@@ -75,12 +75,14 @@ export async function storyDialog(
 
     if (sessionData.isNewSession) {
         return `${answers.intro(random100)} ${answers.storyBegin(random100)}`;
-    } else if (!currentChar) {
+    }
+
+    if (!currentChar) {
         return answers.storyBegin(random100);
     }
 
     if (!nextChar) {
-        return `Это не похоже на персонажа сказки. ${answers.whoCalled(sessionData)}`;
+        return `Это не похоже на персонажа. ${answers.help(sessionData)}`;
     }
 
     chars.push(nextChar);

@@ -59,13 +59,17 @@ export function startServer(handleRequest: RequestHandler, handleCLose: () => vo
         });
 
         request.on('end', () => {
-            const json = JSON.parse(body);
-
-            handleRequest(json).then(reply => {
-                response.setHeader('Content-Type', 'application/json');
-                response.writeHead(200);
-                response.end(JSON.stringify(reply));
-            });
+            try {
+                handleRequest(JSON.parse(body)).then(reply => {
+                    response.setHeader('Content-Type', 'application/json');
+                    response.writeHead(200);
+                    response.end(JSON.stringify(reply));
+                });
+            } catch (error) {
+                console.log(`${new Date().toISOString()} Ошибка парсинга запроса.`, error);
+                response.writeHead(400);
+                response.end('400 Bad request');
+            }
         });
     });
 
