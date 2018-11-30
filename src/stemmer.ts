@@ -17,7 +17,7 @@ type Token = {
 
 type TokenLexeme = { lex: string; gr: string };
 
-export type Lexeme = { lex: string; gr: Gr[]; text: string };
+export type Lexeme = { lex: string; gr: Gr[] };
 
 export enum Gr {
     /**
@@ -180,15 +180,10 @@ export class ReadWriteStreamsQueue {
  * @param tokens
  */
 function tokensToLexemesEx(tokens: Token[]): Lexeme[] {
-    function clean(raw: string) {
-        return raw.toLowerCase().replace('ё', 'е');
-    }
-
     const lexemes: Lexeme[][] = tokens.map(token =>
         (token.analysis || []).map(lex => ({
             lex: lex.lex,
-            gr: lex.gr.split(/=|,|\||\(/) as Gr[],
-            text: clean(token.text)
+            gr: lex.gr.split(/=|,|\||\)|\(/) as Gr[]
         }))
     );
 

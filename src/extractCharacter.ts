@@ -1,26 +1,22 @@
 import * as _ from 'lodash';
 import { Character, Word, Gender } from './character';
-import { Lexeme, Gr, filterLexemes } from './stemmer';
+import { Lexeme, Gr, filterLexemes, matchGrs } from './stemmer';
 
 export function extractCharacter(lexemes: Lexeme[]): Character | undefined {
-    const animated = filterLexemes(lexemes, [Gr.Animated]);
-    const nouns = filterLexemes(animated, [Gr.Noun]);
-    const nounAccusative = _.last(filterLexemes(nouns, [Gr.Accusative, Gr.Single]));
+    const nouns = filterLexemes(lexemes, [Gr.Animated, Gr.Noun, Gr.Single]);
 
-    if (nounAccusative) {
-        return {
-            subject: lexemeToWord(nounAccusative),
-            gender: extractGender(nounAccusative)
-        };
+    const noun =
+        _.first(filterLexemes(nouns, [Gr.Accusative])) ||
+        _.first(filterLexemes(nouns, [Gr.Nominative])) ||
+        _.first(nouns);
+
+    if (!noun) {
+        return undefined;
     }
-
-    // const nounNominative = _.last(filterLexemes(nouns, [Gr.Nominative, Gr.Single]));
-
-    // if (nounNominative) {
-
-    // }
-
-    return undefined;
+    return {
+        subject: lexemeToWord(noun),
+        gender: extractGender(noun)
+    };
 }
 
 export function createDedka(): Character {
@@ -31,7 +27,7 @@ export function createDedka(): Character {
 }
 
 function lexemeToWord(lexeme: Lexeme): Word {
-    const accusative = lexeme.text;
+    const accusative = nominativeToAccusative(lexeme);
 
     return {
         nominative: lexeme.lex,
@@ -51,12 +47,50 @@ function extractGender(lexeme: Lexeme): Gender {
     return Gender.Neuter;
 }
 
-// /**
-//  * Меняет падеж существительного с им. на вин.
-//  * @param noun Существительное в им. падеже.
-//  */
-// function nominativeToAccusative(noun:string) {
-//     if (noun.endsWith('a')) {} {
+/**
+ * Меняет падеж существительного с им. на вин.
+ * @param noun Существительное в им. падеже.
+ */
+function nominativeToAccusative(lexeme: Lexeme) {
+    const gr = lexeme.gr;
+    const noun = lexeme.lex;
+    const isMale = matchGrs(gr, [Gr.Male]);
+    const isFamela = matchGrs(gr, [Gr.Famela]);
 
-//     }
-// }
+    const changeOne = end => `${noun.substring(0, noun.length - 1)}${end}`;
+    const changeTwo = end => `${noun.substring(0, noun.length - 2)}${end}`;
+    const add = end => `${noun}${end}`;
+
+    // Папа -> папу, мама -> маму
+    if (noun.endsWith('а')) {
+        return changeOne('у');
+    }
+
+    // Маня -> маню
+    if (noun.endsWith('я')) {
+        return changeOne('ю');
+    }
+
+    // Отец -> отца, кузнец -> кузнеца
+    if (noun.endsWith('ец')) {
+        return changeTwo('ца');
+    }
+
+    // Богатырь -> богатыря, конь -> коня.
+    if (noun.endsWith('ь') && isMale) {
+        return changeOne('я');
+    }
+
+    // Евгений -> евгения, злодей -> злодея
+    if (noun.endsWith('й') && isMale) {
+        return changeOne('я');
+    }
+
+    // Дочь, ...?
+    if (noun.endsWith('ь') && isFamela) {
+        return changeOne('я');
+    }
+
+    // Человек -> человека, кролик -> кролика.
+    return add('а');
+}

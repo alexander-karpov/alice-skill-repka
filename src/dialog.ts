@@ -61,12 +61,12 @@ export async function storyDialog(
 ) {
     const { chars } = sessionData;
     const lexemes = await stemmer(command);
+    const nextChar = extractCharacter(lexemes);
 
-    if (hasMultipleChars(lexemes)) {
+    if (!nextChar && hasMultipleChars(lexemes)) {
         return answers.onlyOneCharMayCome(sessionData);
     }
 
-    const nextChar = extractCharacter(lexemes);
     const currentChar = _.last(chars);
 
     if (!currentChar) {

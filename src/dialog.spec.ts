@@ -11,7 +11,7 @@ describe('Story dialog', () => {
         return storyDialog(command, sessionData, deps);
     }
 
-    test('Классическая сказка: история', async () => {
+    test('Классическая сказка: начало', async () => {
         expect(await act('')).toMatch('осадил дед репку');
     });
 
@@ -56,11 +56,6 @@ describe('Story dialog', () => {
         expect(await act('Бутылка стола дракона')).toMatch('Дракон за дедку');
     });
 
-    test('Из двух предпочитает последнего', async () => {
-        await act('');
-        expect(await act('Дракона и бабку')).toMatch('Позвала бабка...');
-    });
-
     test('Предпочтение одушевленным', async () => {
         await act('');
         expect(await act('Серёжку')).toMatch('Позвал сережка');
@@ -83,11 +78,24 @@ describe('Story dialog', () => {
         expect(await act('ракета')).toMatch('Кого чудище позвало');
     });
 
-    // test('Принимает персонажа в именительном падеже', async () => {
-    //     await act('');
-    //     await act('человек');
-    //     expect(await act('богатырь')).toMatch('котик за человека');
-    // });
+    test('Принимает персонажа в именительном падеже', async () => {
+        await act('');
+        expect(await act('человек')).toMatch('Человек за дедку');
+        expect(await act('богатырь')).toMatch('Богатырь за человека');
+        expect(await act('Внучок')).toMatch('Внучка за богатыря');
+        expect(await act('Цариса')).toMatch('Царица за внучку');
+        expect(await act('Лебедь')).toMatch('Лебедь за царицу');
+        expect(await act('Врач')).toMatch('Врач за лебедь');
+    });
+
+    test.only('Приоритет вин. падежу', async () => {
+        /**
+         * внучк+а, а не вн+учка
+         * Например дед позвал внучка
+         */
+        await act('');
+        expect(await act('Внучка')).toMatch('Внучок за дедку');
+    });
 
     beforeEach(() => {
         sessionData = createSessionData();
