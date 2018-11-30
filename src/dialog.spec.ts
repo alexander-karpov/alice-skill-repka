@@ -97,6 +97,24 @@ describe('Story dialog', () => {
         expect(await act('Внучка')).toMatch('Внучок за дедку');
     });
 
+    test.only('Позвали репку', async () => {
+        /**
+         * внучк+а, а не вн+учка
+         * Например дед позвал внучка
+         */
+        await act('');
+        expect(await act('Репку')).toMatch('Репка сама себя не вытянет');
+    });
+
+    test.only('Позвали бабку', async () => {
+        /**
+         * внучк+а, а не вн+учка
+         * Например дед позвал внучка
+         */
+        await act('');
+        expect(await act('Бабку')).toMatch(/у тебя такие большие руки\?.+Бабка за дедку/);
+    });
+
     beforeEach(() => {
         sessionData = createSessionData();
     });

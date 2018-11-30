@@ -3,7 +3,7 @@ import { Stemmer } from './stemmer';
 import { extractCharacter, createDedka } from './extractCharacter';
 import { SessionData, Dialogs } from './sessionData';
 import * as answers from './answers';
-import { hasMultipleChars } from './intents';
+import * as intents from './intents';
 
 import {
     Character,
@@ -63,8 +63,12 @@ export async function storyDialog(
     const lexemes = await stemmer(command);
     const nextChar = extractCharacter(lexemes);
 
-    if (!nextChar && hasMultipleChars(lexemes)) {
+    if (!nextChar && intents.hasMultipleChars(lexemes)) {
         return answers.onlyOneCharMayCome(sessionData);
+    }
+
+    if (!nextChar && intents.repka(lexemes)) {
+        return answers.repka(sessionData);
     }
 
     const currentChar = _.last(chars);
@@ -87,7 +91,13 @@ export async function storyDialog(
 
     chars.push(nextChar);
 
-    const story = [formatStory(chars)];
+    const story: string[] = [];
+
+    if (intents.babka(nextChar)) {
+        story.push(answers.babkaCome());
+    }
+
+    story.push(formatStory(chars));
 
     if (isStoryOver(nextChar, chars)) {
         story.push('— вытянули репку! Какая интересная сказка. Хочешь послушать снова?');

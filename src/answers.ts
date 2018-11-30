@@ -56,6 +56,14 @@ export function whoCalled(sessionData: SessionData) {
     return '';
 }
 
+export function repka(sessionData: SessionData) {
+    return `Репка сама себя не вытянет. ${whoCalled(sessionData)}`;
+}
+
+export function babkaCome() {
+    return `Бабушка-бабушка, почему у тебя такие большие руки?. Чтобы лучше репку тянуть!`;
+}
+
 function formatCallWord(char: Character) {
     return isCharMale(char) ? 'позвал' : isCharFamela(char) ? 'позвала' : 'позвало';
 }
