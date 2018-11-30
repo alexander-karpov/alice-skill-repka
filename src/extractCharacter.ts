@@ -1,30 +1,31 @@
 import * as _ from 'lodash';
 import { Character, Word, Gender } from './character';
-import { Lexeme, Gr, filterLexemes, matchGrs } from './stemmer';
+import { Lexeme, Gr, filterLexemes } from './stemmer';
 
 export function extractCharacter(lexemes: Lexeme[]): Character | undefined {
-    const adjectives = filterLexemes(lexemes, [Gr.Adjective]);
     const animated = filterLexemes(lexemes, [Gr.Animated]);
     const nouns = filterLexemes(animated, [Gr.Noun]);
-    const [nounAccusative] = filterLexemes(_.reverse(nouns), [Gr.Accusative, Gr.Single]);
+    const nounAccusative = _.last(filterLexemes(nouns, [Gr.Accusative, Gr.Single]));
 
-    if (!nounAccusative) {
-        return undefined;
+    if (nounAccusative) {
+        return {
+            subject: lexemeToWord(nounAccusative),
+            gender: extractGender(nounAccusative)
+        };
     }
 
-    const attributesWithoutFoundNoun = adjectives.filter(a => a.lex !== nounAccusative.lex);
+    // const nounNominative = _.last(filterLexemes(nouns, [Gr.Nominative, Gr.Single]));
 
-    return {
-        subject: lexemeToWord(nounAccusative),
-        attributes: attributesWithoutFoundNoun.map(lexemeToWord),
-        gender: extractGender(nounAccusative)
-    };
+    // if (nounNominative) {
+
+    // }
+
+    return undefined;
 }
 
 export function createDedka(): Character {
     return {
         subject: { nominative: 'дедка', accusative: 'дедку' },
-        attributes: [],
         gender: Gender.Male
     };
 }
@@ -32,38 +33,10 @@ export function createDedka(): Character {
 function lexemeToWord(lexeme: Lexeme): Word {
     const accusative = lexeme.text;
 
-    // Для прилагательных женского рода нужно
-    // сохранять род в имен.падеже (стеммер приводит к муж.роду)
-    if (matchGrs(lexeme.gr, [Gr.Adjective, Gr.Famela])) {
-        return {
-            nominative: attrAcusativeToNomenative(accusative),
-            accusative
-        };
-    }
-
-    // Для прилагательных среднего рода
-    // имен. падеж совпадает с вин.
-    if (matchGrs(lexeme.gr, [Gr.Adjective, Gr.Neuter])) {
-        return {
-            nominative: accusative,
-            accusative
-        };
-    }
-
     return {
         nominative: lexeme.lex,
         accusative
     };
-}
-
-/**
- * Веняет вин падеж прилагательного в имен
- * Чёрную -> черная
- * @param attr Черный
- */
-function attrAcusativeToNomenative(attr: string): string {
-    const change = end => `${attr.substring(0, attr.length - 2)}${end}`;
-    return attr.endsWith('ую') ? change('ая') : change('яя');
 }
 
 function extractGender(lexeme: Lexeme): Gender {
@@ -77,3 +50,13 @@ function extractGender(lexeme: Lexeme): Gender {
 
     return Gender.Neuter;
 }
+
+// /**
+//  * Меняет падеж существительного с им. на вин.
+//  * @param noun Существительное в им. падеже.
+//  */
+// function nominativeToAccusative(noun:string) {
+//     if (noun.endsWith('a')) {} {
+
+//     }
+// }

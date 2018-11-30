@@ -88,6 +88,8 @@ export enum Gr {
      * Прошедшее
      */
     Praet = 'прош',
+    /** Именительный падеж */
+    Nominative = 'им',
     /** Винительный падеж */
     Accusative = 'вин',
     Single = 'ед',

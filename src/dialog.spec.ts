@@ -66,18 +66,6 @@ describe('Story dialog', () => {
         expect(await act('Серёжку')).toMatch('Позвал сережка');
     });
 
-    test('Сохраняет сказуемое', async () => {
-        await act('');
-        expect(await act('Маленького котёнка')).toMatch('Маленький котенок за дедку');
-        expect(await act('Старую бабку')).toMatch('Старая бабка за маленького котенка');
-        expect(await act('Страшное чудище')).toMatch('Страшное чудище за старую бабку');
-    });
-
-    test('Не добавляет сказуемое, если оно совпадает с подлежащим', async () => {
-        await act('');
-        expect(await act('Маленького')).toMatch('Маленький за дедку');
-    });
-
     test('Уникальная фраза на множ. число', async () => {
         await act('');
         expect(await act('котят')).toMatch('по одному');
@@ -94,6 +82,12 @@ describe('Story dialog', () => {
         await act('чудище');
         expect(await act('ракета')).toMatch('Кого чудище позвало');
     });
+
+    // test('Принимает персонажа в именительном падеже', async () => {
+    //     await act('');
+    //     await act('человек');
+    //     expect(await act('богатырь')).toMatch('котик за человека');
+    // });
 
     beforeEach(() => {
         sessionData = createSessionData();
