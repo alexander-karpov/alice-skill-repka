@@ -37,7 +37,9 @@ export async function mainDialog(
     }
 
     if (sessionData.currentDialog === Dialogs.RepeatQuestion) {
-        if (!command.includes('да') && !command.includes('нет')) {
+        const vars = ['да', 'нет', 'давай'];
+
+        if (!command.some(word => vars.includes(word))) {
             return { text: 'Сейчас я ожидаю слово "Да" или "Нет".', endSession: false };
         }
 

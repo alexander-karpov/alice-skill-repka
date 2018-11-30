@@ -134,13 +134,16 @@ describe('Main dialog', () => {
     test('Повтор истории: подтверждение', async () => {
         await act('');
         expect(await act('мышку')).toMatch('вытянули репку');
-        expect(await act('да')).toMatch('осадил дед репку');
+        expect(await act('да пожалуйста')).toMatch('осадил дед репку');
+
+        expect(await act('мышку')).toMatch('вытянули репку');
+        expect(await act('давай еще раз')).toMatch('осадил дед репку');
     });
 
     test('Повтор истории: отказ', async () => {
         await act('');
         expect(await act('мышку')).toMatch('вытянули репку');
-        const { text, endSession } = await mainDialog(['нет'], sessionData, deps);
+        const { text, endSession } = await mainDialog(['нет спасибо не надо'], sessionData, deps);
 
         expect(text).toMatch('конец');
         expect(endSession).toEqual(true);
