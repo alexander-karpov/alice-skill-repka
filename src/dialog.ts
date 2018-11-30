@@ -37,13 +37,11 @@ export async function mainDialog(
     }
 
     if (sessionData.currentDialog === Dialogs.RepeatQuestion) {
-        const [firstToken, secondToken] = command;
-
-        if (secondToken || !['да', 'нет'].includes(firstToken)) {
+        if (!command.includes('да') && !command.includes('нет')) {
             return { text: 'Сейчас я ожидаю слово "Да" или "Нет".', endSession: false };
         }
 
-        if (firstToken === 'нет') {
+        if (command.includes('нет')) {
             return { text: 'Вот и сказке конец, А кто слушал — молодец.', endSession: true };
         }
 
@@ -123,7 +121,7 @@ function formatCall(char: Character) {
 
 function isStoryOver(char: Character, characters: Character[]) {
     const isLastMouse = char.subject.nominative === 'мышка';
-    const tooManyCharacters = characters.length >= 10;
+    const tooManyCharacters = characters.length >= 6;
     return isLastMouse || tooManyCharacters;
 }
 
