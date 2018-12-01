@@ -114,7 +114,6 @@ export function inanimateCalled(inanimate: Character, sessionData: SessionData, 
     const lastChar = _.last(sessionData.chars) as Character;
     const zval = byGender(lastChar, 'звал', 'звала', 'звало');
     const jdal = byGender(lastChar, 'ждал', 'ждала', 'ждало');
-    const on = byGender(lastChar, 'он', 'она', 'оно');
 
     return lazySample(
         [
@@ -130,7 +129,7 @@ export function inanimateCalled(inanimate: Character, sessionData: SessionData, 
                 ),
             () =>
                 concatSpeech(
-                    `Долго ${jdal} ${on} ответа,`,
+                    `Долго ${jdal} ${charNominative(lastChar)} ответа,`,
                     createSpeech(
                         byGender(lastChar, 'не дождался', 'не дождалась', 'не дождалось'),
                         byGender(
