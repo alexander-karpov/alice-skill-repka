@@ -11,7 +11,7 @@ export function concatSpeech(...items: (Speech | string)[]): Speech {
     const text: string[] = [];
     const tts: string[] = [];
 
-    items.forEach(s => {
+    items.filter(Boolean).forEach(s => {
         if (isSpeech(s)) {
             text.push(s.text);
             tts.push(s.tts);

@@ -20,6 +20,10 @@ export function babka(char: Character) {
     return ['бабка', 'бабушка'].includes(char.subject.nominative);
 }
 
+export function cat(char: Character) {
+    return ['кошка', 'кот', 'котик', 'котенок'].includes(char.subject.nominative);
+}
+
 export function help(tokens: string[]) {
     const command = tokens.join(' ');
     return command === 'что ты умеешь' || command === 'помощь';

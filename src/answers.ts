@@ -1,5 +1,12 @@
 import * as _ from 'lodash';
-import { formatCharNominative, Character, isCharMale, isCharFamela } from './character';
+import {
+    charNominative,
+    charAccusative,
+    Character,
+    isCharMale,
+    isCharFamela,
+    previousChar
+} from './character';
 import { SessionData } from './sessionData';
 import { sample } from './utils';
 import { createSpeech, Speech, concatSpeech } from './speech';
@@ -51,7 +58,7 @@ export function whoCalled(sessionData: SessionData) {
     const char = _.last(sessionData.chars);
 
     if (char) {
-        return `Кого ${formatCharNominative(char)} ${formatCallWord(char)} на помощь?`;
+        return `Кого ${charNominative(char)} ${formatCallWord(char)} на помощь?`;
     }
 
     return '';
@@ -61,9 +68,23 @@ export function repka(sessionData: SessionData) {
     return createSpeech(`Репка сама себя не вытянет. ${whoCalled(sessionData)}`);
 }
 
-export function babkaCome() {
+export function babka() {
     return createSpeech(
         `Бабушка-бабушка, почему у тебя такие большие руки?. Чтобы лучше репку тянуть!`
+    );
+}
+
+export function cat(char: Character, sessionData: SessionData) {
+    const meow = createSpeech('- мяу -', '- <speaker audio="alice-sounds-animals-cat-3.opus"> -');
+    const prev = previousChar(char, sessionData.chars) as Character;
+    const clung = byGender(char, 'вцепился', 'вцепилась', 'вцепилось');
+
+    return concatSpeech(
+        comeRunning(char),
+        charNominative(char),
+        meow,
+        `и ${clung} в`,
+        charAccusative(prev)
     );
 }
 
@@ -83,5 +104,13 @@ export function wrongCommand(sessionData: SessionData) {
 }
 
 function formatCallWord(char: Character) {
-    return isCharMale(char) ? 'позвал' : isCharFamela(char) ? 'позвала' : 'позвало';
+    return byGender(char, 'позвал', 'позвала', 'позвало');
+}
+
+function comeRunning(char: Character) {
+    return byGender(char, 'прибежал', 'прибежала', 'прибежало');
+}
+
+function byGender<T>(char: Character, male: T, famela: T, other: T) {
+    return isCharMale(char) ? male : isCharFamela(char) ? famela : other;
 }

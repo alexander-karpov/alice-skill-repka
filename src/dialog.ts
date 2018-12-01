@@ -6,13 +6,7 @@ import { Speech, createSpeech, concatSpeech } from './speech';
 import * as answers from './answers';
 import * as intents from './intents';
 
-import {
-    Character,
-    isCharMale,
-    isCharFamela,
-    formatCharNominative,
-    formatCharAccusative
-} from './character';
+import { Character, isCharMale, isCharFamela, charNominative, charAccusative } from './character';
 
 //#region types
 export type DialogDependencies = {
@@ -85,7 +79,11 @@ export async function mainDialog(
         const repkaStory = makeRepkaStory(nextChar, chars, sessionData);
 
         if (intents.babka(nextChar)) {
-            return concatSpeech(answers.babkaCome(), repkaStory);
+            return concatSpeech(answers.babka(), repkaStory);
+        }
+
+        if (intents.cat(nextChar)) {
+            return concatSpeech(answers.cat(nextChar, sessionData), repkaStory);
         }
 
         return repkaStory;
@@ -113,7 +111,7 @@ function makeRepkaStory(next: Character, all: Character[], sessionData: SessionD
 
 function formatStory(characters: Character[]): Speech {
     const story = _.reverse(toPairs(characters))
-        .map(pair => `${formatCharNominative(pair[1])} за ${formatCharAccusative(pair[0])}`)
+        .map(pair => `${charNominative(pair[1])} за ${charAccusative(pair[0])}`)
         .join(', ');
 
     return createSpeech(`${_.capitalize(story)}, дедка за репку — тянут-потянут,`);
@@ -130,7 +128,7 @@ function toPairs(characters: Character[]): [Character, Character][] {
 }
 
 function formatCall(char: Character) {
-    return _.capitalize(`${formatCallWord(char)} ${formatCharNominative(char)}...`);
+    return _.capitalize(`${formatCallWord(char)} ${charNominative(char)}...`);
 }
 
 function isStoryOver(chars: Character[]) {

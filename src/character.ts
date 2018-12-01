@@ -1,3 +1,5 @@
+import * as _ from 'lodash';
+
 export type Word = {
     nominative: string;
     accusative: string;
@@ -22,10 +24,14 @@ export function isCharFamela(char: Character) {
     return char.gender === Gender.Famela;
 }
 
-export function formatCharNominative(char: Character) {
+export function charNominative(char: Character) {
     return char.subject.nominative;
 }
 
-export function formatCharAccusative(char: Character) {
+export function charAccusative(char: Character) {
     return char.subject.accusative;
+}
+
+export function previousChar(char: Character, chars: Character[]) {
+    return _.last(chars.filter(c => c != char));
 }
