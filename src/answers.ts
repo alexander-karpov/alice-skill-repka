@@ -80,11 +80,10 @@ export function cat(char: Character, sessionData: SessionData) {
     const clung = byGender(char, 'вцепился', 'вцепилась', 'вцепилось');
 
     return concatSpeech(
-        comeRunning(char),
+        _.capitalize(comeRunning(char)),
         charNominative(char),
         meow,
-        `и ${clung} в`,
-        charAccusative(prev)
+        `и ${clung} в ${charAccusative(prev)}.`
     );
 }
 

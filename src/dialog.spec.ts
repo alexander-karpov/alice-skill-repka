@@ -116,8 +116,8 @@ describe('Main dialog', () => {
 
     test('Специальная фраза для кошек', async () => {
         await act('');
-        expect(await act('кошку')).toMatch(/прибежала кошка.*вцепилась в дедку/);
-        expect(await act('кот')).toMatch(/прибежал кот.*вцепился в кошку/);
+        expect(await act('кошку')).toMatch(/Прибежала кошка.*вцепилась в дедку/);
+        expect(await act('кот')).toMatch(/Прибежал кот.*вцепился в кошку/);
     });
 
     test('что ты умеешь / помощь', async () => {
