@@ -1,6 +1,6 @@
 {
   "name": "alice-skill-repka",
-  "version": "0.2.15",
+  "version": "0.2.16",
   "main": "dist/index.js",
   "scripts": {
     "build": "rm -rf ./dist && tsc",
