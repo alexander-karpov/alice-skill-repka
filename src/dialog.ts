@@ -79,11 +79,11 @@ export async function mainDialog(
         const repkaStory = makeRepkaStory(nextChar, chars, sessionData);
 
         if (intents.babka(nextChar)) {
-            return concatSpeech(answers.babka(), repkaStory);
+            return concatSpeech(answers.granny(), repkaStory);
         }
 
         if (intents.cat(nextChar)) {
-            return concatSpeech(answers.cat(nextChar, sessionData), repkaStory);
+            return concatSpeech(answers.cat(nextChar, sessionData, random100), repkaStory);
         }
 
         return repkaStory;

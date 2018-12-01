@@ -68,14 +68,19 @@ export function repka(sessionData: SessionData) {
     return createSpeech(`Репка сама себя не вытянет. ${whoCalled(sessionData)}`);
 }
 
-export function babka() {
+export function granny() {
     return createSpeech(
-        `Бабушка-бабушка, почему у тебя такие большие руки?. Чтобы лучше репку тянуть!`
+        `Бабушка-бабушка, почему у тебя такие большие руки? Чтобы лучше репку тянуть!`
     );
 }
 
-export function cat(char: Character, sessionData: SessionData) {
-    const meow = createSpeech('- мяу -', '- <speaker audio="alice-sounds-animals-cat-3.opus"> -');
+export function cat(char: Character, sessionData: SessionData, random100) {
+    const soundNumber = sample(byGender(char, [1, 2], [3, 4], [1]), random100);
+    const meow = createSpeech(
+        '- мяу -',
+        `<speaker audio="alice-sounds-animals-cat-${soundNumber}.opus">`
+    );
+
     const prev = previousChar(char, sessionData.chars) as Character;
     const clung = byGender(char, 'вцепился', 'вцепилась', 'вцепилось');
 
