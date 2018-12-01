@@ -145,13 +145,19 @@ describe('Main dialog', () => {
         expect(await act('да пожалуйста')).toMatch('осадил дед репку');
     });
 
+    test('Отказ от продолжения словом Не надо', async () => {
+        await act('');
+        await act('мышку');
+        expect(await act('больше не надо пожалуйста')).toMatch('конец');
+    });
+
     test('Повтор истории: отказ', async () => {
         await act('');
         expect(await act('мышку')).toMatch('вытянули репку');
         const {
             speech: { text },
             endSession
-        } = await mainDialog('нет спасибо не надо'.split(' '), sessionData, deps);
+        } = await mainDialog('нет спасибо'.split(' '), sessionData, deps);
 
         expect(text).toMatch('конец');
         expect(endSession).toEqual(true);
