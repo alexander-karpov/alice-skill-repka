@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Stemmer } from './stemmer';
 import { extractCharacter, createDedka } from './extractCharacter';
 import { SessionData, Dialogs } from './sessionData';
-import { Speech, speech, joinSpeech, concatSpeech } from './speech';
+import { Speech, createSpeech, joinSpeech, concatSpeech } from './speech';
 import * as answers from './answers';
 import * as intents from './intents';
 
@@ -29,7 +29,7 @@ export type DialogResult = {
 export async function mainDialog(
     command: string[],
     sessionData: SessionData,
-    deps: DialogDependencies
+    { stemmer, random100 }: DialogDependencies
 ): Promise<DialogResult> {
     const commandText = command.join(' ');
 
@@ -39,12 +39,15 @@ export async function mainDialog(
 
     if (sessionData.currentDialog === Dialogs.RepeatQuestion) {
         if (!command.some(word => ['да', 'нет', 'давай'].includes(word))) {
-            return { speech: speech('Сейчас я ожидаю ответ "Да" или "Нет".'), endSession: false };
+            return {
+                speech: createSpeech('Сейчас я ожидаю ответ "Да" или "Нет".'),
+                endSession: false
+            };
         }
 
         if (command.includes('нет')) {
             return {
-                speech: speech('Вот и сказке конец, А кто слушал — молодец.'),
+                speech: createSpeech('Вот и сказке конец, А кто слушал — молодец.'),
                 endSession: true
             };
         }
@@ -53,24 +56,16 @@ export async function mainDialog(
         sessionData.currentDialog = Dialogs.Story;
     }
 
-    return { speech: await storyDialog(command.join(' '), sessionData, deps), endSession: false };
-}
-
-export async function storyDialog(
-    command: string,
-    sessionData: SessionData,
-    { stemmer, random100 }: DialogDependencies
-): Promise<Speech> {
     const { chars } = sessionData;
-    const lexemes = await stemmer(command);
+    const lexemes = await stemmer(command.join(' '));
     const nextChar = extractCharacter(lexemes);
 
     if (!nextChar && intents.hasMultipleChars(lexemes)) {
-        return answers.onlyOneCharMayCome(sessionData);
+        return result(answers.onlyOneCharMayCome(sessionData));
     }
 
     if (!nextChar && intents.repka(lexemes)) {
-        return answers.repka(sessionData);
+        return result(answers.repka(sessionData));
     }
 
     const currentChar = _.last(chars);
@@ -80,15 +75,15 @@ export async function storyDialog(
     }
 
     if (sessionData.isNewSession) {
-        return speech(`${answers.intro(random100)} ${answers.storyBegin(random100)}`);
+        return result(createSpeech(`${answers.intro(random100)} ${answers.storyBegin(random100)}`));
     }
 
     if (!currentChar) {
-        return speech(answers.storyBegin(random100));
+        return result(createSpeech(answers.storyBegin(random100)));
     }
 
     if (!nextChar) {
-        return concatSpeech(`Это не похоже на персонажа.`, answers.help(sessionData));
+        return result(concatSpeech(`Это не похоже на персонажа.`, answers.help(sessionData)));
     }
 
     chars.push(nextChar);
@@ -102,13 +97,15 @@ export async function storyDialog(
     story.push(formatStory(chars));
 
     if (isStoryOver(nextChar, chars)) {
-        story.push(speech('— вытянули репку! Какая интересная сказка. Хочешь послушать снова?'));
+        story.push(
+            createSpeech('— вытянули репку! Какая интересная сказка. Хочешь послушать снова?')
+        );
         sessionData.currentDialog = Dialogs.RepeatQuestion;
     } else {
         story.push(concatSpeech(`вытянуть не могут.`, formatCall(nextChar)));
     }
 
-    return joinSpeech(story);
+    return result(joinSpeech(story));
 }
 
 function formatStory(characters: Character[]): Speech {
@@ -116,7 +113,7 @@ function formatStory(characters: Character[]): Speech {
         .map(pair => `${formatCharNominative(pair[1])} за ${formatCharAccusative(pair[0])}`)
         .join(', ');
 
-    return speech(`${_.capitalize(story)}, дедка за репку — тянут-потянут,`);
+    return createSpeech(`${_.capitalize(story)}, дедка за репку — тянут-потянут,`);
 }
 
 function toPairs(characters: Character[]): [Character, Character][] {
@@ -135,10 +132,17 @@ function formatCall(char: Character) {
 
 function isStoryOver(char: Character, characters: Character[]) {
     const isLastMouse = char.subject.nominative === 'мышка';
-    const tooManyCharacters = characters.length >= 6;
+    const tooManyCharacters = characters.length >= 10;
     return isLastMouse || tooManyCharacters;
 }
 
 function formatCallWord(char: Character) {
     return isCharMale(char) ? 'позвал' : isCharFamela(char) ? 'позвала' : 'позвало';
+}
+
+function result(speech: Speech): DialogResult {
+    return {
+        speech,
+        endSession: false
+    };
 }

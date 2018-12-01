@@ -3,7 +3,7 @@ export type Speech = {
     tts: string;
 };
 
-export function speech(text: string, tts: string = text): Speech {
+export function createSpeech(text: string, tts: string = text): Speech {
     return { text, tts };
 }
 
@@ -16,11 +16,11 @@ export function joinSpeech(items: Speech[]): Speech {
         tts.push(s.tts);
     });
 
-    return speech(text.join(' '), tts.join(' '));
+    return createSpeech(text.join(' '), tts.join(' '));
 }
 
 export function concatSpeech(...items: (Speech | string)[]): Speech {
-    const xs = items.map(s => (isSpeech(s) ? s : speech(s)));
+    const xs = items.map(s => (isSpeech(s) ? s : createSpeech(s)));
     return joinSpeech(xs);
 }
 
