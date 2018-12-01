@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { formatCharNominative, Character, isCharMale, isCharFamela } from './character';
 import { SessionData } from './sessionData';
 import { sample } from './utils';
-import { createSpeech } from './speech';
+import { createSpeech, Speech, concatSpeech } from './speech';
 
 const REPKA_GROWING =
     'Выросла репка большая-пребольшая. Стал дед репку из земли тянуть. Тянет-потянет, вытянуть не может. Позвал дед...';
@@ -11,7 +11,7 @@ const GRANTFATHER_PLANT_LOW = 'посадил дед репку';
 const ABOUT_SKILL =
     'Я расскажу сказку про репку, если вы мне поможете. Когда придет время позвать на помощь нового героя, дополните рассказ. Например, я скажу: "Позвал дедка...", а вы продолжите - "Богатыря". Вы готовы?';
 
-export function storyBegin(random100: number) {
+export function storyBegin(random100: number): Speech {
     const cases = [
         `Давным-давно в далёкой деревне ${GRANTFATHER_PLANT_LOW}.`,
         `Жили-были дед да баба. И вот ${GRANTFATHER_PLANT_LOW}.`,
@@ -27,12 +27,12 @@ export function storyBegin(random100: number) {
         `${_.capitalize(GRANTFATHER_PLANT_LOW)}.`
     ];
 
-    return `${sample(cases, random100)} ${REPKA_GROWING}`;
+    return concatSpeech(sample(cases, random100), REPKA_GROWING);
 }
 
-export function intro(random100: number) {
+export function intro(random100: number): Speech {
     const beforeAbout = ['Хорошо.', 'Давайте.', 'С удовольствием!'];
-    return `${sample(beforeAbout, random100)} ${ABOUT_SKILL}`;
+    return concatSpeech(sample(beforeAbout, random100), ABOUT_SKILL, storyBegin(random100));
 }
 
 export function help(sessionData: SessionData) {
@@ -65,6 +65,21 @@ export function babkaCome() {
     return createSpeech(
         `Бабушка-бабушка, почему у тебя такие большие руки?. Чтобы лучше репку тянуть!`
     );
+}
+
+export function yesOrNoExpected(): Speech {
+    return createSpeech(
+        'Сейчас я ожидаю в ответ "Да" или "Нет".',
+        'сейчас я ожидаю в ответ - - да - - или  нет.'
+    );
+}
+
+export function endOfStory() {
+    return createSpeech('Вот и сказке конец, А кто слушал — молодец.');
+}
+
+export function wrongCommand(sessionData: SessionData) {
+    return concatSpeech(`Это не похоже на персонажа.`, help(sessionData));
 }
 
 function formatCallWord(char: Character) {

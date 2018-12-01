@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Stemmer } from './stemmer';
 import { extractCharacter, createDedka } from './extractCharacter';
 import { SessionData, Dialogs } from './sessionData';
-import { Speech, createSpeech, joinSpeech, concatSpeech } from './speech';
+import { Speech, createSpeech, concatSpeech } from './speech';
 import * as answers from './answers';
 import * as intents from './intents';
 
@@ -27,85 +27,88 @@ export type DialogResult = {
 //#endregion
 
 export async function mainDialog(
-    command: string[],
+    tokens: string[],
     sessionData: SessionData,
     { stemmer, random100 }: DialogDependencies
 ): Promise<DialogResult> {
-    const commandText = command.join(' ');
-
-    if (commandText === 'что ты умеешь' || commandText === 'помощь') {
-        return { speech: answers.help(sessionData), endSession: false };
-    }
-
-    if (sessionData.currentDialog === Dialogs.RepeatQuestion) {
-        if (!command.some(word => ['да', 'нет', 'давай'].includes(word))) {
-            return {
-                speech: createSpeech('Сейчас я ожидаю ответ "Да" или "Нет".'),
-                endSession: false
-            };
-        }
-
-        if (command.includes('нет')) {
-            return {
-                speech: createSpeech('Вот и сказке конец, А кто слушал — молодец.'),
-                endSession: true
-            };
-        }
-
-        sessionData.chars.length = 0;
-        sessionData.currentDialog = Dialogs.Story;
-    }
-
+    const isRepeatQuestionDialog = sessionData.currentDialog === Dialogs.RepeatQuestion;
+    const lexemes = await stemmer(tokens.join(' '));
     const { chars } = sessionData;
-    const lexemes = await stemmer(command.join(' '));
-    const nextChar = extractCharacter(lexemes);
 
-    if (!nextChar && intents.hasMultipleChars(lexemes)) {
-        return result(answers.onlyOneCharMayCome(sessionData));
-    }
+    const result = await (async function narrative(): Promise<DialogResult | Speech> {
+        if (intents.help(tokens)) {
+            return answers.help(sessionData);
+        }
 
-    if (!nextChar && intents.repka(lexemes)) {
-        return result(answers.repka(sessionData));
-    }
+        if (isRepeatQuestionDialog && !intents.no(tokens) && !intents.yes(tokens)) {
+            return answers.yesOrNoExpected();
+        }
 
-    const currentChar = _.last(chars);
+        if (isRepeatQuestionDialog && intents.no(tokens)) {
+            return { speech: answers.endOfStory(), endSession: true };
+        }
 
-    if (!currentChar) {
-        chars.push(createDedka());
-    }
+        if (isRepeatQuestionDialog && intents.yes(tokens)) {
+            sessionData.chars.length = 0;
+            sessionData.currentDialog = Dialogs.Story;
+        }
 
-    if (sessionData.isNewSession) {
-        return result(createSpeech(`${answers.intro(random100)} ${answers.storyBegin(random100)}`));
-    }
+        if (intents.repka(lexemes)) {
+            return answers.repka(sessionData);
+        }
 
-    if (!currentChar) {
-        return result(createSpeech(answers.storyBegin(random100)));
-    }
+        const nextChar = extractCharacter(lexemes);
 
-    if (!nextChar) {
-        return result(concatSpeech(`Это не похоже на персонажа.`, answers.help(sessionData)));
-    }
+        if (!nextChar && intents.hasMultipleChars(lexemes)) {
+            return answers.onlyOneCharMayCome(sessionData);
+        }
 
-    chars.push(nextChar);
+        const currentChar = _.last(chars);
 
+        if (!currentChar) {
+            chars.push(createDedka());
+        }
+
+        if (sessionData.isNewSession) {
+            return answers.intro(random100);
+        }
+
+        if (!currentChar) {
+            return answers.storyBegin(random100);
+        }
+
+        if (!nextChar) {
+            return answers.wrongCommand(sessionData);
+        }
+
+        chars.push(nextChar);
+        const repkaStory = makeRepkaStory(nextChar, chars, sessionData);
+
+        if (intents.babka(nextChar)) {
+            return concatSpeech(answers.babkaCome(), repkaStory);
+        }
+
+        return repkaStory;
+    })();
+
+    return isDialogResult(result) ? result : { speech: result, endSession: false };
+}
+
+function makeRepkaStory(next: Character, all: Character[], sessionData: SessionData) {
     const story: Speech[] = [];
 
-    if (intents.babka(nextChar)) {
-        story.push(answers.babkaCome());
-    }
+    story.push(formatStory(all));
 
-    story.push(formatStory(chars));
-
-    if (isStoryOver(nextChar, chars)) {
+    if (isStoryOver(all)) {
         story.push(
             createSpeech('— вытянули репку! Какая интересная сказка. Хочешь послушать снова?')
         );
         sessionData.currentDialog = Dialogs.RepeatQuestion;
     } else {
-        story.push(concatSpeech(`вытянуть не могут.`, formatCall(nextChar)));
+        story.push(concatSpeech(`вытянуть не могут.`, formatCall(next)));
     }
 
-    return result(joinSpeech(story));
+    return concatSpeech(...story);
 }
 
 function formatStory(characters: Character[]): Speech {
@@ -130,9 +133,15 @@ function formatCall(char: Character) {
     return _.capitalize(`${formatCallWord(char)} ${formatCharNominative(char)}...`);
 }
 
-function isStoryOver(char: Character, characters: Character[]) {
-    const isLastMouse = char.subject.nominative === 'мышка';
-    const tooManyCharacters = characters.length >= 10;
+function isStoryOver(chars: Character[]) {
+    const last = _.last(chars);
+
+    if (!last) {
+        return false;
+    }
+
+    const isLastMouse = last.subject.nominative === 'мышка';
+    const tooManyCharacters = chars.length >= 10;
     return isLastMouse || tooManyCharacters;
 }
 
@@ -140,9 +149,6 @@ function formatCallWord(char: Character) {
     return isCharMale(char) ? 'позвал' : isCharFamela(char) ? 'позвала' : 'позвало';
 }
 
-function result(speech: Speech): DialogResult {
-    return {
-        speech,
-        endSession: false
-    };
+function isDialogResult(x): x is DialogResult {
+    return typeof x.speech === 'object' && typeof x.endSession === 'boolean';
 }

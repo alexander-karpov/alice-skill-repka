@@ -10,7 +10,7 @@ describe('Main dialog', () => {
     async function act(command: string): Promise<string> {
         const {
             speech: { text }
-        } = await mainDialog(command.split(' '), sessionData, deps);
+        } = await mainDialog(command.toLowerCase().split(' '), sessionData, deps);
         return text;
     }
 
@@ -132,10 +132,10 @@ describe('Main dialog', () => {
     test('Повтор истории: подтверждение', async () => {
         await act('');
         expect(await act('мышку')).toMatch('вытянули репку');
-        expect(await act('да пожалуйста')).toMatch('осадил дед репку');
+        expect(await act('давай еще раз')).toMatch('осадил дед репку');
 
         expect(await act('мышку')).toMatch('вытянули репку');
-        expect(await act('давай еще раз')).toMatch('осадил дед репку');
+        expect(await act('да пожалуйста')).toMatch('осадил дед репку');
     });
 
     test('Повтор истории: отказ', async () => {

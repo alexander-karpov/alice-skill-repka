@@ -19,3 +19,16 @@ export function repka(lexemes: Lexeme[]) {
 export function babka(char: Character) {
     return ['бабка', 'бабушка'].includes(char.subject.nominative);
 }
+
+export function help(tokens: string[]) {
+    const command = tokens.join(' ');
+    return command === 'что ты умеешь' || command === 'помощь';
+}
+
+export function yes(tokens: string[]) {
+    return tokens.some(t => ['да', 'давай'].includes(t));
+}
+
+export function no(tokens: string[]) {
+    return tokens.some(t => t === 'нет');
+}
