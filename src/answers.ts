@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import {
+    Word,
     charNominative,
     charAccusative,
     Character,
@@ -107,6 +108,22 @@ export function endOfStory() {
 
 export function wrongCommand(sessionData: SessionData) {
     return concatSpeech(`Это не похоже на персонажа.`, help(sessionData));
+}
+
+export function inanimateCalled(inanimate: Word, sessionData: SessionData) {
+    const lastChar = _.last(sessionData.chars) as Character;
+    const zval = byGender(lastChar, 'звал', 'звала', 'звало');
+    const dozvalsa = createSpeech(
+        byGender(lastChar, 'дозвался', 'дозвалась', 'дозвалось'),
+        byGender(lastChar, 'дозв+ался', 'дозвал+ась', 'дозвал+ось')
+    );
+
+    return concatSpeech(
+        `Долго ${charNominative(lastChar)} ${zval} ${inanimate.accusative}, не`,
+        dozvalsa,
+        `.`,
+        whoCalled(sessionData)
+    );
 }
 
 function formatCallWord(char: Character) {

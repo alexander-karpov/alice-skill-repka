@@ -98,7 +98,9 @@ export enum Gr {
     Famela = 'жен',
     Neuter = 'сред',
     /** Одушевленное */
-    Animated = 'од'
+    Animated = 'од',
+    /** Неодушевленное */
+    Inanimated = 'неод'
 }
 //#endregion
 

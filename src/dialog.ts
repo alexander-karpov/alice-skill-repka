@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { Stemmer } from './stemmer';
-import { extractCharacter, createDedka } from './extractCharacter';
+import { extractCharacter, createDedka, extractInanimate } from './extractCharacter';
 import { SessionData, Dialogs } from './sessionData';
 import { Speech, createSpeech, concatSpeech } from './speech';
 import * as answers from './answers';
@@ -52,6 +52,7 @@ export async function mainDialog(
         }
 
         const nextChar = extractCharacter(lexemes);
+        const inanimate = extractInanimate(lexemes);
 
         if (!nextChar && intents.hasMultipleChars(lexemes)) {
             return answers.onlyOneCharMayCome(sessionData);
@@ -69,6 +70,10 @@ export async function mainDialog(
 
         if (!currentChar) {
             return answers.storyBegin(random100);
+        }
+
+        if (!nextChar && inanimate) {
+            return answers.inanimateCalled(inanimate, sessionData);
         }
 
         if (!nextChar) {

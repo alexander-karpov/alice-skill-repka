@@ -22,7 +22,7 @@ export function babka(char: Character) {
 }
 
 export function cat(char: Character) {
-    return ['кошка', 'кошечка', 'кот', 'котик', 'котенок', 'мурка'].includes(
+    return ['кошка', 'кошечка', 'кот', 'котик', 'котенок', 'мурка', 'киска'].includes(
         char.subject.nominative
     );
 }

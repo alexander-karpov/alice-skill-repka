@@ -26,6 +26,24 @@ export function createDedka(): Character {
     };
 }
 
+export function extractInanimate(lexemes: Lexeme[]): Word | undefined {
+    const nouns = filterLexemes(lexemes, [Gr.Inanimated, Gr.Noun, Gr.Single]);
+
+    const noun =
+        _.first(filterLexemes(nouns, [Gr.Accusative])) ||
+        _.first(filterLexemes(nouns, [Gr.Nominative])) ||
+        _.first(nouns);
+
+    if (!noun) {
+        return undefined;
+    }
+
+    return {
+        nominative: noun.lex,
+        accusative: nominativeToAccusativeInanimated(noun)
+    };
+}
+
 function lexemeToWord(lexeme: Lexeme): Word {
     const accusative = nominativeToAccusative(lexeme);
 
@@ -53,54 +71,79 @@ function extractGender(lexeme: Lexeme): Gender {
  */
 function nominativeToAccusative(lexeme: Lexeme) {
     const gr = lexeme.gr;
-    const noun = lexeme.lex;
+    const nomenative = lexeme.lex;
     const isMale = matchGrs(gr, [Gr.Male]);
     const isFamela = matchGrs(gr, [Gr.Famela]);
     const isNeuter = matchGrs(gr, [Gr.Neuter]);
 
-    const changeOne = end => `${noun.substring(0, noun.length - 1)}${end}`;
-    const changeTwo = end => `${noun.substring(0, noun.length - 2)}${end}`;
-    const add = end => `${noun}${end}`;
+    const endsWith = end => nomenative.endsWith(end);
+    const changeOne = end => `${nomenative.substring(0, nomenative.length - 1)}${end}`;
+    const changeTwo = end => `${nomenative.substring(0, nomenative.length - 2)}${end}`;
+    const add = end => `${nomenative}${end}`;
 
     if (isNeuter) {
-        return noun;
+        return nomenative;
     }
 
     // Папа -> папу, мама -> маму
-    if (noun.endsWith('а')) {
+    if (endsWith('а')) {
         return changeOne('у');
     }
 
     // Маня -> маню
-    if (noun.endsWith('я')) {
+    if (endsWith('я')) {
         return changeOne('ю');
     }
 
     // Отец -> отца, кузнец -> кузнеца
-    if (noun.endsWith('ец')) {
+    if (endsWith('ец')) {
         return changeTwo('ца');
     }
 
     // Богатырь -> богатыря, конь -> коня.
-    if (noun.endsWith('ь') && isMale) {
+    if (endsWith('ь') && isMale) {
         return changeOne('я');
     }
 
     // Евгений -> евгения, злодей -> злодея
-    if (noun.endsWith('й') && isMale) {
+    if (endsWith('й') && isMale) {
         return changeOne('я');
     }
 
     // Внучок -> внучка, дружок -> дружка
-    if (noun.endsWith('ок') && isMale) {
+    if (endsWith('ок') && isMale) {
         return changeTwo('ка');
     }
 
     // Дочь, ...?
-    if (noun.endsWith('ь') && isFamela) {
+    if (endsWith('ь') && isFamela) {
         return changeOne('я');
     }
 
     // Человек -> человека, кролик -> кролика.
     return add('а');
+}
+
+/**
+ * Меняет падеж неод. существительного с им. на вин.
+ * @param noun Существительное в им. падеже.
+ */
+function nominativeToAccusativeInanimated(lexeme: Lexeme) {
+    const gr = lexeme.gr;
+    const isFamela = matchGrs(gr, [Gr.Famela]);
+    const nomenative = lexeme.lex;
+
+    const endsWith = end => nomenative.endsWith(end);
+    const changeOne = end => `${nomenative.substring(0, nomenative.length - 1)}${end}`;
+
+    // Икона -> икону, тарелка -> тарелку.
+    if (isFamela && endsWith('а')) {
+        return changeOne('у');
+    }
+
+    if (isFamela && endsWith('я')) {
+        return changeOne('ю');
+    }
+
+    return nomenative;
 }
