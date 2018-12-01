@@ -83,10 +83,12 @@ export function cat(char: Character, sessionData: SessionData, random100) {
 
     const prev = previousChar(char, sessionData.chars) as Character;
     const clung = byGender(char, 'вцепился', 'вцепилась', 'вцепилось');
+    const name = charNominative(char);
+    const description = name === 'мурка' ? 'кошка ' : '';
 
     return concatSpeech(
         _.capitalize(comeRunning(char)),
-        charNominative(char),
+        `${description}${name}`,
         meow,
         `и ${clung} в ${charAccusative(prev)}.`
     );
