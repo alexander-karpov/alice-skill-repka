@@ -33,7 +33,7 @@ export function help(tokens: string[]) {
 }
 
 export function yes(tokens: string[]) {
-    return tokens.some(t => ['да', 'давай', 'продолжай'].includes(t));
+    return tokens.some(t => ['да', 'давай', 'давайте', 'продолжай'].includes(t));
 }
 
 export function no(tokens: string[]) {
