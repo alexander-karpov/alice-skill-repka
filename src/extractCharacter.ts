@@ -56,10 +56,15 @@ function nominativeToAccusative(lexeme: Lexeme) {
     const noun = lexeme.lex;
     const isMale = matchGrs(gr, [Gr.Male]);
     const isFamela = matchGrs(gr, [Gr.Famela]);
+    const isNeuter = matchGrs(gr, [Gr.Neuter]);
 
     const changeOne = end => `${noun.substring(0, noun.length - 1)}${end}`;
     const changeTwo = end => `${noun.substring(0, noun.length - 2)}${end}`;
     const add = end => `${noun}${end}`;
+
+    if (isNeuter) {
+        return noun;
+    }
 
     // Папа -> папу, мама -> маму
     if (noun.endsWith('а')) {
@@ -84,6 +89,11 @@ function nominativeToAccusative(lexeme: Lexeme) {
     // Евгений -> евгения, злодей -> злодея
     if (noun.endsWith('й') && isMale) {
         return changeOne('я');
+    }
+
+    // Внучок -> внучка, дружок -> дружка
+    if (noun.endsWith('ок') && isMale) {
+        return changeTwo('ка');
     }
 
     // Дочь, ...?

@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import { formatCharNominative, Character, isCharMale, isCharFamela } from './character';
 import { SessionData } from './sessionData';
 import { sample } from './utils';
+import { speech } from './speech';
 
 const REPKA_GROWING =
     'Выросла репка большая-пребольшая. Стал дед репку из земли тянуть. Тянет-потянет, вытянуть не может. Позвал дед...';
@@ -36,14 +37,14 @@ export function intro(random100: number) {
 
 export function help(sessionData: SessionData) {
     const called = whoCalled(sessionData);
-    return `${ABOUT_SKILL} ${called}`;
+    return speech(`${ABOUT_SKILL} ${called}`);
 }
 
 export function onlyOneCharMayCome(sessionData: SessionData) {
     const answer = `Я точно помню, в этой сказке все приходили по одному.`;
     const called = whoCalled(sessionData);
 
-    return `${answer} ${called}`;
+    return speech(`${answer} ${called}`);
 }
 
 export function whoCalled(sessionData: SessionData) {
@@ -57,11 +58,11 @@ export function whoCalled(sessionData: SessionData) {
 }
 
 export function repka(sessionData: SessionData) {
-    return `Репка сама себя не вытянет. ${whoCalled(sessionData)}`;
+    return speech(`Репка сама себя не вытянет. ${whoCalled(sessionData)}`);
 }
 
 export function babkaCome() {
-    return `Бабушка-бабушка, почему у тебя такие большие руки?. Чтобы лучше репку тянуть!`;
+    return speech(`Бабушка-бабушка, почему у тебя такие большие руки?. Чтобы лучше репку тянуть!`);
 }
 
 function formatCallWord(char: Character) {

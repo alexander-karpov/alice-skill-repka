@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import { Stemmer } from './stemmer';
 import { extractCharacter, createDedka } from './extractCharacter';
 import { SessionData, Dialogs } from './sessionData';
+import { Speech, speech, joinSpeech, concatSpeech } from './speech';
 import * as answers from './answers';
 import * as intents from './intents';
 
@@ -20,7 +21,7 @@ export type DialogDependencies = {
 };
 
 export type DialogResult = {
-    text: string;
+    speech: Speech;
     endSession: boolean;
 };
 //#endregion
@@ -33,32 +34,33 @@ export async function mainDialog(
     const commandText = command.join(' ');
 
     if (commandText === 'что ты умеешь' || commandText === 'помощь') {
-        return { text: answers.help(sessionData), endSession: false };
+        return { speech: answers.help(sessionData), endSession: false };
     }
 
     if (sessionData.currentDialog === Dialogs.RepeatQuestion) {
-        const vars = ['да', 'нет', 'давай'];
-
-        if (!command.some(word => vars.includes(word))) {
-            return { text: 'Сейчас я ожидаю слово "Да" или "Нет".', endSession: false };
+        if (!command.some(word => ['да', 'нет', 'давай'].includes(word))) {
+            return { speech: speech('Сейчас я ожидаю ответ "Да" или "Нет".'), endSession: false };
         }
 
         if (command.includes('нет')) {
-            return { text: 'Вот и сказке конец, А кто слушал — молодец.', endSession: true };
+            return {
+                speech: speech('Вот и сказке конец, А кто слушал — молодец.'),
+                endSession: true
+            };
         }
 
         sessionData.chars.length = 0;
         sessionData.currentDialog = Dialogs.Story;
     }
 
-    return { text: await storyDialog(command.join(' '), sessionData, deps), endSession: false };
+    return { speech: await storyDialog(command.join(' '), sessionData, deps), endSession: false };
 }
 
 export async function storyDialog(
     command: string,
     sessionData: SessionData,
     { stemmer, random100 }: DialogDependencies
-) {
+): Promise<Speech> {
     const { chars } = sessionData;
     const lexemes = await stemmer(command);
     const nextChar = extractCharacter(lexemes);
@@ -78,20 +80,20 @@ export async function storyDialog(
     }
 
     if (sessionData.isNewSession) {
-        return `${answers.intro(random100)} ${answers.storyBegin(random100)}`;
+        return speech(`${answers.intro(random100)} ${answers.storyBegin(random100)}`);
     }
 
     if (!currentChar) {
-        return answers.storyBegin(random100);
+        return speech(answers.storyBegin(random100));
     }
 
     if (!nextChar) {
-        return `Это не похоже на персонажа. ${answers.help(sessionData)}`;
+        return concatSpeech(`Это не похоже на персонажа.`, answers.help(sessionData));
     }
 
     chars.push(nextChar);
 
-    const story: string[] = [];
+    const story: Speech[] = [];
 
     if (intents.babka(nextChar)) {
         story.push(answers.babkaCome());
@@ -100,21 +102,21 @@ export async function storyDialog(
     story.push(formatStory(chars));
 
     if (isStoryOver(nextChar, chars)) {
-        story.push('— вытянули репку! Какая интересная сказка. Хочешь послушать снова?');
+        story.push(speech('— вытянули репку! Какая интересная сказка. Хочешь послушать снова?'));
         sessionData.currentDialog = Dialogs.RepeatQuestion;
     } else {
-        story.push(`вытянуть не могут. ${formatCall(nextChar)}`);
+        story.push(concatSpeech(`вытянуть не могут.`, formatCall(nextChar)));
     }
 
-    return story.join(' ');
+    return joinSpeech(story);
 }
 
-function formatStory(characters: Character[]): string {
+function formatStory(characters: Character[]): Speech {
     const story = _.reverse(toPairs(characters))
         .map(pair => `${formatCharNominative(pair[1])} за ${formatCharAccusative(pair[0])}`)
         .join(', ');
 
-    return `${_.capitalize(story)}, дедка за репку — тянут-потянут,`;
+    return speech(`${_.capitalize(story)}, дедка за репку — тянут-потянут,`);
 }
 
 function toPairs(characters: Character[]): [Character, Character][] {

@@ -31,7 +31,8 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
 
             return {
                 response: {
-                    text: answer.text,
+                    text: answer.speech.text,
+                    tts: answer.speech.tts,
                     end_session: answer.endSession
                 },
                 session: request.session,

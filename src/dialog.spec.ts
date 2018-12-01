@@ -7,8 +7,9 @@ describe('Story dialog', () => {
     let deps: DialogDependencies;
     let sessionData: SessionData;
 
-    async function act(command: string) {
-        return storyDialog(command, sessionData, deps);
+    async function act(command: string): Promise<string> {
+        const { text } = await storyDialog(command, sessionData, deps);
+        return text;
     }
 
     test('Классическая сказка: начало', async () => {
@@ -82,13 +83,13 @@ describe('Story dialog', () => {
         await act('');
         expect(await act('человек')).toMatch('Человек за дедку');
         expect(await act('богатырь')).toMatch('Богатырь за человека');
-        expect(await act('Внучок')).toMatch('Внучка за богатыря');
-        expect(await act('Цариса')).toMatch('Царица за внучку');
+        expect(await act('Внучок')).toMatch('Внучок за богатыря');
+        expect(await act('Царица')).toMatch('Царица за внучка');
         expect(await act('Лебедь')).toMatch('Лебедь за царицу');
-        expect(await act('Врач')).toMatch('Врач за лебедь');
+        expect(await act('Врач')).toMatch('Врач за лебедя');
     });
 
-    test.only('Приоритет вин. падежу', async () => {
+    test('Приоритет вин. падежу', async () => {
         /**
          * внучк+а, а не вн+учка
          * Например дед позвал внучка
@@ -97,7 +98,7 @@ describe('Story dialog', () => {
         expect(await act('Внучка')).toMatch('Внучок за дедку');
     });
 
-    test.only('Позвали репку', async () => {
+    test('Позвали репку', async () => {
         /**
          * внучк+а, а не вн+учка
          * Например дед позвал внучка
@@ -106,7 +107,7 @@ describe('Story dialog', () => {
         expect(await act('Репку')).toMatch('Репка сама себя не вытянет');
     });
 
-    test.only('Позвали бабку', async () => {
+    test('Позвали бабку', async () => {
         /**
          * внучк+а, а не вн+учка
          * Например дед позвал внучка
@@ -134,12 +135,14 @@ describe('Main dialog', () => {
     let sessionData: SessionData;
 
     async function act(command: string): Promise<string> {
-        const { text } = await mainDialog(command.split(' '), sessionData, deps);
+        const {
+            speech: { text }
+        } = await mainDialog(command.split(' '), sessionData, deps);
         return text;
     }
 
     test('что ты умеешь / помощь', async () => {
-        expect(await act('что ты умеешь')).toMatch('расскажу вам сказку про репку');
+        expect(await act('что ты умеешь')).toMatch('расскажу сказку про репку');
     });
 
     test('что ты умеешь / помощь (в ходе повествования)', async () => {
@@ -161,7 +164,10 @@ describe('Main dialog', () => {
     test('Повтор истории: отказ', async () => {
         await act('');
         expect(await act('мышку')).toMatch('вытянули репку');
-        const { text, endSession } = await mainDialog(['нет спасибо не надо'], sessionData, deps);
+        const {
+            speech: { text },
+            endSession
+        } = await mainDialog('нет спасибо не надо'.split(' '), sessionData, deps);
 
         expect(text).toMatch('конец');
         expect(endSession).toEqual(true);
