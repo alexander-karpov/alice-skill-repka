@@ -15,7 +15,10 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
             const random100 = _.random(100, false);
             const sessionKey = createSessionKey(request);
 
-            appendToLog(logFile, request.request.nlu.tokens.join(' '));
+            // Очень много этих пингов
+            if (!request.request.nlu.tokens.includes('ping')) {
+                appendToLog(logFile, request.request.nlu.tokens.join(' '));
+            }
 
             if (!userData[sessionKey]) {
                 userData[sessionKey] = createSessionData();

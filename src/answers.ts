@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
 import {
-    Word,
     charNominative,
     charAccusative,
     Character,
@@ -9,15 +8,17 @@ import {
     previousChar
 } from './character';
 import { SessionData } from './sessionData';
-import { sample } from './utils';
+import { sample, lazySample } from './utils';
 import { createSpeech, Speech, concatSpeech } from './speech';
 
 const REPKA_GROWING =
     'Выросла репка большая-пребольшая. Стал дед репку из земли тянуть. Тянет-потянет, вытянуть не может. Позвал дед...';
 
 const GRANTFATHER_PLANT_LOW = 'посадил дед репку';
-const ABOUT_SKILL =
-    'Я расскажу сказку про репку, если вы мне поможете. Когда придет время позвать на помощь нового героя, дополните рассказ. Например, я скажу: "Позвал дедка...", а вы продолжите - "Богатыря". Вы готовы?';
+const ABOUT_SKILL = concatSpeech(
+    'Я расскажу сказку про репку, если вы мне поможете. Когда придет время позвать на помощь нового героя, дополните рассказ. Например, я скажу: "Позвал дедка...", а вы продолжите - "Богатыря". Вы готовы?',
+    delay(2)
+);
 
 export function storyBegin(random100: number): Speech {
     const cases = [
@@ -35,7 +36,7 @@ export function storyBegin(random100: number): Speech {
         `${_.capitalize(GRANTFATHER_PLANT_LOW)}.`
     ];
 
-    return concatSpeech(sample(cases, random100), REPKA_GROWING);
+    return concatSpeech(guitar(random100), sample(cases, random100), REPKA_GROWING);
 }
 
 export function intro(random100: number): Speech {
@@ -45,7 +46,7 @@ export function intro(random100: number): Speech {
 
 export function help(sessionData: SessionData) {
     const called = whoCalled(sessionData);
-    return createSpeech(`${ABOUT_SKILL} ${called}`);
+    return concatSpeech(ABOUT_SKILL, called);
 }
 
 export function onlyOneCharMayCome(sessionData: SessionData) {
@@ -110,19 +111,59 @@ export function wrongCommand(sessionData: SessionData) {
     return concatSpeech(`Это не похоже на персонажа.`, help(sessionData));
 }
 
-export function inanimateCalled(inanimate: Word, sessionData: SessionData) {
+export function inanimateCalled(inanimate: Character, sessionData: SessionData, random100: number) {
     const lastChar = _.last(sessionData.chars) as Character;
     const zval = byGender(lastChar, 'звал', 'звала', 'звало');
-    const dozvalsa = createSpeech(
-        byGender(lastChar, 'дозвался', 'дозвалась', 'дозвалось'),
-        byGender(lastChar, 'дозв+ался', 'дозвал+ась', 'дозвал+ось')
-    );
+    const jdal = byGender(lastChar, 'ждал', 'ждала', 'ждало');
+    const on = byGender(lastChar, 'он', 'она', 'оно');
 
-    return concatSpeech(
-        `Долго ${charNominative(lastChar)} ${zval} ${inanimate.accusative}, не`,
-        dozvalsa,
-        `.`,
-        whoCalled(sessionData)
+    return lazySample(
+        [
+            () =>
+                concatSpeech(
+                    `Долго ${zval} ${charNominative(lastChar)} ${charAccusative(inanimate)},`,
+                    guitar(random100),
+                    createSpeech(
+                        byGender(lastChar, 'не дозвался.', 'не дозвалась.', 'не дозвалось.'),
+                        byGender(lastChar, 'не дозв+ался.', 'не дозвал+ась.', 'не дозвал+ось.')
+                    ),
+                    'Давайте позовем другого персонажа.',
+                    whoCalled(sessionData)
+                ),
+            () =>
+                concatSpeech(
+                    `Долго ${jdal} ${on} ответа,`,
+                    createSpeech(
+                        byGender(lastChar, 'не дождался', 'не дождалась', 'не дождалось'),
+                        byGender(
+                            lastChar,
+                            '- - не дожд+ался - -',
+                            '- - не дождал+ась',
+                            '- - не дождал+ось - -'
+                        )
+                    ),
+                    `, к репке`,
+                    createSpeech(
+                        byGender(lastChar, 'воротился', 'воротилась', 'воротилось'),
+                        byGender(lastChar, 'ворот+ился', 'ворот+илась', 'ворот+илось')
+                    ),
+                    '. И позвал другого персонажа.',
+                    whoCalled(sessionData)
+                ),
+            () =>
+                concatSpeech(
+                    `Свойство ${charNominative(inanimate)} ${byGender(
+                        inanimate,
+                        'имел',
+                        'имела',
+                        'имело'
+                    )}: говорить ${byGender(inanimate, 'он умел', 'она умела', 'оно умело')}.`,
+                    byGender(inanimate, 'Попросил', 'Попросила', 'Попросило'),
+                    'позвать другого персонажа.',
+                    whoCalled(sessionData)
+                )
+        ],
+        random100
     );
 }
 
@@ -136,4 +177,17 @@ function comeRunning(char: Character) {
 
 function byGender<T>(char: Character, male: T, famela: T, other: T) {
     return isCharMale(char) ? male : isCharFamela(char) ? famela : other;
+}
+
+function guitar(random100: number): Speech {
+    const accoud = sample(['a', 'c', 'e', 'g'], random100);
+    return createSpeech('', `<speaker audio="alice-music-guitar-${accoud}-1.opus">`, {
+        ttsOnly: true
+    });
+}
+
+function delay(times: number): Speech {
+    return createSpeech('', '-' + _.repeat(' -', times - 1), {
+        ttsOnly: true
+    });
 }

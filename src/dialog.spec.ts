@@ -1,16 +1,16 @@
-import { mainDialog, DialogDependencies } from './dialog';
-import { spawnMystem } from './stemmer';
+import { mainDialog } from './dialog';
+import { spawnMystem, Stemmer } from './stemmer';
 import { SessionData, createSessionData } from './sessionData';
 
 describe('Main dialog', () => {
     let killStemmer: () => void;
-    let deps: DialogDependencies;
+    let stemmer: Stemmer;
     let sessionData: SessionData;
 
-    async function act(command: string): Promise<string> {
+    async function act(command: string, random100 = 0): Promise<string> {
         const {
             speech: { text }
-        } = await mainDialog(command.toLowerCase().split(' '), sessionData, deps);
+        } = await mainDialog(command.toLowerCase().split(' '), sessionData, { stemmer, random100 });
         return text;
     }
 
@@ -127,11 +127,14 @@ describe('Main dialog', () => {
 
     test('Отбрасывает неодушевленное специальной фразой', async () => {
         await act('');
-        expect(await act('лопату')).toMatch(/дедка звал лопату.*не дозвался/);
+        expect(await act('лопату')).toMatch(/звал дедка лопату.*не дозвался/);
+        expect(await act('лопату', 1)).toMatch('Долго ждал он ответа, не дождался');
+        expect(await act('лопату', 2)).toMatch('лопата имела: говорить она умела');
     });
 
     test('что ты умеешь / помощь', async () => {
         expect(await act('что ты умеешь')).toMatch('расскажу сказку про репку');
+        expect(await act('помощь')).toMatch('расскажу сказку про репку');
     });
 
     test('что ты умеешь / помощь (в ходе повествования)', async () => {
@@ -162,7 +165,7 @@ describe('Main dialog', () => {
         const {
             speech: { text },
             endSession
-        } = await mainDialog('нет спасибо'.split(' '), sessionData, deps);
+        } = await mainDialog('нет спасибо'.split(' '), sessionData, { stemmer, random100: 0 });
 
         expect(text).toMatch('конец');
         expect(endSession).toEqual(true);
@@ -174,7 +177,7 @@ describe('Main dialog', () => {
 
     beforeAll(() => {
         const spawned = spawnMystem();
-        deps = { stemmer: spawned.stemmer, random100: 0 };
+        stemmer = spawned.stemmer;
         killStemmer = spawned.killStemmer;
     });
 

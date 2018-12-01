@@ -26,7 +26,7 @@ export function createDedka(): Character {
     };
 }
 
-export function extractInanimate(lexemes: Lexeme[]): Word | undefined {
+export function extractInanimate(lexemes: Lexeme[]): Character | undefined {
     const nouns = filterLexemes(lexemes, [Gr.Inanimated, Gr.Noun, Gr.Single]);
 
     const noun =
@@ -39,8 +39,11 @@ export function extractInanimate(lexemes: Lexeme[]): Word | undefined {
     }
 
     return {
-        nominative: noun.lex,
-        accusative: nominativeToAccusativeInanimated(noun)
+        subject: {
+            nominative: noun.lex,
+            accusative: nominativeToAccusativeInanimated(noun)
+        },
+        gender: extractGender(noun)
     };
 }
 

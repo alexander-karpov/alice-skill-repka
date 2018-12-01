@@ -1,10 +1,15 @@
 export type Speech = {
     text: string;
     tts: string;
+    ttsOnly: boolean;
 };
 
-export function createSpeech(text: string, tts: string = text): Speech {
-    return { text, tts };
+export function createSpeech(
+    text: string,
+    tts: string = text,
+    { ttsOnly }: { ttsOnly: boolean } = { ttsOnly: false }
+): Speech {
+    return { text, tts, ttsOnly };
 }
 
 export function concatSpeech(...items: (Speech | string)[]): Speech {
@@ -13,7 +18,10 @@ export function concatSpeech(...items: (Speech | string)[]): Speech {
 
     items.filter(Boolean).forEach(s => {
         if (isSpeech(s)) {
-            text.push(s.text);
+            if (!s.ttsOnly) {
+                text.push(s.text);
+            }
+
             tts.push(s.tts);
         } else {
             text.push(s);
@@ -21,9 +29,13 @@ export function concatSpeech(...items: (Speech | string)[]): Speech {
         }
     });
 
-    return createSpeech(text.join(' '), tts.join(' '));
+    return createSpeech(fixSpeceBeforeComma(text.join(' ')), fixSpeceBeforeComma(tts.join(' ')));
 }
 
 function isSpeech(x): x is Speech {
     return typeof x.text === 'string' && typeof x.tts === 'string';
+}
+
+function fixSpeceBeforeComma(text) {
+    return text.replace(' ,', ',').replace(' .', '.');
 }

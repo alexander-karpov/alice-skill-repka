@@ -73,7 +73,7 @@ export async function mainDialog(
         }
 
         if (!nextChar && inanimate) {
-            return answers.inanimateCalled(inanimate, sessionData);
+            return answers.inanimateCalled(inanimate, sessionData, random100);
         }
 
         if (!nextChar) {
