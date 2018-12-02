@@ -100,7 +100,7 @@ export async function mainDialog(
         }
 
         if (intents.sobaka(nextChar)) {
-            return concatSpeech(answers.sobaka(nextChar, random100), repkaStory);
+            return concatSpeech(answers.sobaka(nextChar, currentChar, random100), repkaStory);
         }
 
         return repkaStory;

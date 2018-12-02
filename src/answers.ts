@@ -187,10 +187,10 @@ export function inanimateCalled(inanimate: Character, sessionData: SessionData, 
     );
 }
 
-export function sobaka(sobaka: Character, random100: number) {
+export function sobaka(sobaka: Character, previousChar: Character, random100: number) {
     const soundNumber = sample([1, 3, 4, 5], random100);
     const woof = createSpeech(
-        '- гав-гав.',
+        '- гав-гав -',
         `<speaker audio="alice-sounds-animals-dog-${soundNumber}.opus">`
     );
 
@@ -198,7 +198,7 @@ export function sobaka(sobaka: Character, random100: number) {
         'Прибежала',
         charNominative(sobaka),
         woof,
-        'повиляла хвостиком и тоже стала репку тянуть.'
+        `повиляла хвостиком и вцепилась за ${charAccusative(previousChar)}`
     );
 }
 
