@@ -138,7 +138,7 @@ describe('Main dialog', () => {
 
     test('Специальная фраза для собаки', async () => {
         await act('');
-        expect(await act('собака')).toMatch(/Прибежала собака.*повиляла/);
+        expect(await act('собака')).toMatch(/Прибежала собака/);
     });
 
     test('Отбрасывает неодушевленное специальной фразой', async () => {

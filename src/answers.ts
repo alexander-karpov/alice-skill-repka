@@ -198,7 +198,7 @@ export function sobaka(sobaka: Character, previousChar: Character, random100: nu
         'Прибежала',
         charNominative(sobaka),
         woof,
-        `повиляла хвостиком и вцепилась в ${charAccusative(previousChar)}.`
+        `и вцепилась в ${charAccusative(previousChar)}.`
     );
 }
 
