@@ -83,12 +83,16 @@ export async function mainDialog(
         chars.push(nextChar);
         const repkaStory = makeRepkaStory(nextChar, chars, sessionData);
 
-        if (intents.babka(nextChar)) {
-            return concatSpeech(answers.granny(), repkaStory);
+        if (intents.babushka(nextChar)) {
+            return concatSpeech(answers.babushka(), repkaStory);
         }
 
-        if (intents.cat(nextChar)) {
-            return concatSpeech(answers.cat(nextChar, sessionData, random100), repkaStory);
+        if (intents.kot(nextChar)) {
+            return concatSpeech(answers.kot(nextChar, sessionData, random100), repkaStory);
+        }
+
+        if (intents.slon(nextChar)) {
+            return concatSpeech(answers.slon(random100), repkaStory);
         }
 
         return repkaStory;

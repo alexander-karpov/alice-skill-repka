@@ -69,13 +69,13 @@ export function repka(sessionData: SessionData) {
     return createSpeech(`Репка сама себя не вытянет. ${whoCalled(sessionData)}`);
 }
 
-export function granny() {
+export function babushka() {
     return createSpeech(
         `Бабушка-бабушка, почему у тебя такие большие руки? Чтобы лучше репку тянуть!`
     );
 }
 
-export function cat(char: Character, sessionData: SessionData, random100) {
+export function kot(char: Character, sessionData: SessionData, random100) {
     const soundNumber = sample(byGender(char, [1, 2], [3, 4], [1]), random100);
     const meow = createSpeech(
         '- мяу -',
@@ -92,6 +92,14 @@ export function cat(char: Character, sessionData: SessionData, random100) {
         `${description}${name}`,
         meow,
         `и ${clung} в ${charAccusative(prev)}.`
+    );
+}
+
+export function slon(random100: number): Speech {
+    return concatSpeech(
+        `Что делал слон, когда пришёл на поле он?`,
+        elephant(random100),
+        'Помогал репку тянуть.'
     );
 }
 
@@ -174,6 +182,13 @@ function comeRunning(char: Character) {
 
 function byGender<T>(char: Character, male: T, famela: T, other: T) {
     return isCharMale(char) ? male : isCharFamela(char) ? famela : other;
+}
+
+function elephant(random100: number): Speech {
+    const n = sample([1, 2], random100);
+    return createSpeech('', `<speaker audio="alice-sounds-animals-elephant-${n}.opus">`, {
+        ttsOnly: true
+    });
 }
 
 // function guitar(random100: number): Speech {

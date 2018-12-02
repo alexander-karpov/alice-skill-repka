@@ -115,6 +115,11 @@ describe('Main dialog', () => {
         expect(await act('Бабку')).toMatch(/у тебя такие большие руки\?.+Бабка за дедку/);
     });
 
+    test('Специальная фраза для слона', async () => {
+        await act('');
+        expect(await act('слона')).toMatch('Что делал слон, когда пришёл на поле он');
+    });
+
     test('Специальная фраза для кошек', async () => {
         await act('');
         expect(await act('кошку')).toMatch(/Прибежала кошка.*вцепилась в дедку/);

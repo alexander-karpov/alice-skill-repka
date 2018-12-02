@@ -17,14 +17,18 @@ export function repka(lexemes: Lexeme[]) {
     return lexemes.length === 1 && lexemes && lexemes[0].lex === 'репка';
 }
 
-export function babka(char: Character) {
+export function babushka(char: Character) {
     return ['бабка', 'бабушка'].includes(char.subject.nominative);
 }
 
-export function cat(char: Character) {
+export function kot(char: Character) {
     return ['кошка', 'кошечка', 'кот', 'котик', 'котенок', 'мурка', 'киска'].includes(
         char.subject.nominative
     );
+}
+
+export function slon(char: Character) {
+    return ['слон', 'слоник', 'слоненок', 'слониха'].includes(char.subject.nominative);
 }
 
 export function help(tokens: string[]) {
