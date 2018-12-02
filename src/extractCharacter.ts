@@ -118,9 +118,9 @@ function nominativeToAccusative(lexeme: Lexeme) {
         return changeTwo('ка');
     }
 
-    // Дочь, ...?
+    // Дочь, лошадь?
     if (endsWith('ь') && isFamela) {
-        return changeOne('я');
+        return nomenative;
     }
 
     // Человек -> человека, кролик -> кролика.

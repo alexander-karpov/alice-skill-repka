@@ -37,5 +37,10 @@ export function yes(tokens: string[]) {
 }
 
 export function no(tokens: string[]) {
-    return tokens.includes('нет') || includesSeq(tokens, ['не', 'надо']);
+    return (
+        tokens.includes('достаточно') ||
+        tokens.includes('хватит') ||
+        tokens.includes('нет') ||
+        includesSeq(tokens, ['не', 'надо'])
+    );
 }
