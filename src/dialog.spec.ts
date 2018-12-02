@@ -136,6 +136,11 @@ describe('Main dialog', () => {
         expect(await act('мурку')).toMatch(/Прибежала кошка мурка/);
     });
 
+    test('Специальная фраза для собаки', async () => {
+        await act('');
+        expect(await act('собака')).toMatch(/Прибежала собака.*повиляла/);
+    });
+
     test('Отбрасывает неодушевленное специальной фразой', async () => {
         await act('');
         expect(await act('лопату')).toMatch(/звал дедка лопату.*не дозвался/);

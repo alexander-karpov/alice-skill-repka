@@ -88,7 +88,7 @@ export function kot(char: Character, sessionData: SessionData, random100) {
     const description = name === 'мурка' ? 'кошка ' : '';
 
     return concatSpeech(
-        _.capitalize(comeRunning(char)),
+        byGender(char, 'Прибежал', 'Прибежала', 'Прибежало'),
         `${description}${name}`,
         meow,
         `и ${clung} в ${charAccusative(prev)}.`
@@ -187,12 +187,23 @@ export function inanimateCalled(inanimate: Character, sessionData: SessionData, 
     );
 }
 
-function formatCallWord(char: Character) {
-    return byGender(char, 'позвал', 'позвала', 'позвало');
+export function sobaka(sobaka: Character, random100: number) {
+    const soundNumber = sample([1, 3, 4, 5], random100);
+    const woof = createSpeech(
+        '- гав-гав.',
+        `<speaker audio="alice-sounds-animals-dog-${soundNumber}.opus">`
+    );
+
+    return concatSpeech(
+        'Прибежала',
+        charNominative(sobaka),
+        woof,
+        'повиляла хвостиком и тоже стала репку тянуть.'
+    );
 }
 
-function comeRunning(char: Character) {
-    return byGender(char, 'прибежал', 'прибежала', 'прибежало');
+function formatCallWord(char: Character) {
+    return byGender(char, 'позвал', 'позвала', 'позвало');
 }
 
 function byGender<T>(char: Character, male: T, famela: T, other: T) {

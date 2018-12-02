@@ -99,6 +99,10 @@ export async function mainDialog(
             return concatSpeech(answers.rybka(currentChar), repkaStory);
         }
 
+        if (intents.sobaka(nextChar)) {
+            return concatSpeech(answers.sobaka(nextChar, random100), repkaStory);
+        }
+
         return repkaStory;
     })();
 

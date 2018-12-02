@@ -35,13 +35,17 @@ export function rybka(char: Character) {
     return ['рыба', 'рыбка'].includes(char.subject.nominative);
 }
 
+export function sobaka(char: Character) {
+    return ['жучка', 'собака', 'собачка'].includes(char.subject.nominative);
+}
+
 export function help(tokens: string[]) {
     const command = tokens.join(' ');
     return command === 'что ты умеешь' || command === 'помощь';
 }
 
 export function yes(tokens: string[]) {
-    return tokens.some(t => ['да', 'давай', 'давайте', 'продолжай'].includes(t));
+    return tokens.some(t => ['да', 'давай', 'давайте', 'продолжай', 'ладно'].includes(t));
 }
 
 export function no(tokens: string[]) {
