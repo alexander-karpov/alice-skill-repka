@@ -103,6 +103,21 @@ export function slon(random100: number): Speech {
     );
 }
 
+export function rybka(currentChar: Character) {
+    const nemu = byGender(currentChar, 'нему', 'ней', 'нему');
+    const poshel = byGender(currentChar, 'Пошёл', 'Пошла', 'Пошло');
+    const stalOn = byGender(currentChar, 'Стал он', 'Стал она', 'Стало оно');
+
+    return concatSpeech(
+        `${poshel} ${charNominative(currentChar)} к синему морю;`,
+        sea(),
+        `${stalOn} кликать рыбку, приплыла к ${nemu} рыбка, спросила:`,
+        `«Чего тебе надобно ${charNominative(currentChar)}?»`,
+        `Ей с поклоном ${charNominative(currentChar)} отвечает:`,
+        `«Смилуйся, государыня рыбка, помоги вытянуть репку.»`
+    );
+}
+
 export function yesOrNoExpected(): Speech {
     return createSpeech(
         'Сейчас я ожидаю в ответ "Да" или "Нет".',
@@ -187,6 +202,12 @@ function byGender<T>(char: Character, male: T, famela: T, other: T) {
 function elephant(random100: number): Speech {
     const n = sample([1, 2], random100);
     return createSpeech('', `<speaker audio="alice-sounds-animals-elephant-${n}.opus">`, {
+        ttsOnly: true
+    });
+}
+
+function sea(): Speech {
+    return createSpeech('', `<speaker audio="alice-sounds-nature-sea-1.opus">`, {
         ttsOnly: true
     });
 }

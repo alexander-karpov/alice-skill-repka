@@ -120,6 +120,11 @@ describe('Main dialog', () => {
         expect(await act('слона')).toMatch('Что делал слон, когда пришёл на поле он');
     });
 
+    test('Специальная фраза для рыбки', async () => {
+        await act('');
+        expect(await act('рыбку')).toMatch('приплыла к нему рыбка, спросила');
+    });
+
     test('Специальная фраза для кошек', async () => {
         await act('');
         expect(await act('кошку')).toMatch(/Прибежала кошка.*вцепилась в дедку/);

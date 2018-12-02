@@ -31,6 +31,10 @@ export function slon(char: Character) {
     return ['слон', 'слоник', 'слоненок', 'слониха'].includes(char.subject.nominative);
 }
 
+export function rybka(char: Character) {
+    return ['рыба', 'рыбка'].includes(char.subject.nominative);
+}
+
 export function help(tokens: string[]) {
     const command = tokens.join(' ');
     return command === 'что ты умеешь' || command === 'помощь';
