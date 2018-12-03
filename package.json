@@ -2,6 +2,12 @@
   "name": "alice-skill-repka",
   "version": "0.2.22",
   "main": "dist/index.js",
+  "author": "Alexander Karpov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/alexander-karpov/alice-skill-repka/issues"
+  },
+  "homepage": "https://github.com/alexander-karpov/alice-skill-repka#readme",
   "scripts": {
     "build": "rm -rf ./dist && tsc",
     "test": "jest",
