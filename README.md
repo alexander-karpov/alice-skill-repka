@@ -16,4 +16,4 @@ const { startSkillServer } = require('alice-skill-repka');
 startSkillServer({port: 3000, logsDir: '/var/logs/repka'});
 ```
 
-Буду очень рад помощи если вам это интересно 🙂
+Буду рад помощи.
