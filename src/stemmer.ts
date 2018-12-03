@@ -3,21 +3,22 @@ import { spawn } from 'child_process';
 import { Readable, Writable } from 'stream';
 
 //#region types
-export type Stemmer = (message: string) => Promise<Lexeme[]>;
+export type Stemmer = (message: string) => Promise<Token[]>;
 
 type PromiseResolvers = {
     resolve: (value: string) => void;
     reject: (reason: string) => void;
 };
 
-type Token = {
-    analysis?: TokenLexeme[];
+type MyStemToken = {
+    analysis?: MyStemLexeme[];
     text: string;
 };
 
-type TokenLexeme = { lex: string; gr: string };
+type MyStemLexeme = { lex: string; gr: string };
 
 export type Lexeme = { lex: string; gr: Gr[] };
+export type Token = { lexemes: Lexeme[] };
 
 export enum Gr {
     /**
@@ -97,6 +98,7 @@ export enum Gr {
     Male = 'муж',
     Famela = 'жен',
     Neuter = 'сред',
+    Unisex = 'мж',
     /** Одушевленное */
     Animated = 'од',
     /** Неодушевленное */
@@ -139,14 +141,14 @@ export function spawnMystem(): { stemmer: Stemmer; killStemmer: () => void } {
     const mystem = spawn('mystem', ['--format=json', '-ig', '-c'], { detached: true });
     const queue = ReadWriteStreamsQueue.create(mystem.stdin, mystem.stdout, mystem.stderr);
 
-    function stemmer(message: string): Promise<Lexeme[]> {
+    function stemmer(message: string): Promise<Token[]> {
         if (!message) {
             return Promise.resolve([]);
         }
 
         return queue
             .process(cleanBeforeStemming(message) + '\n')
-            .then<Lexeme[]>(output => tokensToLexemesEx(JSON.parse(output)));
+            .then<Token[]>(output => (JSON.parse(output) as MyStemToken[]).map(preprocessToken));
     }
 
     function killStemmer() {
@@ -209,13 +211,8 @@ export class ReadWriteStreamsQueue {
  * исходный текст каждого токена внутрь.
  * @param tokens
  */
-function tokensToLexemesEx(tokens: Token[]): Lexeme[] {
-    const lexemes: Lexeme[][] = tokens.map(token =>
-        (token.analysis || []).map(lex => ({
-            lex: lex.lex,
-            gr: lex.gr.split(/=|,|\||\)|\(/) as Gr[]
-        }))
-    );
+export function tokensToLexemesEx(tokens: Token[]): Lexeme[] {
+    const lexemes: Lexeme[][] = tokens.map(token => token.lexemes || []);
 
     return _.flatten(lexemes);
 }
@@ -231,4 +228,21 @@ export function filterLexemes(lexemes: Lexeme[], grs: Gr[]): Lexeme[] {
 
 export function matchGrs(gr: string[], pattern: Gr[]) {
     return pattern.every(p => gr.includes(p));
+}
+
+export function findLexeme(token: Token, grs: Gr[]): Lexeme | undefined {
+    return token.lexemes.find(l => {
+        return grs.every(gr => l.gr.includes(gr));
+    });
+}
+
+function preprocessLexeme({ lex, gr }): Lexeme {
+    return {
+        lex,
+        gr: gr.split(/=|,|\||\)|\(/) as Gr[]
+    };
+}
+
+function preprocessToken({ analysis }: MyStemToken): Token {
+    return { lexemes: _.map(analysis, preprocessLexeme) };
 }

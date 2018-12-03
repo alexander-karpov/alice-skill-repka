@@ -1,8 +1,15 @@
 import * as _ from 'lodash';
 import { Character, Word, Gender } from './character';
-import { Lexeme, Gr, filterLexemes, matchGrs } from './stemmer';
+import { Lexeme, Gr, filterLexemes, matchGrs, findLexeme, Token } from './stemmer';
+import { matchSeq, Maybe } from './utils/seq';
 
-export function extractCharacter(lexemes: Lexeme[]): Character | undefined {
+export function extractCharacter(tokens: Token[], lexemes: Lexeme[]): Character | undefined {
+    const fullNameChar = extractFullNameChar(tokens);
+
+    if (fullNameChar) {
+        return fullNameChar;
+    }
+
     const nouns = filterLexemes(lexemes, [Gr.Animated, Gr.Noun, Gr.Single]);
 
     const noun =
@@ -118,6 +125,11 @@ function nominativeToAccusative(lexeme: Lexeme) {
         return changeTwo('ка');
     }
 
+    // Гарри
+    if (endsWith('и') && isMale) {
+        return nomenative;
+    }
+
     // Дочь, лошадь?
     if (endsWith('ь') && isFamela) {
         return nomenative;
@@ -149,4 +161,36 @@ function nominativeToAccusativeInanimated(lexeme: Lexeme) {
     }
 
     return nomenative;
+}
+
+function extractFullNameChar(tokens: Token[]): Maybe<Character> {
+    const maleFirstName = t => findLexeme(t, [Gr.persn, Gr.Male]);
+    const maleLastName = t =>
+        findLexeme(t, [Gr.famn, Gr.Male]) || findLexeme(t, [Gr.famn, Gr.Unisex]);
+    const famelaFirstName = t => findLexeme(t, [Gr.persn, Gr.Famela]);
+    const famelaLastName = t =>
+        findLexeme(t, [Gr.famn, Gr.Famela]) || findLexeme(t, [Gr.famn, Gr.Unisex]);
+    const space = t => _.isEmpty(t.lexemes);
+
+    const fullNameLexemes =
+        matchSeq(tokens, [maleFirstName, maleLastName], space) ||
+        matchSeq(tokens, [famelaFirstName, famelaLastName], space);
+
+    if (!fullNameLexemes) {
+        return undefined;
+    }
+
+    const [firstNameWord, lastNameWord] = fullNameLexemes.map(lexemeToWord);
+
+    return {
+        subject: {
+            nominative: `${_.upperFirst(firstNameWord.nominative)} ${_.upperFirst(
+                lastNameWord.nominative
+            )}`,
+            accusative: `${_.upperFirst(firstNameWord.accusative)} ${_.upperFirst(
+                lastNameWord.accusative
+            )}`
+        },
+        gender: extractGender(fullNameLexemes[0])
+    };
 }

@@ -181,6 +181,15 @@ describe('Main dialog', () => {
         expect(await act('лошадь')).toMatch('Лошадь за лошадь');
     });
 
+    test('Принимает полное имя', async () => {
+        await act('');
+        expect(await act('александра карпова')).toMatch('Александр Карпов за дедку');
+        expect(await act('ирина карпова')).toMatch('Ирина Карпова за Александра Карпова');
+        expect(await act('владимир путин')).toMatch('Владимир Путин за Ирину Карпову');
+        expect(await act('гарри поттер')).toMatch('Гарри Поттер за Владимира Путина');
+        expect(await act('фёдор емельяненко')).toMatch('Федор Емельяненко за Гарри Поттера');
+    });
+
     test('Повтор истории: отказ', async () => {
         await act('');
         expect(await act('мышку')).toMatch('вытянули репку');

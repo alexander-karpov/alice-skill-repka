@@ -1,6 +1,6 @@
 import { Lexeme, Gr, filterLexemes } from './stemmer';
 import { Character } from './character';
-import { includesSeq } from './utils/seq';
+import * as seq from './utils/seq';
 
 export function hasMultipleChars(lexemes: Lexeme[]) {
     const [nounMultiple] = filterLexemes(lexemes, [
@@ -49,10 +49,10 @@ export function yes(tokens: string[]) {
 }
 
 export function no(tokens: string[]) {
-    return (
+    return Boolean(
         tokens.includes('достаточно') ||
-        tokens.includes('хватит') ||
-        tokens.includes('нет') ||
-        includesSeq(tokens, ['не', 'надо'])
+            tokens.includes('хватит') ||
+            tokens.includes('нет') ||
+            seq.matchSeq(tokens, [seq.eq('не'), seq.eq('надо')])
     );
 }

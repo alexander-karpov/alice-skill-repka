@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Stemmer } from './stemmer';
+import { Stemmer, tokensToLexemesEx } from './stemmer';
 import { extractCharacter, createDedka, extractInanimate } from './extractCharacter';
 import { SessionData, Dialogs } from './sessionData';
 import { Speech, createSpeech, concatSpeech } from './speech';
@@ -21,28 +21,29 @@ export type DialogResult = {
 //#endregion
 
 export async function mainDialog(
-    tokens: string[],
+    rawTokens: string[],
     sessionData: SessionData,
     { stemmer, random100 }: DialogDependencies
 ): Promise<DialogResult> {
     const isRepeatQuestionDialog = sessionData.currentDialog === Dialogs.RepeatQuestion;
-    const lexemes = await stemmer(tokens.join(' '));
+    const tokens = await stemmer(rawTokens.join(' '));
+    const lexemes = tokensToLexemesEx(tokens);
     const { chars } = sessionData;
 
     const result = await (async function narrative(): Promise<DialogResult | Speech> {
-        if (intents.help(tokens)) {
+        if (intents.help(rawTokens)) {
             return answers.help(sessionData);
         }
 
-        if (isRepeatQuestionDialog && !intents.no(tokens) && !intents.yes(tokens)) {
+        if (isRepeatQuestionDialog && !intents.no(rawTokens) && !intents.yes(rawTokens)) {
             return answers.yesOrNoExpected();
         }
 
-        if (isRepeatQuestionDialog && intents.no(tokens)) {
+        if (isRepeatQuestionDialog && intents.no(rawTokens)) {
             return { speech: answers.endOfStory(), endSession: true };
         }
 
-        if (isRepeatQuestionDialog && intents.yes(tokens)) {
+        if (isRepeatQuestionDialog && intents.yes(rawTokens)) {
             sessionData.chars.length = 0;
             sessionData.currentDialog = Dialogs.Story;
         }
@@ -51,7 +52,7 @@ export async function mainDialog(
             return answers.repka(sessionData);
         }
 
-        const nextChar = extractCharacter(lexemes);
+        const nextChar = extractCharacter(tokens, lexemes);
         const inanimate = extractInanimate(lexemes);
 
         if (!nextChar && intents.hasMultipleChars(lexemes)) {
@@ -131,7 +132,7 @@ function formatStory(characters: Character[]): Speech {
         .map(pair => `${charNominative(pair[1])} за ${charAccusative(pair[0])}`)
         .join(', ');
 
-    return createSpeech(`${_.capitalize(story)}, дедка за репку — тянут-потянут,`);
+    return createSpeech(`${_.upperFirst(story)}, дедка за репку — тянут-потянут,`);
 }
 
 function toPairs(characters: Character[]): [Character, Character][] {
