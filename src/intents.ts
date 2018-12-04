@@ -13,25 +13,23 @@ export function repka(lexemes: Lexeme[]) {
 }
 
 export function babushka(char: Character) {
-    return ['бабка', 'бабушка'].includes(char.subject.nominative);
+    return ['бабка', 'бабушка', 'баба'].some(alias => char.subject.nominative.includes(alias));
 }
 
 export function kot(char: Character) {
-    return ['кошка', 'кошечка', 'кот', 'котик', 'котенок', 'мурка', 'киска'].includes(
-        char.subject.nominative
+    return ['кошка', 'кошечка', 'кот', 'котик', 'котенок', 'мурка', 'киска'].some(alias =>
+        char.subject.nominative.includes(alias)
     );
 }
 
 export function slon(char: Character) {
-    return ['слон', 'слоник', 'слоненок', 'слониха'].includes(char.subject.nominative);
+    return ['слон', 'слоник', 'слоненок', 'слониха'].some(alias =>
+        char.subject.nominative.includes(alias)
+    );
 }
 
 export function rybka(char: Character) {
-    return ['рыба', 'рыбка'].includes(char.subject.nominative);
-}
-
-export function sobaka(char: Character) {
-    return ['жучка', 'собака', 'собачка'].includes(char.subject.nominative);
+    return ['рыба', 'рыбка'].some(alias => char.subject.nominative.includes(alias));
 }
 
 export function help(tokens: string[]) {

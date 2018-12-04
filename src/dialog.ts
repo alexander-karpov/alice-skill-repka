@@ -97,11 +97,7 @@ export async function mainDialog(
         }
 
         if (intents.rybka(nextChar)) {
-            return concatSpeech(answers.rybka(currentChar), repkaStory);
-        }
-
-        if (intents.sobaka(nextChar)) {
-            return concatSpeech(answers.sobaka(nextChar, currentChar, random100), repkaStory);
+            return concatSpeech(answers.rybka(nextChar, currentChar), repkaStory);
         }
 
         return repkaStory;

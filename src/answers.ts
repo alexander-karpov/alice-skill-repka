@@ -116,7 +116,7 @@ export function slon(random100: number): Speech {
     );
 }
 
-export function rybka(currentChar: Character) {
+export function rybka(char: Character, currentChar: Character) {
     const nemu = byGender(currentChar, 'нему', 'ней', 'нему');
     const poshel = byGender(currentChar, 'Пошёл', 'Пошла', 'Пошло');
     const stalOn = byGender(currentChar, 'стал он', 'стал она', 'стало оно');
@@ -124,7 +124,7 @@ export function rybka(currentChar: Character) {
     return concatSpeech(
         `${poshel} ${nom(currentChar)} к синему морю;`,
         sea(),
-        `${stalOn} кликать рыбку, приплыла к ${nemu} рыбка, спросила:`,
+        `${stalOn} кликать ${acc(char)}, приплыла к ${nemu} рыбка, спросила:`,
         `«Чего тебе надобно ${nom(currentChar)}?»`,
         `Ей с поклоном ${nom(currentChar)} отвечает:`,
         `«Смилуйся, государыня рыбка, помоги вытянуть репку.»`
@@ -198,16 +198,6 @@ export function inanimateCalled(inanimate: Character, sessionData: SessionData, 
         ],
         random100
     );
-}
-
-export function sobaka(sobaka: Character, previousChar: Character, random100: number) {
-    const soundNumber = sample([1, 3, 4, 5], random100);
-    const woof = createSpeech(
-        '- гав-гав -',
-        `<speaker audio="alice-sounds-animals-dog-${soundNumber}.opus">`
-    );
-
-    return concatSpeech('Прибежала', nom(sobaka), woof, `и вцепилась в ${acc(previousChar)}.`);
 }
 
 function formatCallWord(char: Character) {
