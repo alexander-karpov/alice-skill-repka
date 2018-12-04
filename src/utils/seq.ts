@@ -12,24 +12,19 @@ export type Maybe<T> = T | undefined;
  */
 export function matchSeq<T, TResult>(
     seq: Maybe<T[]>,
-    pattern: Selector<T, TResult>[],
-    separator: Predicate<T> = () => false
+    pattern: Selector<T, TResult>[]
 ): Maybe<TResult[]> {
     if (!seq) {
         return undefined;
     }
 
-    const withoutSpaces = _.filter(seq, item => !separator(item));
-
-    if (!areLengthsCompatible(withoutSpaces, pattern)) {
+    if (!areLengthsCompatible(seq, pattern)) {
         return undefined;
     }
 
-    for (let i = 0; i < withoutSpaces.length - pattern.length + 1; i++) {
-        if (startsWithf(withoutSpaces, pattern, i)) {
-            return withoutSpaces
-                .slice(i, i + pattern.length)
-                .map((v, i) => pattern[i](v) as TResult);
+    for (let i = 0; i < seq.length - pattern.length + 1; i++) {
+        if (startsWithf(seq, pattern, i)) {
+            return seq.slice(i, i + pattern.length).map((v, i) => pattern[i](v) as TResult);
         }
     }
 

@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 import { Character, Word, Gender } from './character';
 import { Lexeme, Gr, filterLexemes, matchGrs, findLexeme, Token } from './stemmer';
 import { matchSeq, Maybe } from './utils/seq';
-import { NOTFOUND } from 'dns';
 
 export function extractCharacter(tokens: Token[], lexemes: Lexeme[]): Character | undefined {
     const fullNameChar = extractFullNameChar(tokens);
@@ -27,8 +26,15 @@ export function extractCharacter(tokens: Token[], lexemes: Lexeme[]): Character 
     if (!noun) {
         return undefined;
     }
+
+    const token = tokens.find(t => t.lexemes.includes(noun));
+
+    if (!token) {
+        return undefined;
+    }
+
     return {
-        subject: lexemeToWord(noun),
+        subject: lexemeToWord(noun, token),
         gender: extractGender(noun)
     };
 }
@@ -61,11 +67,11 @@ export function extractInanimate(lexemes: Lexeme[]): Character | undefined {
     };
 }
 
-function lexemeToWord(lexeme: Lexeme): Word {
-    const accusative = lexeme.gr.includes(Gr.S) ? SNomToAcc(lexeme) : ANomToAcc(lexeme);
+function lexemeToWord(lexeme: Lexeme, token: Token): Word {
+    const accusative = lexeme.gr.includes(Gr.S) ? SNomToAcc(lexeme) : ANomToAcc(lexeme, token);
     const nominative =
         lexeme.gr.includes(Gr.Famela) && lexeme.gr.includes(Gr.A)
-            ? AMaleToFamela(lexeme)
+            ? ANomMaleToFamela(lexeme, token)
             : lexeme.lex;
 
     return {
@@ -184,45 +190,53 @@ function nominativeToAccusativeInanimated(lexeme: Lexeme) {
  * Меняет падеж прилагательного с им. на вин.
  * @param noun Существительное в им. падеже.
  */
-function ANomToAcc(lexeme: Lexeme) {
-    const gr = lexeme.gr;
-    const nom = lexeme.lex;
-    const isMale = matchGrs(gr, [Gr.Male]);
-    const isFamela = matchGrs(gr, [Gr.Famela]);
-    const isNeuter = matchGrs(gr, [Gr.Neuter]);
-    const isUnisex = matchGrs(gr, [Gr.Unisex]);
+function ANomToAcc(lexeme: Lexeme, token: Token) {
+    if (lexeme.gr.includes(Gr.Acc)) {
+        return token.text;
+    }
 
+    const nom = token.text;
     const endsWith = end => nom.endsWith(end);
-    const changeOne = end => `${nom.substring(0, nom.length - 1)}${end}`;
     const changeTwo = end => `${nom.substring(0, nom.length - 2)}${end}`;
-    const add = end => `${nom}${end}`;
 
-    if (isMale && endsWith('ый')) {
+    if (endsWith('ий')) {
+        return changeTwo('его');
+    }
+
+    if (endsWith('ый')) {
         return changeTwo('ого');
     }
 
-    if (isFamela && endsWith('ий')) {
+    if (endsWith('ая')) {
         return changeTwo('ую');
+    }
+
+    if (endsWith('яя')) {
+        return changeTwo('юю');
     }
 
     return nom;
 }
 
-function AMaleToFamela(lexeme: Lexeme) {
-    const gr = lexeme.gr;
-    const nom = lexeme.lex;
-    const isMale = matchGrs(gr, [Gr.Male]);
-    const isFamela = matchGrs(gr, [Gr.Famela]);
-    const isNeuter = matchGrs(gr, [Gr.Neuter]);
-    const isUnisex = matchGrs(gr, [Gr.Unisex]);
+/**
+ * Меняет род прилагательного с муж. на жен.
+ * @param lexeme
+ */
+function ANomMaleToFamela(lexeme: Lexeme, token: Token) {
+    if (lexeme.gr.includes(Gr.Nom)) {
+        return token.text;
+    }
 
+    const nom = token.text;
     const endsWith = end => nom.endsWith(end);
-    const changeOne = end => `${nom.substring(0, nom.length - 1)}${end}`;
     const changeTwo = end => `${nom.substring(0, nom.length - 2)}${end}`;
-    const add = end => `${nom}${end}`;
 
-    if (endsWith('ий')) {
+    if (endsWith('ую')) {
         return changeTwo('ая');
+    }
+
+    if (endsWith('юю')) {
+        return changeTwo('яя');
     }
 
     return nom;
@@ -235,17 +249,24 @@ function extractFullNameChar(tokens: Token[]): Maybe<Character> {
     const famelaFirstName = t => findLexeme(t, [Gr.persn, Gr.Famela]);
     const famelaLastName = t =>
         findLexeme(t, [Gr.famn, Gr.Famela]) || findLexeme(t, [Gr.famn, Gr.Unisex]);
-    const space = t => _.isEmpty(t.lexemes);
 
     const fullNameLexemes =
-        matchSeq(tokens, [maleFirstName, maleLastName], space) ||
-        matchSeq(tokens, [famelaFirstName, famelaLastName], space);
+        matchSeq(tokens, [maleFirstName, maleLastName]) ||
+        matchSeq(tokens, [famelaFirstName, famelaLastName]);
 
     if (!fullNameLexemes) {
         return undefined;
     }
 
-    const [firstNameWord, lastNameWord] = fullNameLexemes.map(lexemeToWord);
+    const token0 = tokens.find(t => t.lexemes.includes(fullNameLexemes[0]));
+    const token1 = tokens.find(t => t.lexemes.includes(fullNameLexemes[1]));
+
+    if (!token0 || !token1) {
+        return undefined;
+    }
+
+    const firstNameWord = lexemeToWord(fullNameLexemes[0], token0);
+    const lastNameWord = lexemeToWord(fullNameLexemes[1], token1);
 
     return {
         subject: {
@@ -265,25 +286,31 @@ function extractFullNameChar(tokens: Token[]): Maybe<Character> {
  * @param tokens
  */
 function extractСharWithAttribute(tokens: Token[]): Maybe<Character> {
-    const ANom = t => findLexeme(t, [Gr.A, Gr.Nom]);
-    const AAcc = t => findLexeme(t, [Gr.A, Gr.Acc]);
-    const SNom = t => findLexeme(t, [Gr.S, Gr.Nom]);
-    const SAcc = t => findLexeme(t, [Gr.S, Gr.Acc]);
+    const ANom = matcher([Gr.A, Gr.Nom]);
+    const AAcc = matcher([Gr.A, Gr.Acc]);
+    const SNom = matcher([Gr.S, Gr.Nom, Gr.Animated]);
+    const SAcc = matcher([Gr.S, Gr.Acc, Gr.Animated]);
 
-    const space = t => _.isEmpty(t.lexemes);
-    const lexemes = matchSeq(tokens, [AAcc, SAcc], space) || matchSeq(tokens, [ANom, SNom], space);
+    const matches = matchSeq(tokens, [AAcc, SAcc]) || matchSeq(tokens, [ANom, SNom]);
 
-    if (!lexemes) {
+    if (!matches) {
         return undefined;
     }
 
-    const [adj, noun] = lexemes.map(lexemeToWord);
+    const [adj, noun] = matches.map(m => lexemeToWord(...m));
 
     return {
         subject: {
             nominative: `${adj.nominative} ${noun.nominative}`,
             accusative: `${adj.accusative} ${noun.accusative}`
         },
-        gender: extractGender(lexemes[1])
+        gender: extractGender(matches[1][0])
+    };
+}
+
+function matcher(grs: Gr[]): (x: Token) => [Lexeme, Token] | undefined {
+    return (token: Token) => {
+        const lexeme = findLexeme(token, grs);
+        return lexeme ? [lexeme, token] : undefined;
     };
 }

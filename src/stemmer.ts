@@ -18,7 +18,7 @@ type MyStemToken = {
 type MyStemLexeme = { lex: string; gr: string };
 
 export type Lexeme = { lex: string; gr: Gr[] };
-export type Token = { lexemes: Lexeme[] };
+export type Token = { lexemes: Lexeme[]; text: string };
 
 export enum Gr {
     /**
@@ -138,7 +138,7 @@ export function spawnMystem(): { stemmer: Stemmer; killStemmer: () => void } {
     /**
      * @see https://tech.yandex.ru/mystem/doc/
      */
-    const mystem = spawn('mystem', ['--format=json', '-ig', '-c'], { detached: true });
+    const mystem = spawn('mystem', ['--format=json', '-i'], { detached: true });
     const queue = ReadWriteStreamsQueue.create(mystem.stdin, mystem.stdout, mystem.stderr);
 
     function stemmer(message: string): Promise<Token[]> {
@@ -239,10 +239,10 @@ export function findLexeme(token: Token, grs: Gr[]): Lexeme | undefined {
 function preprocessLexeme({ lex, gr }): Lexeme {
     return {
         lex,
-        gr: gr.split(/=|,|\||\)|\(/) as Gr[]
+        gr: gr.split(/=|,/) as Gr[]
     };
 }
 
-function preprocessToken({ analysis }: MyStemToken): Token {
-    return { lexemes: _.map(analysis, preprocessLexeme) };
+function preprocessToken({ analysis, text }: MyStemToken): Token {
+    return { lexemes: _.map(analysis, preprocessLexeme), text };
 }
