@@ -201,6 +201,11 @@ describe('Main dialog', () => {
         expect(await act('зверя')).toMatch('Зверь за летнюю пчелку,');
     });
 
+    test('Подставляет персонажей со спец.фразами во вводной/справке', async () => {
+        await act('');
+        expect(await act('ххх')).toMatch('продолжите: "бабушку"');
+    });
+
     test('Повтор истории: отказ', async () => {
         await act('');
         expect(await act('мышку')).toMatch('вытянули репку');

@@ -16,20 +16,22 @@ export type Character = {
     gender: Gender;
 };
 
+export function createChar(nom: string, acc: string, gender: Gender): Character {
+    return {
+        subject: {
+            nominative: nom,
+            accusative: acc
+        },
+        gender
+    };
+}
+
 export function isCharMale(char: Character) {
     return char.gender === Gender.Male;
 }
 
 export function isCharFamela(char: Character) {
     return char.gender === Gender.Famela;
-}
-
-export function charNominative(char: Character) {
-    return char.subject.nominative;
-}
-
-export function charAccusative(char: Character) {
-    return char.subject.accusative;
 }
 
 export function previousChar(char: Character, chars: Character[]) {

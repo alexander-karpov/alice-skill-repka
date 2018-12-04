@@ -6,7 +6,7 @@ import { Speech, createSpeech, concatSpeech } from './speech';
 import * as answers from './answers';
 import * as intents from './intents';
 
-import { Character, isCharMale, isCharFamela, charNominative, charAccusative } from './character';
+import { Character, isCharMale, isCharFamela } from './character';
 
 //#region types
 export type DialogDependencies = {
@@ -32,7 +32,7 @@ export async function mainDialog(
 
     const result = await (async function narrative(): Promise<DialogResult | Speech> {
         if (intents.help(rawTokens)) {
-            return answers.help(sessionData);
+            return answers.help(sessionData, random100);
         }
 
         if (isRepeatQuestionDialog && !intents.no(rawTokens) && !intents.yes(rawTokens)) {
@@ -78,7 +78,7 @@ export async function mainDialog(
         }
 
         if (!nextChar) {
-            return answers.wrongCommand(sessionData);
+            return answers.wrongCommand(sessionData, random100);
         }
 
         chars.push(nextChar);
@@ -129,7 +129,7 @@ function makeRepkaStory(next: Character, all: Character[], sessionData: SessionD
 
 function formatStory(characters: Character[]): Speech {
     const story = _.reverse(toPairs(characters))
-        .map(pair => `${charNominative(pair[1])} за ${charAccusative(pair[0])}`)
+        .map(pair => `${answers.nom(pair[1])} за ${answers.acc(pair[0])}`)
         .join(', ');
 
     return createSpeech(`${_.upperFirst(story)}, дедка за репку — тянут-потянут,`);
@@ -146,7 +146,7 @@ function toPairs(characters: Character[]): [Character, Character][] {
 }
 
 function formatCall(char: Character) {
-    return _.capitalize(`${formatCallWord(char)} ${charNominative(char)}...`);
+    return _.capitalize(`${formatCallWord(char)} ${answers.nom(char)}...`);
 }
 
 function isStoryOver(chars: Character[]) {
