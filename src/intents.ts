@@ -3,12 +3,7 @@ import { Character } from './character';
 import * as seq from './utils/seq';
 
 export function hasMultipleChars(lexemes: Lexeme[]) {
-    const [nounMultiple] = filterLexemes(lexemes, [
-        Gr.Noun,
-        Gr.Accusative,
-        Gr.Animated,
-        Gr.Mutliple
-    ]);
+    const [nounMultiple] = filterLexemes(lexemes, [Gr.S, Gr.Acc, Gr.Animated, Gr.Mutliple]);
 
     return Boolean(nounMultiple);
 }

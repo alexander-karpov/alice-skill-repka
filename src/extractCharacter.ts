@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import { Character, Word, Gender } from './character';
 import { Lexeme, Gr, filterLexemes, matchGrs, findLexeme, Token } from './stemmer';
 import { matchSeq, Maybe } from './utils/seq';
+import { NOTFOUND } from 'dns';
 
 export function extractCharacter(tokens: Token[], lexemes: Lexeme[]): Character | undefined {
     const fullNameChar = extractFullNameChar(tokens);
@@ -10,11 +11,17 @@ export function extractCharacter(tokens: Token[], lexemes: Lexeme[]): Character 
         return fullNameChar;
     }
 
-    const nouns = filterLexemes(lexemes, [Gr.Animated, Gr.Noun, Gr.Single]);
+    const attrsChar = extractСharWithAttribute(tokens);
+
+    if (attrsChar) {
+        return attrsChar;
+    }
+
+    const nouns = filterLexemes(lexemes, [Gr.Animated, Gr.S, Gr.Single]);
 
     const noun =
-        _.first(filterLexemes(nouns, [Gr.Accusative])) ||
-        _.first(filterLexemes(nouns, [Gr.Nominative])) ||
+        _.first(filterLexemes(nouns, [Gr.Acc])) ||
+        _.first(filterLexemes(nouns, [Gr.Nom])) ||
         _.first(nouns);
 
     if (!noun) {
@@ -34,11 +41,11 @@ export function createDedka(): Character {
 }
 
 export function extractInanimate(lexemes: Lexeme[]): Character | undefined {
-    const nouns = filterLexemes(lexemes, [Gr.Inanimated, Gr.Noun, Gr.Single]);
+    const nouns = filterLexemes(lexemes, [Gr.Inanimated, Gr.S, Gr.Single]);
 
     const noun =
-        _.first(filterLexemes(nouns, [Gr.Accusative])) ||
-        _.first(filterLexemes(nouns, [Gr.Nominative])) ||
+        _.first(filterLexemes(nouns, [Gr.Acc])) ||
+        _.first(filterLexemes(nouns, [Gr.Nom])) ||
         _.first(nouns);
 
     if (!noun) {
@@ -55,10 +62,14 @@ export function extractInanimate(lexemes: Lexeme[]): Character | undefined {
 }
 
 function lexemeToWord(lexeme: Lexeme): Word {
-    const accusative = nominativeToAccusative(lexeme);
+    const accusative = lexeme.gr.includes(Gr.S) ? SNomToAcc(lexeme) : ANomToAcc(lexeme);
+    const nominative =
+        lexeme.gr.includes(Gr.Famela) && lexeme.gr.includes(Gr.A)
+            ? AMaleToFamela(lexeme)
+            : lexeme.lex;
 
     return {
-        nominative: lexeme.lex,
+        nominative,
         accusative
     };
 }
@@ -79,7 +90,7 @@ function extractGender(lexeme: Lexeme): Gender {
  * Меняет падеж существительного с им. на вин.
  * @param noun Существительное в им. падеже.
  */
-function nominativeToAccusative(lexeme: Lexeme) {
+function SNomToAcc(lexeme: Lexeme) {
     const gr = lexeme.gr;
     const nomenative = lexeme.lex;
     const isMale = matchGrs(gr, [Gr.Male]);
@@ -169,6 +180,54 @@ function nominativeToAccusativeInanimated(lexeme: Lexeme) {
     return nomenative;
 }
 
+/**
+ * Меняет падеж прилагательного с им. на вин.
+ * @param noun Существительное в им. падеже.
+ */
+function ANomToAcc(lexeme: Lexeme) {
+    const gr = lexeme.gr;
+    const nom = lexeme.lex;
+    const isMale = matchGrs(gr, [Gr.Male]);
+    const isFamela = matchGrs(gr, [Gr.Famela]);
+    const isNeuter = matchGrs(gr, [Gr.Neuter]);
+    const isUnisex = matchGrs(gr, [Gr.Unisex]);
+
+    const endsWith = end => nom.endsWith(end);
+    const changeOne = end => `${nom.substring(0, nom.length - 1)}${end}`;
+    const changeTwo = end => `${nom.substring(0, nom.length - 2)}${end}`;
+    const add = end => `${nom}${end}`;
+
+    if (isMale && endsWith('ый')) {
+        return changeTwo('ого');
+    }
+
+    if (isFamela && endsWith('ий')) {
+        return changeTwo('ую');
+    }
+
+    return nom;
+}
+
+function AMaleToFamela(lexeme: Lexeme) {
+    const gr = lexeme.gr;
+    const nom = lexeme.lex;
+    const isMale = matchGrs(gr, [Gr.Male]);
+    const isFamela = matchGrs(gr, [Gr.Famela]);
+    const isNeuter = matchGrs(gr, [Gr.Neuter]);
+    const isUnisex = matchGrs(gr, [Gr.Unisex]);
+
+    const endsWith = end => nom.endsWith(end);
+    const changeOne = end => `${nom.substring(0, nom.length - 1)}${end}`;
+    const changeTwo = end => `${nom.substring(0, nom.length - 2)}${end}`;
+    const add = end => `${nom}${end}`;
+
+    if (endsWith('ий')) {
+        return changeTwo('ая');
+    }
+
+    return nom;
+}
+
 function extractFullNameChar(tokens: Token[]): Maybe<Character> {
     const maleFirstName = t => findLexeme(t, [Gr.persn, Gr.Male]);
     const maleLastName = t =>
@@ -198,5 +257,33 @@ function extractFullNameChar(tokens: Token[]): Maybe<Character> {
             )}`
         },
         gender: extractGender(fullNameLexemes[0])
+    };
+}
+
+/**
+ * Пытается найти цепочку прилагательное-существительное
+ * @param tokens
+ */
+function extractСharWithAttribute(tokens: Token[]): Maybe<Character> {
+    const ANom = t => findLexeme(t, [Gr.A, Gr.Nom]);
+    const AAcc = t => findLexeme(t, [Gr.A, Gr.Acc]);
+    const SNom = t => findLexeme(t, [Gr.S, Gr.Nom]);
+    const SAcc = t => findLexeme(t, [Gr.S, Gr.Acc]);
+
+    const space = t => _.isEmpty(t.lexemes);
+    const lexemes = matchSeq(tokens, [AAcc, SAcc], space) || matchSeq(tokens, [ANom, SNom], space);
+
+    if (!lexemes) {
+        return undefined;
+    }
+
+    const [adj, noun] = lexemes.map(lexemeToWord);
+
+    return {
+        subject: {
+            nominative: `${adj.nominative} ${noun.nominative}`,
+            accusative: `${adj.accusative} ${noun.accusative}`
+        },
+        gender: extractGender(lexemes[1])
     };
 }
