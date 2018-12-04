@@ -85,6 +85,7 @@ function nominativeToAccusative(lexeme: Lexeme) {
     const isMale = matchGrs(gr, [Gr.Male]);
     const isFamela = matchGrs(gr, [Gr.Famela]);
     const isNeuter = matchGrs(gr, [Gr.Neuter]);
+    const isUnisex = matchGrs(gr, [Gr.Unisex]);
 
     const endsWith = end => nomenative.endsWith(end);
     const changeOne = end => `${nomenative.substring(0, nomenative.length - 1)}${end}`;
@@ -118,6 +119,11 @@ function nominativeToAccusative(lexeme: Lexeme) {
     // Евгений -> евгения, злодей -> злодея
     if (endsWith('й') && isMale) {
         return changeOne('я');
+    }
+
+    // Евгений -> евгения, злодей -> злодея
+    if (endsWith('о') && isUnisex) {
+        return nomenative;
     }
 
     // Внучок -> внучка, дружок -> дружка
