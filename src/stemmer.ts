@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { spawn } from 'child_process';
 import { Readable, Writable } from 'stream';
+import { Token, Gr, Lexeme } from './tokens';
 
 //#region types
 export type Stemmer = (message: string) => Promise<Token[]>;
@@ -16,122 +17,6 @@ type MyStemToken = {
 };
 
 type MyStemLexeme = { lex: string; gr: string };
-
-export type Lexeme = { lex: string; gr: Gr[] };
-export type Token = { lexemes: Lexeme[]; text: string };
-
-export enum Gr {
-    /**
-     * Прилагательное
-     */
-    A = 'A',
-    /**
-     * Наречие
-     */
-    ADV = 'ADV',
-    /**
-     * Местоименное наречие
-     */
-    ADVPRO = 'ADVPRO',
-    /**
-     * Числительное-прилагательное
-     */
-    ANUM = 'ANUM',
-    /**
-     * Местоимение-прилагательное
-     */
-    APRO = 'APRO',
-    /**
-     * Часть композита - сложного слова
-     */
-    COM = 'COM',
-    /**
-     * Союз
-     */
-    CONJ = 'CONJ',
-    /**
-     * Междометие
-     */
-    INTJ = 'INTJ',
-    /**
-     * Числительное
-     */
-    NUM = 'NUM',
-    /**
-     * Частица
-     */
-    PART = 'PART',
-    /**
-     * Предлог
-     */
-    PR = 'PR',
-    /**
-     * Существительное
-     */
-    S = 'S',
-    /**
-     * Местоимение-существительное
-     */
-    SPRO = 'SPRO',
-    /**
-     * Глагол
-     */
-    Verb = 'V',
-    /**
-     * Настоящее
-     */
-    Praes = 'наст',
-    /**
-     * Непрошедшее
-     */
-    Inpraes = 'непрош',
-    /**
-     * Прошедшее
-     */
-    Praet = 'прош',
-    /** Именительный падеж */
-    Nom = 'им',
-    /** Винительный падеж */
-    Acc = 'вин',
-    Single = 'ед',
-    Mutliple = 'мн',
-    Male = 'муж',
-    Famela = 'жен',
-    Neuter = 'сред',
-    Unisex = 'мж',
-    /** Одушевленное */
-    Animated = 'од',
-    /** Неодушевленное */
-    Inanimated = 'неод',
-    /** вводное слово */
-    parenth = 'вводн',
-    /** географическое название */
-    geo = 'гео',
-    /** образование формы затруднено */
-    awkw = 'затр',
-    /** имя собственное */
-    persn = 'имя',
-    /** искаженная форма */
-    dist = 'искаж',
-    /** общая форма мужского и женского рода */
-    mf = 'мж',
-    /** обсценная лексика */
-    obsc = 'обсц',
-    /** отчество */
-    patrn = 'отч',
-    /** предикатив */
-    praed = 'прдк',
-    /** разговорная форма */
-    inform = 'разг',
-    /** редко встречающееся слово */
-    rare = 'редк',
-    /** сокращение */
-    abbr = 'сокр',
-    /** устаревшая форма */
-    obsol = 'устар',
-    /** фамилия */
-    famn = 'фам'
-}
 //#endregion
 
 export function spawnMystem(): { stemmer: Stemmer; killStemmer: () => void } {
@@ -206,34 +91,9 @@ export class ReadWriteStreamsQueue {
     }
 }
 
-/**
- * Делает список лексем плоским, помещая
- * исходный текст каждого токена внутрь.
- * @param tokens
- */
-export function tokensToLexemesEx(tokens: Token[]): Lexeme[] {
-    const lexemes: Lexeme[][] = tokens.map(token => token.lexemes || []);
-
-    return _.flatten(lexemes);
-}
-
 function cleanBeforeStemming(text: string) {
     // Буква И в mystem получает очень большой набор свойств
     return text.replace(' и ', ' ');
-}
-
-export function filterLexemes(lexemes: Lexeme[], grs: Gr[]): Lexeme[] {
-    return lexemes.filter(lex => matchGrs(lex.gr, grs));
-}
-
-export function matchGrs(gr: string[], pattern: Gr[]) {
-    return pattern.every(p => gr.includes(p));
-}
-
-export function findLexeme(token: Token, grs: Gr[]): Lexeme | undefined {
-    return token.lexemes.find(l => {
-        return grs.every(gr => l.gr.includes(gr));
-    });
 }
 
 function preprocessLexeme({ lex, gr }): Lexeme {

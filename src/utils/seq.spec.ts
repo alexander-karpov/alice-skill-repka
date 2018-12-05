@@ -1,4 +1,4 @@
-import { matchSeq, eq } from './seq';
+import { matchSeq } from './seq';
 
 describe('match', () => {
     test('Undefined при несовместимых длинах', async () => {
@@ -63,4 +63,8 @@ describe('match', () => {
 
         expect(matchSeq(seq, pattern)).toEqual([5]);
     });
+
+    function eq<T>(value: T) {
+        return (x: T) => (x === value ? x : undefined);
+    }
 });

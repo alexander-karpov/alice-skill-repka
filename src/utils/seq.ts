@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 
 export type Selector<T, TResult> = (x: T) => TResult | undefined;
-export type Predicate<T> = (x: T) => boolean;
 export type Maybe<T> = T | undefined;
 
 /**
@@ -29,10 +28,6 @@ export function matchSeq<T, TResult>(
     }
 
     return undefined;
-}
-
-export function eq<T>(value: T): Selector<T, T> {
-    return (x: T) => (x === value ? x : undefined);
 }
 
 function areLengthsCompatible<TItem, TResult>(seq: TItem[], pattern: Selector<TItem, TResult>[]) {

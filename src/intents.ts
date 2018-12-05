@@ -1,15 +1,13 @@
-import { Lexeme, Gr, filterLexemes } from './stemmer';
+import { Gr, findLexeme, Token } from './tokens';
 import { Character } from './character';
-import * as seq from './utils/seq';
+import { matchSeq } from './utils/seq';
 
-export function hasMultipleChars(lexemes: Lexeme[]) {
-    const [nounMultiple] = filterLexemes(lexemes, [Gr.S, Gr.Acc, Gr.Animated, Gr.Mutliple]);
-
-    return Boolean(nounMultiple);
+export function hasMultipleChars(tokens: Token[]) {
+    return tokens.some(t => !!findLexeme(t, [Gr.S, Gr.Acc, Gr.anim, Gr.plural]));
 }
 
-export function repka(lexemes: Lexeme[]) {
-    return lexemes.length === 1 && lexemes && lexemes[0].lex === 'репка';
+export function repka(tokens: Token[]) {
+    return tokens.some(t => t.lexemes.length === 1 && t.lexemes[0].lex === 'репка');
 }
 
 export function babushka(char: Character) {
@@ -42,10 +40,14 @@ export function yes(tokens: string[]) {
 }
 
 export function no(tokens: string[]) {
+    function eq<T>(value: T) {
+        return (x: T) => (x === value ? x : undefined);
+    }
+
     return Boolean(
         tokens.includes('достаточно') ||
             tokens.includes('хватит') ||
             tokens.includes('нет') ||
-            seq.matchSeq(tokens, [seq.eq('не'), seq.eq('надо')])
+            matchSeq(tokens, [eq('не'), eq('надо')])
     );
 }

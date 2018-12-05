@@ -1,12 +1,12 @@
 import * as _ from 'lodash';
-import { Stemmer, tokensToLexemesEx } from './stemmer';
-import { extractCharacter, createDedka, extractInanimate } from './extractCharacter';
+import { Stemmer } from './stemmer';
+import { extractChar, extractInanimate } from './extractChar';
 import { SessionData, Dialogs } from './sessionData';
 import { Speech, createSpeech, concatSpeech } from './speech';
 import * as answers from './answers';
 import * as intents from './intents';
 
-import { Character, isCharMale, isCharFamela } from './character';
+import { Character, createDedka } from './character';
 
 //#region types
 export type DialogDependencies = {
@@ -27,7 +27,6 @@ export async function mainDialog(
 ): Promise<DialogResult> {
     const isRepeatQuestionDialog = sessionData.currentDialog === Dialogs.RepeatQuestion;
     const tokens = await stemmer(rawTokens.join(' '));
-    const lexemes = tokensToLexemesEx(tokens);
     const { chars } = sessionData;
 
     const result = await (async function narrative(): Promise<DialogResult | Speech> {
@@ -48,14 +47,14 @@ export async function mainDialog(
             sessionData.currentDialog = Dialogs.Story;
         }
 
-        if (intents.repka(lexemes)) {
+        if (intents.repka(tokens)) {
             return answers.repka(sessionData);
         }
 
-        const nextChar = extractCharacter(tokens, lexemes);
-        const inanimate = extractInanimate(lexemes);
+        const nextChar = extractChar(tokens);
+        const inanimate = extractInanimate(tokens);
 
-        if (!nextChar && intents.hasMultipleChars(lexemes)) {
+        if (!nextChar && intents.hasMultipleChars(tokens)) {
             return answers.onlyOneCharMayCome(sessionData);
         }
 
@@ -82,7 +81,7 @@ export async function mainDialog(
         }
 
         chars.push(nextChar);
-        const repkaStory = makeRepkaStory(nextChar, chars, sessionData);
+        const repkaStory = makeRepkaStory(chars, sessionData);
 
         if (intents.babushka(nextChar)) {
             return concatSpeech(answers.babushka(), repkaStory);
@@ -106,7 +105,7 @@ export async function mainDialog(
     return isDialogResult(result) ? result : { speech: result, endSession: false };
 }
 
-function makeRepkaStory(next: Character, all: Character[], sessionData: SessionData) {
+function makeRepkaStory(all: Character[], sessionData: SessionData) {
     const story: Speech[] = [];
 
     story.push(formatStory(all));
@@ -117,7 +116,7 @@ function makeRepkaStory(next: Character, all: Character[], sessionData: SessionD
         );
         sessionData.currentDialog = Dialogs.RepeatQuestion;
     } else {
-        story.push(concatSpeech(`вытянуть не могут.`, formatCall(next)));
+        story.push(concatSpeech(`вытянуть не могут.`, answers.whoCalled(sessionData)));
     }
 
     return concatSpeech(...story);
@@ -141,10 +140,6 @@ function toPairs(characters: Character[]): [Character, Character][] {
     return [[first, rest[0]], ...toPairs(rest)];
 }
 
-function formatCall(char: Character) {
-    return _.capitalize(`${formatCallWord(char)} ${answers.nom(char)}...`);
-}
-
 function isStoryOver(chars: Character[]) {
     const last = _.last(chars);
 
@@ -155,10 +150,6 @@ function isStoryOver(chars: Character[]) {
     const isLastMouse = last.subject.nominative === 'мышка';
     const tooManyCharacters = chars.length >= 10;
     return isLastMouse || tooManyCharacters;
-}
-
-function formatCallWord(char: Character) {
-    return isCharMale(char) ? 'позвал' : isCharFamela(char) ? 'позвала' : 'позвало';
 }
 
 function isDialogResult(x): x is DialogResult {

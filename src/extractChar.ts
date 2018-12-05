@@ -1,70 +1,10 @@
 import * as _ from 'lodash';
 import { Character, Word, Gender } from './character';
-import { Lexeme, Gr, filterLexemes, matchGrs, findLexeme, Token } from './stemmer';
 import { matchSeq, Maybe } from './utils/seq';
+import { Lexeme, Gr, matchGrs, Token, tokenSelector } from './tokens';
 
-export function extractCharacter(tokens: Token[], lexemes: Lexeme[]): Character | undefined {
-    const fullNameChar = extractFullNameChar(tokens);
-
-    if (fullNameChar) {
-        return fullNameChar;
-    }
-
-    const attrsChar = extractСharWithAttribute(tokens);
-
-    if (attrsChar) {
-        return attrsChar;
-    }
-
-    const nouns = filterLexemes(lexemes, [Gr.Animated, Gr.S, Gr.Single]);
-
-    const noun =
-        _.first(filterLexemes(nouns, [Gr.Acc])) ||
-        _.first(filterLexemes(nouns, [Gr.Nom])) ||
-        _.first(nouns);
-
-    if (!noun) {
-        return undefined;
-    }
-
-    const token = tokens.find(t => t.lexemes.includes(noun));
-
-    if (!token) {
-        return undefined;
-    }
-
-    return {
-        subject: lexemeToWord(noun, token),
-        gender: extractGender(noun)
-    };
-}
-
-export function createDedka(): Character {
-    return {
-        subject: { nominative: 'дедка', accusative: 'дедку' },
-        gender: Gender.Male
-    };
-}
-
-export function extractInanimate(lexemes: Lexeme[]): Character | undefined {
-    const nouns = filterLexemes(lexemes, [Gr.Inanimated, Gr.S, Gr.Single]);
-
-    const noun =
-        _.first(filterLexemes(nouns, [Gr.Acc])) ||
-        _.first(filterLexemes(nouns, [Gr.Nom])) ||
-        _.first(nouns);
-
-    if (!noun) {
-        return undefined;
-    }
-
-    return {
-        subject: {
-            nominative: noun.lex,
-            accusative: nominativeToAccusativeInanimated(noun)
-        },
-        gender: extractGender(noun)
-    };
+export function extractChar(tokens: Token[]): Character | undefined {
+    return extractFullNameChar(tokens) || extractAttrChar(tokens) || extractAnimChar(tokens);
 }
 
 function lexemeToWord(lexeme: Lexeme, token: Token): Word {
@@ -243,12 +183,11 @@ function ANomMaleToFamela(lexeme: Lexeme, token: Token) {
 }
 
 function extractFullNameChar(tokens: Token[]): Maybe<Character> {
-    const maleFirstName = t => findLexeme(t, [Gr.persn, Gr.Male]);
-    const maleLastName = t =>
-        findLexeme(t, [Gr.famn, Gr.Male]) || findLexeme(t, [Gr.famn, Gr.Unisex]);
-    const famelaFirstName = t => findLexeme(t, [Gr.persn, Gr.Famela]);
-    const famelaLastName = t =>
-        findLexeme(t, [Gr.famn, Gr.Famela]) || findLexeme(t, [Gr.famn, Gr.Unisex]);
+    const maleFirstName = tokenSelector([Gr.persn, Gr.Male]);
+    const maleLastName = tokenSelector([Gr.famn, Gr.Male], [Gr.famn, Gr.Unisex]);
+
+    const famelaFirstName = tokenSelector([Gr.persn, Gr.Famela]);
+    const famelaLastName = tokenSelector([Gr.famn, Gr.Famela], [Gr.famn, Gr.Unisex]);
 
     const fullNameLexemes =
         matchSeq(tokens, [maleFirstName, maleLastName]) ||
@@ -258,15 +197,8 @@ function extractFullNameChar(tokens: Token[]): Maybe<Character> {
         return undefined;
     }
 
-    const token0 = tokens.find(t => t.lexemes.includes(fullNameLexemes[0]));
-    const token1 = tokens.find(t => t.lexemes.includes(fullNameLexemes[1]));
-
-    if (!token0 || !token1) {
-        return undefined;
-    }
-
-    const firstNameWord = lexemeToWord(fullNameLexemes[0], token0);
-    const lastNameWord = lexemeToWord(fullNameLexemes[1], token1);
+    const firstNameWord = lexemeToWord(...fullNameLexemes[0]);
+    const lastNameWord = lexemeToWord(...fullNameLexemes[1]);
 
     return {
         subject: {
@@ -277,7 +209,7 @@ function extractFullNameChar(tokens: Token[]): Maybe<Character> {
                 lastNameWord.accusative
             )}`
         },
-        gender: extractGender(fullNameLexemes[0])
+        gender: extractGender(fullNameLexemes[0][0])
     };
 }
 
@@ -285,11 +217,11 @@ function extractFullNameChar(tokens: Token[]): Maybe<Character> {
  * Пытается найти цепочку прилагательное-существительное
  * @param tokens
  */
-function extractСharWithAttribute(tokens: Token[]): Maybe<Character> {
-    const ANom = matcher([Gr.A, Gr.Nom]);
-    const AAcc = matcher([Gr.A, Gr.Acc]);
-    const SNom = matcher([Gr.S, Gr.Nom, Gr.Animated]);
-    const SAcc = matcher([Gr.S, Gr.Acc, Gr.Animated]);
+function extractAttrChar(tokens: Token[]): Maybe<Character> {
+    const ANom = tokenSelector([Gr.A, Gr.Nom]);
+    const AAcc = tokenSelector([Gr.A, Gr.Acc]);
+    const SNom = tokenSelector([Gr.S, Gr.Nom, Gr.anim]);
+    const SAcc = tokenSelector([Gr.S, Gr.Acc, Gr.anim]);
 
     const matches = matchSeq(tokens, [AAcc, SAcc]) || matchSeq(tokens, [ANom, SNom]);
 
@@ -308,9 +240,34 @@ function extractСharWithAttribute(tokens: Token[]): Maybe<Character> {
     };
 }
 
-function matcher(grs: Gr[]): (x: Token) => [Lexeme, Token] | undefined {
-    return (token: Token) => {
-        const lexeme = findLexeme(token, grs);
-        return lexeme ? [lexeme, token] : undefined;
+function extractAnimChar(tokens: Token[]) {
+    const sAnimSingle = [Gr.anim, Gr.S, Gr.single];
+
+    const found =
+        matchSeq(tokens, [tokenSelector(sAnimSingle.concat(Gr.Acc))]) ||
+        matchSeq(tokens, [tokenSelector(sAnimSingle.concat(Gr.Nom))]);
+
+    if (!found) return undefined;
+    const [char] = found;
+
+    return {
+        subject: lexemeToWord(char[0], char[1]),
+        gender: extractGender(char[0])
+    };
+}
+
+export function extractInanimate(tokens: Token[]): Character | undefined {
+    const inanimSingle = [Gr.inanim, Gr.S, Gr.single];
+
+    const found =
+        matchSeq(tokens, [tokenSelector(inanimSingle.concat(Gr.Acc))]) ||
+        matchSeq(tokens, [tokenSelector(inanimSingle.concat(Gr.Nom))]);
+
+    if (!found) return undefined;
+    const [char] = found;
+
+    return {
+        subject: lexemeToWord(char[0], char[1]),
+        gender: extractGender(char[0])
     };
 }

@@ -22,8 +22,8 @@ function aboutSkill(random100: number): Speech {
     return concatSpeech(
         'Я расскажу сказку про репку, если вы мне поможете.',
         'Когда придет время позвать нового героя, дополните рассказ.',
-        'Например, я скажу: "Позвал дедка...",',
-        createSpeech(`а вы продолжите: "${acc(char)}".`, `а вы продолжите - ${acc(char)}.`),
+        'Например, я скажу: «Позвал дедка...»,',
+        createSpeech(`а вы продолжите: «${acc(char)}».`, `а вы продолжите - ${acc(char)}.`),
         'Вы готовы?'
     );
 }
@@ -57,8 +57,7 @@ export function intro(random100: number): Speech {
 }
 
 export function help(sessionData: SessionData, random100: number) {
-    const called = whoCalled(sessionData);
-    return concatSpeech(aboutSkill(random100), called);
+    return concatSpeech(aboutSkill(random100), whoCalled(sessionData));
 }
 
 export function onlyOneCharMayCome(sessionData: SessionData) {
@@ -72,7 +71,7 @@ export function whoCalled(sessionData: SessionData) {
     const char = _.last(sessionData.chars);
 
     if (char) {
-        return `Кого ${nom(char)} ${formatCallWord(char)} на помощь?`;
+        return `Кого ${nom(char)} позовёт на помощь?`;
     }
 
     return '';
@@ -180,7 +179,7 @@ export function inanimateCalled(inanimate: Character, sessionData: SessionData, 
                         byGender(lastChar, 'воротился', 'воротилась', 'воротилось'),
                         byGender(lastChar, 'ворот+ился', 'ворот+илась', 'ворот+илось')
                     ),
-                    `. И ${formatCallWord(lastChar)} другого персонажа.`,
+                    `. И ${called(lastChar)} другого персонажа.`,
                     whoCalled(sessionData)
                 ),
             () =>
@@ -200,10 +199,9 @@ export function inanimateCalled(inanimate: Character, sessionData: SessionData, 
     );
 }
 
-function formatCallWord(char: Character) {
+function called(char: Character) {
     return byGender(char, 'позвал', 'позвала', 'позвало');
 }
-
 function byGender<T>(char: Character, male: T, famela: T, other: T) {
     return isCharMale(char) ? male : isCharFamela(char) ? famela : other;
 }

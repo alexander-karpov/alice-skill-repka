@@ -37,3 +37,10 @@ export function isCharFamela(char: Character) {
 export function previousChar(char: Character, chars: Character[]) {
     return _.last(chars.filter(c => c != char));
 }
+
+export function createDedka(): Character {
+    return {
+        subject: { nominative: 'дедка', accusative: 'дедку' },
+        gender: Gender.Male
+    };
+}
