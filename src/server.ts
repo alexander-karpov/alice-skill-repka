@@ -58,15 +58,15 @@ export function startServer(handleRequest: RequestHandler, handleCLose: () => vo
             body += data.toString();
         });
 
-        request.on('end', () => {
+        request.on('end', async () => {
             try {
-                handleRequest(JSON.parse(body)).then(reply => {
-                    response.setHeader('Content-Type', 'application/json');
-                    response.writeHead(200);
-                    response.end(JSON.stringify(reply));
-                });
+                const reply = await handleRequest(JSON.parse(body));
+
+                response.setHeader('Content-Type', 'application/json');
+                response.writeHead(200);
+                response.end(JSON.stringify(reply));
             } catch (error) {
-                console.log(`${new Date().toISOString()} Ошибка парсинга запроса.`, error);
+                console.log(`${new Date().toISOString()} Handle request error.`, error);
                 response.writeHead(400);
                 response.end('400 Bad request');
             }

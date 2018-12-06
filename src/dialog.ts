@@ -29,7 +29,7 @@ export async function mainDialog(
     const tokens = await stemmer(rawTokens.join(' '));
     const { chars } = sessionData;
 
-    const result = await (async function narrative(): Promise<DialogResult | Speech> {
+    const result = (function narrative(): DialogResult | Speech {
         if (intents.help(rawTokens)) {
             return answers.help(sessionData, random100);
         }

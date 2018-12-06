@@ -1,15 +1,11 @@
-import * as _ from 'lodash';
+import * as readline from 'readline';
 import { spawn } from 'child_process';
-import { Readable, Writable } from 'stream';
+import * as _ from 'lodash';
 import { Token, Gr, Lexeme } from './tokens';
+import { Action } from './core';
 
 //#region types
 export type Stemmer = (message: string) => Promise<Token[]>;
-
-type PromiseResolvers = {
-    resolve: (value: string) => void;
-    reject: (reason: string) => void;
-};
 
 type MyStemToken = {
     analysis?: MyStemLexeme[];
@@ -20,74 +16,82 @@ type MyStemLexeme = { lex: string; gr: string };
 //#endregion
 
 export function spawnMystem(): { stemmer: Stemmer; killStemmer: () => void } {
-    /**
-     * @see https://tech.yandex.ru/mystem/doc/
-     */
+    /** @see https://tech.yandex.ru/mystem/doc/ */
     const mystem = spawn('mystem', ['--format=json', '-i'], { detached: true });
-    const queue = ReadWriteStreamsQueue.create(mystem.stdin, mystem.stdout, mystem.stderr);
 
-    function stemmer(message: string): Promise<Token[]> {
-        if (!message) {
-            return Promise.resolve([]);
-        }
+    const rl = readline.createInterface({
+        input: mystem.stdout,
+        output: mystem.stdin
+    });
 
-        return queue
-            .process(cleanBeforeStemming(message) + '\n')
-            .then<Token[]>(output => (JSON.parse(output) as MyStemToken[]).map(preprocessToken));
+    const input = new AsyncQueue<string>();
+    const output = new AsyncQueue<Token[]>();
+
+    /** Прогоняет текст через mystem */
+    function process(message) {
+        return new Promise<Token[]>(resolve => {
+            const preparedMessage = cleanBeforeStemming(message) + '\n';
+
+            rl.question(preparedMessage, answer => {
+                const tokens = JSON.parse(answer).map(preprocessToken);
+                resolve(tokens);
+            });
+        });
     }
 
+    /**
+     * Такая хитрость нужна, чтобы в mystem уходило
+     * не больше одного сообщения за раз. Иначе оно ломается.
+     */
+    async function processLoop() {
+        while (true) {
+            const message = await input.dequeue();
+            const tokens = await process(message);
+            output.enqueue(tokens);
+        }
+    }
+
+    function stemmer(message) {
+        input.enqueue(message);
+        return output.dequeue();
+    }
+
+    processLoop();
+
     function killStemmer() {
+        rl.close();
         mystem.kill();
     }
 
     return { stemmer, killStemmer };
 }
 
-/**
- * Позволяет упорядочить обращение к консолькой утилите mystem,
- * общение с которой происходит через запись в stdin и ожидание
- * событий stdout.
- */
-export class ReadWriteStreamsQueue {
-    private queue: PromiseResolvers[] = [];
+class AsyncQueue<TItem> {
+    private resolves: Action<TItem>[] = [];
+    private queue: TItem[] = [];
 
-    private constructor(
-        private input: Writable,
-        private output: Readable,
-        private errors: Readable
-    ) {
-        this.output.on('data', data => {
-            const resolvers = this.tryDequeuePromise();
-            resolvers.resolve(data.toString());
-        });
+    enqueue(item: TItem) {
+        const resolve = this.resolves.shift();
 
-        this.errors.on('data', data => {
-            const resolvers = this.tryDequeuePromise();
-            resolvers.reject(data.toString());
-        });
+        if (resolve) {
+            resolve(item);
+        } else {
+            this.queue.push(item);
+        }
     }
 
-    static create(input: Writable, output: Readable, errors: Readable) {
-        return new ReadWriteStreamsQueue(input, output, errors);
-    }
+    dequeue(): Promise<TItem> {
+        const item = this.queue.shift();
 
-    process(message: string): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            this.queue.push({ resolve, reject });
-            this.input.write(message);
-        });
-    }
-
-    private tryDequeuePromise() {
-        const resolvers = this.queue.shift();
-
-        if (!resolvers) {
-            throw new Error(
-                '[ReadWriteStreamsQueue] Из output получены данные, которые не были запрошены.'
-            );
+        if (item && this.resolves.length) {
+            throw new Error('PromiseQueue.dequeue inconsistent queue and resolves.');
         }
 
-        return resolvers;
+        if (item) {
+            return Promise.resolve(item);
+        }
+
+        return new Promise(resolve => this.resolves.push(resolve));
     }
 }
 

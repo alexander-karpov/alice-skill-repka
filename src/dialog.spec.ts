@@ -19,10 +19,10 @@ describe('Main dialog', () => {
     });
 
     test('Классическая сказка: история', async () => {
-        await act('');
-        await act('Бабку');
-        await act('Внучку');
-        await act('Жучку');
+        act('');
+        act('Бабку');
+        act('Внучку');
+        act('Жучку');
         const story = await act('Кошку');
 
         expect(story).toMatch('Кошка за жучку, жучка за внучку, внучка за бабку,');
@@ -30,8 +30,8 @@ describe('Main dialog', () => {
     });
 
     test('Классическая сказка: конец [позвали мышку]', async () => {
-        await act('');
-        await act('Бабку');
+        act('');
+        act('Бабку');
         const story = await act('Мышку');
 
         expect(story).toMatch(
@@ -40,49 +40,49 @@ describe('Main dialog', () => {
     });
 
     test('Мужской род зовет на помощь', async () => {
-        await act('');
+        act('');
         expect(await act('Дракона')).toMatch('Кого дракон позовёт');
     });
 
     test('Женский род зовет на помощь', async () => {
-        await act('');
+        act('');
         expect(await act('Бабку')).toMatch('Кого бабка позовёт');
     });
 
     test('Средний род зовет на помощь', async () => {
-        await act('');
+        act('');
         expect(await act('Чудище')).toMatch('Кого чудище позовёт');
     });
 
     test('Сохраняет только героя в творительном падеже', async () => {
-        await act('');
+        act('');
         expect(await act('Бутылка стола дракона')).toMatch('Дракон за дедку');
     });
 
     test('Предпочтение одушевленным', async () => {
-        await act('');
+        act('');
         expect(await act('Серёжку')).toMatch('Кого сережка позовёт');
     });
 
     test('Уникальная фраза на множ. число', async () => {
-        await act('');
+        act('');
         expect(await act('котят')).toMatch('по одному');
     });
 
     test('Правильно склоняет фразу переспрашивания героя', async () => {
-        await act('');
-        await act('внука');
+        act('');
+        act('внука');
         expect(await act('ракета')).toMatch('Кого внук позовёт');
 
-        await act('Бабку');
+        act('Бабку');
         expect(await act('ракета')).toMatch('Кого бабка позовёт');
 
-        await act('чудище');
+        act('чудище');
         expect(await act('ракета')).toMatch('Кого чудище позовёт');
     });
 
     test('Принимает персонажа в именительном падеже', async () => {
-        await act('');
+        act('');
         expect(await act('человек')).toMatch('Человек за дедку');
         expect(await act('богатырь')).toMatch('Богатырь за человека');
         expect(await act('Внучок')).toMatch('Внучок за богатыря');
@@ -97,7 +97,7 @@ describe('Main dialog', () => {
          * внучк+а, а не вн+учка
          * Например дед позвал внучка
          */
-        await act('');
+        act('');
         expect(await act('Внучка')).toMatch('Внучок за дедку');
     });
 
@@ -106,40 +106,40 @@ describe('Main dialog', () => {
          * внучк+а, а не вн+учка
          * Например дед позвал внучка
          */
-        await act('');
+        act('');
         expect(await act('Репку')).toMatch('Репка сама себя не вытянет');
     });
 
     test('Специальная фраза для бабки', async () => {
-        await act('');
+        act('');
         expect(await act('Бабку')).toMatch(/у тебя такие большие руки\?.+Бабка за дедку/);
     });
 
     test('Специальная фраза для слона', async () => {
-        await act('');
+        act('');
         expect(await act('африканского слона')).toMatch('Что делал слон, когда пришёл на поле он');
     });
 
     test('Специальная фраза для рыбки', async () => {
-        await act('');
+        act('');
         expect(await act('золотую рыбку из сказки Пушкина')).toMatch(
             /кликать золотую рыбку.*приплыла к нему рыбка, спросила/
         );
     });
 
     test('Специальная фраза для кошек', async () => {
-        await act('');
+        act('');
         expect(await act('черную кошку')).toMatch(/Прибежала черная кошка.*вцепилась в дедку/);
         expect(await act('кот мартоскин')).toMatch(/Прибежал кот.*вцепился в/);
     });
 
     test('Специальная фраза для мурки', async () => {
-        await act('');
+        act('');
         expect(await act('мурку')).toMatch(/Прибежала кошка мурка/);
     });
 
     test('Отбрасывает неодушевленное специальной фразой', async () => {
-        await act('');
+        act('');
         expect(await act('лопату')).toMatch(/звал дедка лопату.*не дозвался/);
         expect(await act('лопату', 1)).toMatch('Долго ждал дедка ответа, не дождался');
         expect(await act('лопату', 2)).toMatch('лопата имела: говорить она умела');
@@ -151,14 +151,14 @@ describe('Main dialog', () => {
     });
 
     test('что ты умеешь / помощь (в ходе повествования)', async () => {
-        await act('');
-        await act('котика');
+        act('');
+        act('котика');
         expect(await act('что ты умеешь')).toMatch('Кого котик позовёт на помощь?');
         expect(await act('помощь')).toMatch('Кого котик позовёт на помощь?');
     });
 
     test('Повтор истории: подтверждение', async () => {
-        await act('');
+        act('');
         expect(await act('мышку')).toMatch('вытянули репку');
         expect(await act('давай еще раз')).toMatch('осадил дед репку');
 
@@ -167,19 +167,20 @@ describe('Main dialog', () => {
     });
 
     test('Отказ от продолжения словом Не надо', async () => {
-        await act('');
+        act('');
+        // FIXME: Если убрать await, тест упадет. Понять, почему.
         await act('мышку');
         expect(await act('больше не надо пожалуйста')).toMatch('конец');
     });
 
     test('Позвали лошадь (регрессия)', async () => {
-        await act('');
+        act('');
         expect(await act('лошадь')).toMatch('Лошадь за дедку');
         expect(await act('лошадь')).toMatch('Лошадь за лошадь');
     });
 
     test('Принимает имя-фамилию', async () => {
-        await act('');
+        act('');
         expect(await act('александра карпова')).toMatch('Александр Карпов за дедку,');
         expect(await act('ирина карпова')).toMatch('Ирина Карпова за Александра Карпова,');
         expect(await act('владимир путин')).toMatch('Владимир Путин за Ирину Карпову,');
@@ -189,7 +190,7 @@ describe('Main dialog', () => {
     });
 
     test('Принимает прилагательное-существительное', async () => {
-        await act('');
+        act('');
         expect(await act('железного человека')).toMatch('Железный человек за дедку');
         expect(await act('маленькую кошечку')).toMatch('Маленькая кошечка за железного человека,');
         expect(await act('черную кошку')).toMatch('Черная кошка за маленькую кошечку,');
@@ -199,12 +200,12 @@ describe('Main dialog', () => {
     });
 
     test('Подставляет персонажей со спец.фразами во вводной/справке', async () => {
-        await act('');
+        act('');
         expect(await act('ххх')).toMatch('продолжите: «бабушку»');
     });
 
     test('Повтор истории: отказ', async () => {
-        await act('');
+        act('');
         expect(await act('мышку')).toMatch('вытянули репку');
         const {
             speech: { text },
@@ -213,6 +214,17 @@ describe('Main dialog', () => {
 
         expect(text).toMatch('конец');
         expect(endSession).toEqual(true);
+    });
+
+    test('Проверяем, обеспечивается ли порядок если не дожидаться обработки', async () => {
+        act('');
+        act('Бабку');
+        act('Внучку');
+        act('Жучку');
+        const story = await act('Кошку');
+
+        expect(story).toMatch('Кошка за жучку, жучка за внучку, внучка за бабку,');
+        expect(story).toMatch('бабка за дедку, дедка за репку — тянут-потянут, вытянуть не могут.');
     });
 
     beforeEach(() => {
