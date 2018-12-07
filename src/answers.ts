@@ -88,7 +88,8 @@ export function babushka() {
 }
 
 export function kot(char: Character, previousChar: Character, random100: number) {
-    const soundNumber = sample(byGender(char, [1, 2], [3, 4], [1]), random100);
+    const useSOftMeow = isCharFamela(char) || nom(char).includes('котен');
+    const soundNumber = sample(useSOftMeow ? [3, 4] : [1, 2], random100);
     const meow = createSpeech(
         '- мяу -',
         `<speaker audio="alice-sounds-animals-cat-${soundNumber}.opus">`
