@@ -117,7 +117,7 @@ export function slon(random100: number): Speech {
 export function rybka(char: Character, currentChar: Character) {
     const nemu = byGender(currentChar, 'нему', 'ней', 'нему');
     const poshel = byGender(currentChar, 'Пошёл', 'Пошла', 'Пошло');
-    const stalOn = byGender(currentChar, 'стал он', 'стал она', 'стало оно');
+    const stalOn = byGender(currentChar, 'стал он', 'стала она', 'стало оно');
 
     return concatSpeech(
         `${poshel} ${nom(currentChar)} к синему морю;`,
