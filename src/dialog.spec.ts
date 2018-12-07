@@ -41,17 +41,17 @@ describe('Main dialog', () => {
 
     test('Мужской род зовет на помощь', async () => {
         act('');
-        expect(await act('Дракона')).toMatch('Кого дракон позовёт');
+        expect(await act('Дракона')).toMatch('Кого позвал дракон');
     });
 
     test('Женский род зовет на помощь', async () => {
         act('');
-        expect(await act('Бабку')).toMatch('Кого бабка позовёт');
+        expect(await act('Бабку')).toMatch('Кого позвала бабка');
     });
 
     test('Средний род зовет на помощь', async () => {
         act('');
-        expect(await act('Чудище')).toMatch('Кого чудище позовёт');
+        expect(await act('Чудище')).toMatch('Кого позвало чудище');
     });
 
     test('Сохраняет только героя в творительном падеже', async () => {
@@ -61,7 +61,7 @@ describe('Main dialog', () => {
 
     test('Предпочтение одушевленным', async () => {
         act('');
-        expect(await act('Серёжку')).toMatch('Кого сережка позовёт');
+        expect(await act('Серёжку')).toMatch('Кого позвал сережка');
     });
 
     test('Уникальная фраза на множ. число', async () => {
@@ -72,13 +72,13 @@ describe('Main dialog', () => {
     test('Правильно склоняет фразу переспрашивания героя', async () => {
         act('');
         act('внука');
-        expect(await act('ракета')).toMatch('Кого внук позовёт');
+        expect(await act('ракета')).toMatch('Кого позвал внук');
 
         act('Бабку');
-        expect(await act('ракета')).toMatch('Кого бабка позовёт');
+        expect(await act('ракета')).toMatch('Кого позвала бабка');
 
         act('чудище');
-        expect(await act('ракета')).toMatch('Кого чудище позовёт');
+        expect(await act('ракета')).toMatch('Кого позвало чудище');
     });
 
     test('Принимает персонажа в именительном падеже', async () => {
@@ -153,8 +153,8 @@ describe('Main dialog', () => {
     test('что ты умеешь / помощь (в ходе повествования)', async () => {
         act('');
         act('котика');
-        expect(await act('что ты умеешь')).toMatch('Кого котик позовёт на помощь?');
-        expect(await act('помощь')).toMatch('Кого котик позовёт на помощь?');
+        expect(await act('что ты умеешь')).toMatch('Кого позвал котик');
+        expect(await act('помощь')).toMatch('Кого позвал котик');
     });
 
     test('Повтор истории: подтверждение', async () => {
@@ -177,6 +177,11 @@ describe('Main dialog', () => {
         act('');
         expect(await act('лошадь')).toMatch('Лошадь за дедку');
         expect(await act('лошадь')).toMatch('Лошадь за лошадь');
+    });
+
+    test('Для имен неопред. рода выбирается мужской', async () => {
+        act('');
+        expect(await act('сашу')).toMatch('Кого позвал саша');
     });
 
     test('Принимает имя-фамилию', async () => {
@@ -206,7 +211,7 @@ describe('Main dialog', () => {
 
     test('Любого персонажа вин. падежа предпочитает Имени-Фамилии им. падежа', async () => {
         act('');
-        expect(await act('позвал Вася Пупкин котика')).toMatch('Кого котик позовёт');
+        expect(await act('позвал Вася Пупкин котика')).toMatch('Кого позвал котик');
     });
 
     test('Распознает Имя-Фамилия когда имя неопределенного пола', async () => {

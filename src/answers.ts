@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Character, isCharMale, isCharFamela, previousChar, createChar, Gender } from './character';
+import { Character, isCharMale, isCharFamela, createChar, Gender, isCharUnisex } from './character';
 import { SessionData } from './sessionData';
 import { sample, lazySample } from './utils';
 import { createSpeech, Speech, concatSpeech } from './speech';
@@ -71,7 +71,7 @@ export function whoCalled(sessionData: SessionData) {
     const char = _.last(sessionData.chars);
 
     if (char) {
-        return `Кого ${nom(char)} позовёт на помощь?`;
+        return `Кого ${called(char)} ${nom(char)}?`;
     }
 
     return '';
@@ -94,7 +94,7 @@ export function kot(char: Character, sessionData: SessionData, random100) {
         `<speaker audio="alice-sounds-animals-cat-${soundNumber}.opus">`
     );
 
-    const prev = previousChar(char, sessionData.chars) as Character;
+    const prev = _.last(sessionData.chars.filter(c => c != char));
     const clung = byGender(char, 'вцепился', 'вцепилась', 'вцепилось');
     const name = nom(char);
     const description = name === 'мурка' ? 'кошка ' : '';
@@ -203,7 +203,11 @@ function called(char: Character) {
     return byGender(char, 'позвал', 'позвала', 'позвало');
 }
 function byGender<T>(char: Character, male: T, famela: T, other: T) {
-    return isCharMale(char) ? male : isCharFamela(char) ? famela : other;
+    if (isCharMale(char) || isCharUnisex(char)) {
+        return male;
+    }
+
+    return isCharFamela(char) ? famela : other;
 }
 
 function elephant(random100: number): Speech {

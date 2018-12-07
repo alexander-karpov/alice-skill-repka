@@ -32,6 +32,10 @@ function extractGender(lexeme: Lexeme): Gender {
         return Gender.Male;
     }
 
+    if (lexeme.gr.includes(Gr.Unisex)) {
+        return Gender.Unisex;
+    }
+
     if (lexeme.gr.includes(Gr.Famela)) {
         return Gender.Famela;
     }

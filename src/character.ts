@@ -8,7 +8,8 @@ export type Word = {
 export enum Gender {
     Male,
     Famela,
-    Neuter
+    Neuter,
+    Unisex
 }
 
 export type Character = {
@@ -33,9 +34,8 @@ export function isCharMale(char: Character) {
 export function isCharFamela(char: Character) {
     return char.gender === Gender.Famela;
 }
-
-export function previousChar(char: Character, chars: Character[]) {
-    return _.last(chars.filter(c => c != char));
+export function isCharUnisex(char: Character) {
+    return char.gender === Gender.Unisex;
 }
 
 export function createDedka(): Character {
