@@ -87,14 +87,13 @@ export function babushka() {
     );
 }
 
-export function kot(char: Character, sessionData: SessionData, random100) {
+export function kot(char: Character, previousChar: Character, random100: number) {
     const soundNumber = sample(byGender(char, [1, 2], [3, 4], [1]), random100);
     const meow = createSpeech(
         '- мяу -',
         `<speaker audio="alice-sounds-animals-cat-${soundNumber}.opus">`
     );
 
-    const prev = _.last(sessionData.chars.filter(c => c != char));
     const clung = byGender(char, 'вцепился', 'вцепилась', 'вцепилось');
     const name = nom(char);
     const description = name === 'мурка' ? 'кошка ' : '';
@@ -103,7 +102,7 @@ export function kot(char: Character, sessionData: SessionData, random100) {
         byGender(char, 'Прибежал', 'Прибежала', 'Прибежало'),
         `${description}${name}`,
         meow,
-        `и ${clung} в ${acc(prev)}.`
+        `и ${clung} в ${acc(previousChar)}.`
     );
 }
 

@@ -88,7 +88,7 @@ export async function mainDialog(
         }
 
         if (intents.kot(nextChar)) {
-            return concatSpeech(answers.kot(nextChar, sessionData, random100), repkaStory);
+            return concatSpeech(answers.kot(nextChar, currentChar, random100), repkaStory);
         }
 
         if (intents.slon(nextChar)) {

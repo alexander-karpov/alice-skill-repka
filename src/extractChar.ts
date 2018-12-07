@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { Character, Word, Gender } from './character';
-import { matchSeq, Maybe } from './utils/seq';
+import { matchSeq } from './utils/seq';
 import { Lexeme, Gr, matchGrs, Token, tokenSelector } from './tokens';
 
 export function extractChar(tokens: Token[]): Character | undefined {
@@ -111,30 +111,6 @@ function SNomToAcc(lexeme: Lexeme) {
 
     // Человек -> человека, кролик -> кролика.
     return add('а');
-}
-
-/**
- * Меняет падеж неод. существительного с им. на вин.
- * @param noun Существительное в им. падеже.
- */
-function nominativeToAccusativeInanimated(lexeme: Lexeme) {
-    const gr = lexeme.gr;
-    const isFamela = matchGrs(gr, [Gr.Famela]);
-    const nomenative = lexeme.lex;
-
-    const endsWith = end => nomenative.endsWith(end);
-    const changeOne = end => `${nomenative.substring(0, nomenative.length - 1)}${end}`;
-
-    // Икона -> икону, тарелка -> тарелку.
-    if (isFamela && endsWith('а')) {
-        return changeOne('у');
-    }
-
-    if (isFamela && endsWith('я')) {
-        return changeOne('ю');
-    }
-
-    return nomenative;
 }
 
 /**
