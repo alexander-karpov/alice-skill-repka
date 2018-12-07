@@ -15,14 +15,18 @@ export enum Gender {
 export type Character = {
     subject: Word;
     gender: Gender;
+    // Нормальная форма главного слова.
+    // Помогает при определении, кто это.
+    normal: string;
 };
 
-export function createChar(nom: string, acc: string, gender: Gender): Character {
+export function createChar(nom: string, acc: string, normal: string, gender: Gender): Character {
     return {
         subject: {
             nominative: nom,
             accusative: acc
         },
+        normal,
         gender
     };
 }
@@ -41,6 +45,7 @@ export function isCharUnisex(char: Character) {
 export function createDedka(): Character {
     return {
         subject: { nominative: 'дедка', accusative: 'дедку' },
+        normal: 'дедка',
         gender: Gender.Male
     };
 }

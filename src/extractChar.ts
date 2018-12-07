@@ -198,6 +198,7 @@ function extractFullNameChar(tokens: Token[]): [Character, number] | undefined {
                     lastNameWord.accusative
                 )}`
             },
+            normal: firstNameWord.nominative,
             gender: extractGender(fullNameLexemes[0][0])
         },
         tokenIndex
@@ -229,6 +230,7 @@ function extractAttrChar(tokens: Token[]): [Character, number] | undefined {
                 nominative: `${adj.nominative} ${noun.nominative}`,
                 accusative: `${adj.accusative} ${noun.accusative}`
             },
+            normal: noun.nominative,
             gender: extractGender(matches[1][0])
         },
         tokenIndex
@@ -249,7 +251,8 @@ function extractAnimChar(tokens: Token[]): [Character, number] | undefined {
     return [
         {
             subject: lexemeToWord(char[0], char[1]),
-            gender: extractGender(char[0])
+            gender: extractGender(char[0]),
+            normal: char[0].lex
         },
         tokenIndex
     ];
@@ -267,6 +270,7 @@ export function extractInanimate(tokens: Token[]): Character | undefined {
 
     return {
         subject: lexemeToWord(char[0], char[1]),
+        normal: char[0].lex,
         gender: extractGender(char[0])
     };
 }

@@ -5,10 +5,20 @@ import { sample, lazySample } from './utils';
 import { createSpeech, Speech, concatSpeech } from './speech';
 
 const appearanceSpecialPhraseChars = [
-    createChar('бабушка', 'бабушку', Gender.Famela),
-    createChar('чёрная кошка', 'чёрную кошку', Gender.Famela),
-    createChar('слон', 'слона', Gender.Male),
-    createChar('золотую рыбка', 'золотую рыбку', Gender.Famela)
+    createChar('бабушка', 'бабушку', 'бабушка', Gender.Famela),
+    createChar('чёрная кошка', 'чёрную кошку', 'кошка', Gender.Famela),
+    createChar('слон', 'слона', 'слон', Gender.Male),
+    createChar('золотую рыбка', 'золотую рыбку', 'рыбка', Gender.Famela),
+    createChar('серый волк', 'серого волка', 'волк', Gender.Male),
+    createChar('ворона', 'ворону', 'ворона', Gender.Famela),
+    createChar('коровушка', 'коровушку', 'коровушка', Gender.Famela),
+    createChar('страшный лев', 'страшного льва', 'лев', Gender.Male),
+    createChar('курочка', 'курочку', 'курочка', Gender.Famela),
+    createChar('лошадка', 'лошадку', 'лошадка', Gender.Famela),
+    createChar('лягушка', 'лягушку', 'лягушка', Gender.Famela),
+    createChar('петушок', 'петушка', 'петушок', Gender.Male),
+    createChar('собака', 'собаку', 'собака', Gender.Famela),
+    createChar('сова', 'сову', 'сова', Gender.Famela)
 ];
 
 const REPKA_GROWING =
@@ -199,9 +209,102 @@ export function inanimateCalled(inanimate: Character, sessionData: SessionData, 
     );
 }
 
+export function wolf(wolf: Character) {
+    const come = comeRunningCapitalized(wolf);
+
+    return createSpeech(
+        `${come} ${nom(wolf)}.`,
+        `${come} ${nom(wolf)} - <speaker audio="alice-sounds-animals-wolf-1.opus">.`
+    );
+}
+
+export function crow(crow: Character) {
+    const come = flownCapitalized(crow);
+
+    return createSpeech(
+        `${come} ${nom(crow)}.`,
+        `${come} ${nom(crow)} - <speaker audio="alice-sounds-animals-crow-1.opus">.`
+    );
+}
+export function lion(lion: Character) {
+    const come = comeCapitalized(lion);
+
+    return createSpeech(
+        `${come} ${nom(lion)}.`,
+        `${come} ${nom(lion)} - <speaker audio="alice-sounds-animals-lion-1.opus">.`
+    );
+}
+
+export function cow(cow: Character) {
+    const come = comeCapitalized(cow);
+
+    return createSpeech(
+        `${come} ${nom(cow)}.`,
+        `${come} ${nom(cow)} - <speaker audio="alice-sounds-animals-cow-2.opus">.`
+    );
+}
+
+export function horse(horse: Character, random100: number) {
+    const come = riddenCapitalized(horse);
+    const soundNumber = (random100 % 2) + 1;
+
+    return createSpeech(
+        `${come} ${nom(horse)}.`,
+        `${come} ${nom(horse)} - <speaker audio="alice-sounds-animals-horse-${soundNumber}.opus">.`
+    );
+}
+
+export function chicken(chicken: Character) {
+    const come = comeRunningCapitalized(chicken);
+
+    return createSpeech(
+        `${come} ${nom(chicken)}.`,
+        `${come} ${nom(chicken)} - <speaker audio="alice-sounds-animals-chicken-1.opus">.`
+    );
+}
+
+export function frog(frog: Character) {
+    const come = riddenCapitalized(frog);
+
+    return createSpeech(
+        `${come} ${nom(frog)}.`,
+        `${come} ${nom(frog)} - <speaker audio="alice-sounds-animals-frog-1.opus">.`
+    );
+}
+
+export function rooster(rooster: Character) {
+    const come = flownCapitalized(rooster);
+
+    return createSpeech(
+        `${come} ${nom(rooster)}.`,
+        `${come} ${nom(rooster)} - <speaker audio="alice-sounds-animals-rooster-1.opus">.`
+    );
+}
+
+export function owl(owl: Character, random100) {
+    const come = flownCapitalized(owl);
+    const soundNumber = sample([1, 2], random100);
+
+    return createSpeech(
+        `${come} ${nom(owl)}.`,
+        `${come} ${nom(owl)} - <speaker audio="alice-sounds-animals-owl-${soundNumber}.opus">.`
+    );
+}
+
+export function dog(dog: Character, random100) {
+    const come = comeRunningCapitalized(dog);
+    const soundNumber = sample([3, 5], random100);
+
+    return createSpeech(
+        `${come} ${nom(dog)}.`,
+        `${come} ${nom(dog)} - <speaker audio="alice-sounds-animals-dog-${soundNumber}.opus">.`
+    );
+}
+
 function called(char: Character) {
     return byGender(char, 'позвал', 'позвала', 'позвало');
 }
+
 function byGender<T>(char: Character, male: T, famela: T, other: T) {
     if (isCharMale(char) || isCharUnisex(char)) {
         return male;
@@ -229,6 +332,21 @@ export function nom(char: Character) {
 
 export function acc(char: Character) {
     return char.subject.accusative;
+}
+
+function comeRunningCapitalized(char: Character) {
+    return byGender(char, 'Прибежал', 'Прибежала', 'Прибежало');
+}
+
+function comeCapitalized(char: Character) {
+    return byGender(char, 'Пришёл', 'Пришла', 'Пришло');
+}
+
+function riddenCapitalized(char: Character) {
+    return byGender(char, 'Прискакал', 'Прискакала', 'Прискакало');
+}
+function flownCapitalized(char: Character) {
+    return byGender(char, 'Прилетел', 'Прилетела', 'Прилетело');
 }
 
 // function guitar(random100: number): Speech {

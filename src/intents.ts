@@ -11,23 +11,59 @@ export function repka(tokens: Token[]) {
 }
 
 export function babushka(char: Character) {
-    return ['бабка', 'бабушка', 'баба'].some(alias => char.subject.nominative.includes(alias));
+    return equals(char, 'бабка', 'бабушка', 'баба');
 }
 
-export function kot(char: Character) {
-    return ['кошка', 'кошечка', 'кот', 'котик', 'котенок', 'мурка', 'киска'].some(alias =>
-        char.subject.nominative.includes(alias)
-    );
+export function cat(char: Character) {
+    return startsWith(char, 'кош', 'кот', 'киск', 'мурк');
 }
 
 export function slon(char: Character) {
-    return ['слон', 'слоник', 'слоненок', 'слониха'].some(alias =>
-        char.subject.nominative.includes(alias)
-    );
+    return startsWith(char, 'слон');
 }
 
-export function rybka(char: Character) {
-    return ['рыба', 'рыбка'].some(alias => char.subject.nominative.includes(alias));
+export function fish(char: Character) {
+    return equals(char, 'рыба', 'рыбка');
+}
+
+export function wolf(char: Character) {
+    return startsWith(char, 'волк', 'волч');
+}
+
+export function crow(char: Character) {
+    return startsWith(char, 'ворон');
+}
+
+export function cow(char: Character) {
+    return startsWith(char, 'коров');
+}
+
+export function chicken(char: Character) {
+    return startsWith(char, 'куриц', 'курочк');
+}
+
+export function lion(char: Character) {
+    return startsWith(char, 'льв') || equals(char, 'лев');
+}
+
+export function horse(char: Character) {
+    return startsWith(char, 'лошад', 'жереб') || equals(char, 'конь');
+}
+
+export function frog(char: Character) {
+    return startsWith(char, 'лягуш');
+}
+
+export function rooster(char: Character) {
+    return startsWith(char, 'петух', 'петуш');
+}
+
+export function dog(char: Character) {
+    return startsWith(char, 'собак', 'собач', 'щено') || equals(char, 'пес');
+}
+
+export function owl(char: Character) {
+    return startsWith(char, 'сова', 'совен', 'филин');
 }
 
 export function help(tokens: string[]) {
@@ -50,4 +86,11 @@ export function no(tokens: string[]) {
             tokens.includes('нет') ||
             matchSeq(tokens, [eq('не'), eq('надо')])
     );
+}
+
+function startsWith(char: Character, ...aliases: string[]) {
+    return aliases.some(alias => char.normal.startsWith(alias));
+}
+function equals(char: Character, ...alias: string[]) {
+    return alias.some(alias => char.normal === alias);
 }

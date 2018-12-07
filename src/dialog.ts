@@ -82,27 +82,46 @@ export async function mainDialog(
 
         chars.push(nextChar);
         const repkaStory = makeRepkaStory(chars, sessionData);
+        const specialPhrase = findSpecialPhrase(nextChar, currentChar, random100);
 
-        if (intents.babushka(nextChar)) {
-            return concatSpeech(answers.babushka(), repkaStory);
-        }
-
-        if (intents.kot(nextChar)) {
-            return concatSpeech(answers.kot(nextChar, currentChar, random100), repkaStory);
-        }
-
-        if (intents.slon(nextChar)) {
-            return concatSpeech(answers.slon(random100), repkaStory);
-        }
-
-        if (intents.rybka(nextChar)) {
-            return concatSpeech(answers.rybka(nextChar, currentChar), repkaStory);
-        }
-
-        return repkaStory;
+        return specialPhrase ? concatSpeech(specialPhrase, repkaStory) : repkaStory;
     })();
 
     return isDialogResult(result) ? result : { speech: result, endSession: false };
+}
+
+function findSpecialPhrase(char: Character, previousChar: Character, random100: number) {
+    if (intents.cat(char)) {
+        return answers.kot(char, previousChar, random100);
+    }
+
+    if (intents.slon(char)) {
+        return answers.slon(random100);
+    }
+
+    if (intents.fish(char)) {
+        return answers.rybka(char, previousChar);
+    }
+
+    const pairs: [
+        (char: Character) => boolean,
+        (char: Character, random100: number) => Speech
+    ][] = [
+        [intents.babushka, answers.babushka],
+        [intents.wolf, answers.wolf],
+        [intents.crow, answers.crow],
+        [intents.cow, answers.cow],
+        [intents.chicken, answers.chicken],
+        [intents.lion, answers.lion],
+        [intents.horse, answers.horse],
+        [intents.frog, answers.frog],
+        [intents.rooster, answers.rooster],
+        [intents.dog, answers.dog],
+        [intents.owl, answers.owl]
+    ];
+
+    const found = pairs.find(([intent]) => intent(char));
+    return found ? found[1](char, random100) : undefined;
 }
 
 function makeRepkaStory(all: Character[], sessionData: SessionData) {
