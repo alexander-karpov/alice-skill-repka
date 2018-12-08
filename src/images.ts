@@ -1,7 +1,7 @@
 export const imageIds = {
-    wolf: '1030494/887a7e3b76c36622a370',
-    crow: '1540737/d3d5d873f247258903f0',
+    wolf: '965417/9929614145838c2092ab',
+    crow: '997614/61c6fab9d5da7f3a5eba',
     cat: '1540737/52f138d32164dcfb334b',
-    mouse: '1030494/bb1d03c45ae3bc56f449',
+    mouse: '1652229/dec46e3a051abd7eef90',
     dog: '1030494/fb311cc1fb2cb7fafa8a'
 };
