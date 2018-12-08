@@ -301,6 +301,15 @@ export function dog(dog: Character, random100) {
     );
 }
 
+export function mouse(mouse: Character) {
+    const come = comeRunningCapitalized(mouse);
+
+    return createSpeech(
+        `${come} ${nom(mouse)}.`,
+        `${come} ${nom(mouse)} - <speaker audio="alice-music-violin-b-1.opus">.`
+    );
+}
+
 function called(char: Character) {
     return byGender(char, 'позвал', 'позвала', 'позвало');
 }

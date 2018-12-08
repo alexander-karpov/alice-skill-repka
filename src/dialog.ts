@@ -5,6 +5,7 @@ import { SessionData, Dialogs } from './sessionData';
 import { Speech, createSpeech, concatSpeech } from './speech';
 import * as answers from './answers';
 import * as intents from './intents';
+import { imageIds } from './images';
 
 import { Character, createDedka } from './character';
 
@@ -83,52 +84,61 @@ export async function mainDialog(
 
         chars.push(nextChar);
         const repkaStory = makeRepkaStory(chars, sessionData);
-        const specialPhrase = findSpecialPhrase(nextChar, currentChar, random100);
+        const specialPhraseResult = findSpecialPhrase(nextChar, currentChar, random100);
 
-        const tale = specialPhrase ? concatSpeech(specialPhrase, repkaStory) : repkaStory;
-
-        if (intents.wolf(nextChar)) {
-            return { speech: tale, imageId: '213044/adb69889ca84d687086a', endSession: false };
+        if (!specialPhraseResult) {
+            return repkaStory;
         }
 
-        return tale;
+        const [specialPhrase, imageId] = specialPhraseResult;
+        return {
+            speech: concatSpeech(specialPhrase, repkaStory),
+            imageId: imageId,
+            endSession: false
+        };
     })();
 
     return isDialogResult(result) ? result : { speech: result, endSession: false };
 }
 
-function findSpecialPhrase(char: Character, previousChar: Character, random100: number) {
+function findSpecialPhrase(
+    char: Character,
+    previousChar: Character,
+    random100: number
+): [Speech, string?] | undefined {
     if (intents.cat(char)) {
-        return answers.kot(char, previousChar, random100);
+        return [answers.kot(char, previousChar, random100), imageIds.cat];
     }
 
     if (intents.slon(char)) {
-        return answers.slon(random100);
+        return [answers.slon(random100)];
     }
 
     if (intents.fish(char)) {
-        return answers.rybka(char, previousChar);
+        return [answers.rybka(char, previousChar)];
     }
 
     const pairs: [
         (char: Character) => boolean,
-        (char: Character, random100: number) => Speech
+        (char: Character, random100: number) => Speech,
+        string?
     ][] = [
         [intents.babushka, answers.babushka],
-        [intents.wolf, answers.wolf],
-        [intents.crow, answers.crow],
+        [intents.wolf, answers.wolf, imageIds.wolf],
+        [intents.crow, answers.crow, imageIds.crow],
         [intents.cow, answers.cow],
         [intents.chicken, answers.chicken],
         [intents.lion, answers.lion],
         [intents.horse, answers.horse],
         [intents.frog, answers.frog],
         [intents.rooster, answers.rooster],
-        [intents.dog, answers.dog],
-        [intents.owl, answers.owl]
+        [intents.dog, answers.dog, imageIds.dog],
+        [intents.owl, answers.owl],
+        [intents.mouse, answers.mouse, imageIds.mouse]
     ];
 
     const found = pairs.find(([intent]) => intent(char));
-    return found ? found[1](char, random100) : undefined;
+    return found ? [found[1](char, random100), found[2]] : undefined;
 }
 
 function makeRepkaStory(all: Character[], sessionData: SessionData) {
@@ -173,7 +183,7 @@ function isStoryOver(chars: Character[]) {
         return false;
     }
 
-    const isLastMouse = last.subject.nominative === 'мышка';
+    const isLastMouse = last.normal.startsWith('мыш');
     const tooManyCharacters = chars.length >= 10;
     return isLastMouse || tooManyCharacters;
 }

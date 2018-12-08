@@ -66,6 +66,10 @@ export function owl(char: Character) {
     return startsWith(char, 'сова', 'совен', 'филин');
 }
 
+export function mouse(char: Character) {
+    return startsWith(char, 'мыш');
+}
+
 export function help(tokens: string[]) {
     const command = tokens.join(' ');
     return command === 'что ты умеешь' || command === 'помощь';
