@@ -32,10 +32,19 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
                 random100
             });
 
+            const card = answer.imageId
+                ? {
+                      type: 'BigImage',
+                      image_id: answer.imageId,
+                      description: answer.speech.text
+                  }
+                : undefined;
+
             return {
                 response: {
                     text: answer.speech.text,
                     tts: answer.speech.tts,
+                    card,
                     end_session: answer.endSession
                 },
                 session: request.session,

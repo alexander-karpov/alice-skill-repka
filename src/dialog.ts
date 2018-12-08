@@ -16,6 +16,7 @@ export type DialogDependencies = {
 
 export type DialogResult = {
     speech: Speech;
+    imageId?: string;
     endSession: boolean;
 };
 //#endregion
@@ -84,7 +85,13 @@ export async function mainDialog(
         const repkaStory = makeRepkaStory(chars, sessionData);
         const specialPhrase = findSpecialPhrase(nextChar, currentChar, random100);
 
-        return specialPhrase ? concatSpeech(specialPhrase, repkaStory) : repkaStory;
+        const tale = specialPhrase ? concatSpeech(specialPhrase, repkaStory) : repkaStory;
+
+        if (intents.wolf(nextChar)) {
+            return { speech: tale, imageId: '213044/adb69889ca84d687086a', endSession: false };
+        }
+
+        return tale;
     })();
 
     return isDialogResult(result) ? result : { speech: result, endSession: false };
