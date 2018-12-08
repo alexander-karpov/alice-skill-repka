@@ -1,6 +1,6 @@
 {
   "name": "alice-skill-repka",
-  "version": "0.2.30",
+  "version": "0.2.31",
   "main": "dist/index.js",
   "author": "Alexander Karpov",
   "license": "MIT",
