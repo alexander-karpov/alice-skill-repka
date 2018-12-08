@@ -225,6 +225,17 @@ describe('Main dialog', () => {
         expect(await act('Саша Карпов')).toMatch('Саша Карпов за дедку');
     });
 
+    test('Очень короткие слова в вин. падеже.', async () => {
+        act('');
+        expect(await act('пса')).toMatch('Пес за дедку');
+        expect(await act('льва')).toMatch('Лев за пса');
+        expect(await act('котика')).toMatch('Котик за льва');
+
+        expect(await act('пес')).toMatch('Пес за котика');
+        expect(await act('лев')).toMatch('Лев за пса');
+        expect(await act('котик')).toMatch('Котик за льва');
+    });
+
     test('Повтор истории: отказ', async () => {
         act('');
         expect(await act('мышку')).toMatch('вытянули репку');

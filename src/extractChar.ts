@@ -104,6 +104,21 @@ function SNomToAcc(lexeme: Lexeme) {
         return nomenative;
     }
 
+    // Пес -> пса
+    if (endsWith('ес') && isMale) {
+        return changeTwo('са');
+    }
+
+    // Гонец -> когца
+    if (endsWith('це') && isMale) {
+        return changeTwo('ца');
+    }
+
+    // Лев -> льва
+    if (endsWith('ев') && isMale) {
+        return changeTwo('ьва');
+    }
+
     // Дочь, лошадь?
     if (endsWith('ь') && isFamela) {
         return nomenative;
