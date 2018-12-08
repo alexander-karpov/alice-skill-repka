@@ -4,70 +4,47 @@ import { SessionData } from './sessionData';
 import { sample, lazySample } from './utils';
 import { createSpeech, Speech, concatSpeech } from './speech';
 
-const appearanceSpecialPhraseChars = [
-    createChar('бабушка', 'бабушку', 'бабушка', Gender.Famela),
-    createChar('чёрная кошка', 'чёрную кошку', 'кошка', Gender.Famela),
-    createChar('слон', 'слона', 'слон', Gender.Male),
-    createChar('золотую рыбка', 'золотую рыбку', 'рыбка', Gender.Famela),
-    createChar('серый волк', 'серого волка', 'волк', Gender.Male),
-    createChar('ворона', 'ворону', 'ворона', Gender.Famela),
-    createChar('коровушка', 'коровушку', 'коровушка', Gender.Famela),
-    createChar('страшный лев', 'страшного льва', 'лев', Gender.Male),
-    createChar('курочка', 'курочку', 'курочка', Gender.Famela),
-    createChar('лошадка', 'лошадку', 'лошадка', Gender.Famela),
-    createChar('лягушка', 'лягушку', 'лягушка', Gender.Famela),
-    createChar('петушок', 'петушка', 'петушок', Gender.Male),
-    createChar('собака', 'собаку', 'собака', Gender.Famela),
-    createChar('сова', 'сову', 'сова', Gender.Famela)
-];
+// const appearanceSpecialPhraseChars = [
+//     createChar('бабушка', 'бабушку', 'бабушка', Gender.Famela),
+//     createChar('чёрная кошка', 'чёрную кошку', 'кошка', Gender.Famela),
+//     createChar('слон', 'слона', 'слон', Gender.Male),
+//     createChar('золотую рыбка', 'золотую рыбку', 'рыбка', Gender.Famela),
+//     createChar('серый волк', 'серого волка', 'волк', Gender.Male),
+//     createChar('ворона', 'ворону', 'ворона', Gender.Famela),
+//     createChar('коровушка', 'коровушку', 'коровушка', Gender.Famela),
+//     createChar('страшный лев', 'страшного льва', 'лев', Gender.Male),
+//     createChar('курочка', 'курочку', 'курочка', Gender.Famela),
+//     createChar('лошадка', 'лошадку', 'лошадка', Gender.Famela),
+//     createChar('лягушка', 'лягушку', 'лягушка', Gender.Famela),
+//     createChar('петушок', 'петушка', 'петушок', Gender.Male),
+//     createChar('собака', 'собаку', 'собака', Gender.Famela),
+//     createChar('сова', 'сову', 'сова', Gender.Famela)
+// ];
 
-const REPKA_GROWING =
-    'Выросла репка большая-пребольшая. Стал дед репку из земли тянуть. Тянет-потянет, вытянуть не может. Позвал дед...';
-
-const GRANTFATHER_PLANT_LOW = 'посадил дед репку';
-
-function aboutSkill(random100: number): Speech {
-    const char = sample(appearanceSpecialPhraseChars, random100);
-
+function aboutSkill(): Speech {
     return concatSpeech(
-        'Я расскажу сказку про репку, если вы мне поможете.',
-        'Когда придет время позвать нового героя, дополните рассказ.',
-        'Например, я скажу: «Позвал дедка...»,',
-        createSpeech(`а вы продолжите: «${acc(char)}».`, `а вы продолжите - ${acc(char)}.`),
-        'Вы готовы?'
+        'Давайте вместе сочиним сказку.',
+        createSpeech('Вы слышали, как посадил дед репку?', 'Вы слышали - как посадил дед репку?'),
+        ' А кто помогал её тянуть? Давайте придумаем вместе.'
     );
 }
 
-export function storyBegin(random100: number): Speech {
-    const cases = [
-        `Давным-давно в далёкой деревне ${GRANTFATHER_PLANT_LOW}.`,
-        `Жили-были дед да баба. И вот ${GRANTFATHER_PLANT_LOW}.`,
-        `В стародавние времена жил на свете дед. И вот отнажды ${GRANTFATHER_PLANT_LOW}.`,
-        `На опушке большого леса ${GRANTFATHER_PLANT_LOW}.`,
-        `Однажды ${GRANTFATHER_PLANT_LOW}.`,
-        `Где-то далеко, в тридесятом царстве ${GRANTFATHER_PLANT_LOW}.`,
-        `Жил на опушке дремучего леса дед. ${_.capitalize(GRANTFATHER_PLANT_LOW)}.`,
-        `В некотором царстве ${GRANTFATHER_PLANT_LOW}.`,
-        `Давно тому назад ${GRANTFATHER_PLANT_LOW}.`,
-        `В одной деревне ${GRANTFATHER_PLANT_LOW}.`,
-        `Жарким летним днем ${GRANTFATHER_PLANT_LOW}.`,
-        `${_.capitalize(GRANTFATHER_PLANT_LOW)}.`
-    ];
-
-    return concatSpeech(sample(cases, random100), REPKA_GROWING);
+export function storyBegin(): Speech {
+    return concatSpeech(
+        'Посадил дед репку. Выросла репка большая-пребольшая. Стал дед репку из земли тянуть. Тянет-потянет, вытянуть не может. Кого позвал дедка?'
+    );
 }
 
 export function intro(random100: number): Speech {
-    const beforeAbout = ['Хорошо.', 'Давайте.', 'С удовольствием!'];
     return concatSpeech(
-        sample(beforeAbout, random100),
-        aboutSkill(random100),
-        storyBegin(random100)
+        sample(['Хорошо.', 'С удовольствием!'], random100),
+        aboutSkill(),
+        storyBegin()
     );
 }
 
-export function help(sessionData: SessionData, random100: number) {
-    return concatSpeech(aboutSkill(random100), whoCalled(sessionData));
+export function help(sessionData: SessionData) {
+    return concatSpeech(aboutSkill(), whoCalled(sessionData));
 }
 
 export function onlyOneCharMayCome(sessionData: SessionData) {
