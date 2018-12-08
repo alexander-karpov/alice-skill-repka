@@ -59,7 +59,7 @@ export function rooster(char: Character) {
 }
 
 export function dog(char: Character) {
-    return startsWith(char, 'собак', 'собач', 'щено') || equals(char, 'пес');
+    return startsWith(char, 'собак', 'собач', 'щено', 'жучка') || equals(char, 'пес');
 }
 
 export function owl(char: Character) {

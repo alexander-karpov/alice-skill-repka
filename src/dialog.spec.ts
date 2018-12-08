@@ -244,6 +244,11 @@ describe('Main dialog', () => {
         expect(story).toMatch('бабка за дедку, дедка за репку — тянут-потянут, вытянуть не могут.');
     });
 
+    test('Спецфраза для жучки', async () => {
+        act('');
+        expect(await act('жучку')).toMatch('Прибежала жучка');
+    });
+
     beforeEach(() => {
         sessionData = createSessionData();
     });
