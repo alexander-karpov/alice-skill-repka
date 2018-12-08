@@ -10,7 +10,7 @@ export function repka(tokens: Token[]) {
     return tokens.some(t => t.lexemes.length === 1 && t.lexemes[0].lex === 'репка');
 }
 
-export function babushka(char: Character) {
+export function granny(char: Character) {
     return equals(char, 'бабка', 'бабушка', 'баба');
 }
 
@@ -18,7 +18,7 @@ export function cat(char: Character) {
     return startsWith(char, 'кош', 'кот', 'киск', 'мурк');
 }
 
-export function slon(char: Character) {
+export function elephant(char: Character) {
     return startsWith(char, 'слон');
 }
 
@@ -70,6 +70,14 @@ export function mouse(char: Character) {
     return startsWith(char, 'мыш');
 }
 
+export function bear(char: Character) {
+    return startsWith(char, 'медвед', 'медвеж');
+}
+
+export function fox(char: Character) {
+    return startsWith(char, 'лис');
+}
+
 export function help(tokens: string[]) {
     const command = tokens.join(' ');
     return command === 'что ты умеешь' || command === 'помощь';
@@ -88,7 +96,7 @@ export function no(tokens: string[]) {
         tokens.includes('достаточно') ||
             tokens.includes('хватит') ||
             tokens.includes('нет') ||
-            matchSeq(tokens, [eq('не'), eq('надо')])
+            matchSeq(tokens, [eq('не'), eq('надо')]),
     );
 }
 

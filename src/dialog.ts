@@ -5,7 +5,7 @@ import { SessionData, Dialogs } from './sessionData';
 import { Speech, createSpeech, concatSpeech } from './speech';
 import * as answers from './answers';
 import * as intents from './intents';
-import { imageIds } from './images';
+import { findKnownChar } from './knownChars';
 
 import { Character, createDedka } from './character';
 
@@ -25,7 +25,7 @@ export type DialogResult = {
 export async function mainDialog(
     rawTokens: string[],
     sessionData: SessionData,
-    { stemmer, random100 }: DialogDependencies
+    { stemmer, random100 }: DialogDependencies,
 ): Promise<DialogResult> {
     const isRepeatQuestionDialog = sessionData.currentDialog === Dialogs.RepeatQuestion;
     const tokens = await stemmer(rawTokens.join(' '));
@@ -33,7 +33,7 @@ export async function mainDialog(
 
     const result = (function narrative(): DialogResult | Speech {
         if (intents.help(rawTokens)) {
-            return answers.help(sessionData, random100);
+            return answers.help(sessionData);
         }
 
         if (isRepeatQuestionDialog && !intents.no(rawTokens) && !intents.yes(rawTokens)) {
@@ -71,7 +71,7 @@ export async function mainDialog(
         }
 
         if (!currentChar) {
-            return answers.storyBegin(random100);
+            return answers.storyBegin();
         }
 
         if (!nextChar && inanimate) {
@@ -79,66 +79,26 @@ export async function mainDialog(
         }
 
         if (!nextChar) {
-            return answers.wrongCommand(sessionData, random100);
+            return answers.wrongCommand(sessionData);
         }
 
         chars.push(nextChar);
-        const repkaStory = makeRepkaStory(chars, sessionData);
-        const specialPhraseResult = findSpecialPhrase(nextChar, currentChar, random100);
+        const tale = makeRepkaStory(chars, sessionData);
 
-        if (!specialPhraseResult) {
-            return repkaStory;
+        const knownChar = findKnownChar(nextChar);
+
+        if (knownChar) {
+            return {
+                speech: concatSpeech(knownChar.answer(nextChar, currentChar, random100), tale),
+                imageId: knownChar.image,
+                endSession: false,
+            };
         }
 
-        const [specialPhrase, imageId] = specialPhraseResult;
-        return {
-            speech: concatSpeech(specialPhrase, repkaStory),
-            imageId: imageId,
-            endSession: false
-        };
+        return tale;
     })();
 
     return isDialogResult(result) ? result : { speech: result, endSession: false };
-}
-
-function findSpecialPhrase(
-    char: Character,
-    previousChar: Character,
-    random100: number
-): [Speech, string?] | undefined {
-    if (intents.cat(char)) {
-        return [answers.kot(char, previousChar, random100), imageIds.cat];
-    }
-
-    if (intents.slon(char)) {
-        return [answers.slon(random100)];
-    }
-
-    if (intents.fish(char)) {
-        return [answers.rybka(char, previousChar)];
-    }
-
-    const pairs: [
-        (char: Character) => boolean,
-        (char: Character, random100: number) => Speech,
-        string?
-    ][] = [
-        [intents.babushka, answers.babushka],
-        [intents.wolf, answers.wolf, imageIds.wolf],
-        [intents.crow, answers.crow, imageIds.crow],
-        [intents.cow, answers.cow],
-        [intents.chicken, answers.chicken],
-        [intents.lion, answers.lion],
-        [intents.horse, answers.horse],
-        [intents.frog, answers.frog],
-        [intents.rooster, answers.rooster],
-        [intents.dog, answers.dog, imageIds.dog],
-        [intents.owl, answers.owl],
-        [intents.mouse, answers.mouse, imageIds.mouse]
-    ];
-
-    const found = pairs.find(([intent]) => intent(char));
-    return found ? [found[1](char, random100), found[2]] : undefined;
 }
 
 function makeRepkaStory(all: Character[], sessionData: SessionData) {
@@ -148,7 +108,7 @@ function makeRepkaStory(all: Character[], sessionData: SessionData) {
 
     if (isStoryOver(all)) {
         story.push(
-            createSpeech('— вытянули репку! Какая интересная сказка. Хочешь послушать снова?')
+            createSpeech('— вытянули репку! Какая интересная сказка. Хочешь послушать снова?'),
         );
         sessionData.currentDialog = Dialogs.RepeatQuestion;
     } else {

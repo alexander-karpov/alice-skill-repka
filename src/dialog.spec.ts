@@ -9,7 +9,7 @@ describe('Main dialog', () => {
 
     async function act(command: string, random100 = 0): Promise<string> {
         const {
-            speech: { text }
+            speech: { text },
         } = await mainDialog(command.toLowerCase().split(' '), sessionData, { stemmer, random100 });
         return text;
     }
@@ -35,7 +35,7 @@ describe('Main dialog', () => {
         const story = await act('Мышку');
 
         expect(story).toMatch(
-            'Мышка за бабку, бабка за дедку, дедка за репку — тянут-потянут, — вытянули репку!'
+            'Мышка за бабку, бабка за дедку, дедка за репку — тянут-потянут, — вытянули репку!',
         );
     });
 
@@ -110,20 +110,10 @@ describe('Main dialog', () => {
         expect(await act('Репку')).toMatch('Репка сама себя не вытянет');
     });
 
-    test('Специальная фраза для бабки', async () => {
-        act('');
-        expect(await act('Бабку')).toMatch(/у тебя такие большие руки\?.+Бабка за дедку/);
-    });
-
-    test('Специальная фраза для слона', async () => {
-        act('');
-        expect(await act('африканского слона')).toMatch('Что делал слон, когда пришёл на поле он');
-    });
-
     test('Специальная фраза для рыбки', async () => {
         act('');
         expect(await act('золотую рыбку из сказки Пушкина')).toMatch(
-            /кликать золотую рыбку.*приплыла к нему рыбка, спросила/
+            /кликать золотую рыбку.*приплыла к нему рыбка, спросила/,
         );
 
         act('кошку');
@@ -236,7 +226,7 @@ describe('Main dialog', () => {
         expect(await act('мышку')).toMatch('вытянули репку');
         const {
             speech: { text },
-            endSession
+            endSession,
         } = await mainDialog('нет спасибо'.split(' '), sessionData, { stemmer, random100: 0 });
 
         expect(text).toMatch('конец');
