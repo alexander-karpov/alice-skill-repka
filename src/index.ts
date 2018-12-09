@@ -44,7 +44,16 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
                 ? answer.buttons.map(title => {
                       return { title, hide: true };
                   })
-                : undefined;
+                : answer.endSession
+                    ? [
+                          {
+                              title: 'Оставить отзыв',
+                              url:
+                                  'https://dialogs.yandex.ru/store/skills/916a8380-skazka-pro-repku',
+                              hide: true,
+                          },
+                      ]
+                    : undefined;
 
             return {
                 response: {
