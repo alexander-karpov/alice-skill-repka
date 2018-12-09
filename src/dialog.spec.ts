@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import { mainDialog } from './dialog';
 import { spawnMystem, Stemmer } from './stemmer';
 import { SessionData, createSessionData } from './sessionData';
@@ -273,6 +274,24 @@ describe('Main dialog', () => {
         act('');
         expect(await act('бобра')).toMatch('Бобер за дедку');
         expect(await act('котика')).toMatch('Котик за бобра,');
+    });
+
+    test('Не выводит кнопки в конце истории.', async () => {
+        act('');
+        for (let _n of _.range(0, 8)) {
+            await act('бобра');
+        }
+
+        const {
+            speech: { text },
+            buttons,
+        } = await mainDialog('и наконец последнего бобра'.split(' '), sessionData, {
+            stemmer,
+            random100: 0,
+        });
+
+        expect(text).toMatch('вытянули репку');
+        expect(buttons).toBeUndefined();
     });
 
     beforeEach(() => {

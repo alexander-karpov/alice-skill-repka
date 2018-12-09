@@ -102,7 +102,7 @@ export async function mainDialog(
 
         return {
             speech: tale,
-            buttons: chooseKnownCharButtons(chars, random100),
+            buttons: !isStoryOver(chars) ? chooseKnownCharButtons(chars, random100) : undefined,
             endSession: false,
         };
     })();
