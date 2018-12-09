@@ -257,6 +257,18 @@ describe('Main dialog', () => {
         expect(await act('котята')).toMatch('Котенок за кошку');
     });
 
+    test('Позвали осла', async () => {
+        act('');
+        expect(await act('осла')).toMatch('Осел за дедку');
+        expect(await act('котика')).toMatch('Котик за осла,');
+    });
+
+    test('Позвали гонца', async () => {
+        act('');
+        expect(await act('гонца')).toMatch('Гонец за дедку');
+        expect(await act('котика')).toMatch('Котик за гонца,');
+    });
+
     beforeEach(() => {
         sessionData = createSessionData();
     });

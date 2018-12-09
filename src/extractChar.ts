@@ -114,9 +114,9 @@ function SNomToAcc(lexeme: Lexeme) {
         return changeTwo('са');
     }
 
-    // Гонец -> когца
-    if (isMale && endsWith('це')) {
-        return changeTwo('ца');
+    // Осел -> осла, дятел -> дятла.
+    if (isMale && endsWith('ел')) {
+        return changeTwo('ла');
     }
 
     // Лев -> льва
