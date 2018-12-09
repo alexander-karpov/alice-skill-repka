@@ -71,7 +71,7 @@ export function mouse(char: Character) {
 }
 
 export function bear(char: Character) {
-    return startsWith(char, 'медвед', 'медвеж');
+    return equals(char, 'мишка', 'мишутка') || startsWith(char, 'медвед', 'медвеж');
 }
 
 export function fox(char: Character) {
