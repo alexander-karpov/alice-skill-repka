@@ -5,7 +5,7 @@ import { SessionData, Dialogs } from './sessionData';
 import { Speech, createSpeech, concatSpeech } from './speech';
 import * as answers from './answers';
 import * as intents from './intents';
-import { findKnownChar } from './knownChars';
+import { findKnownChar, chooseKnownCharButtons } from './knownChars';
 
 import { Character, createDedka } from './character';
 
@@ -18,6 +18,7 @@ export type DialogDependencies = {
 export type DialogResult = {
     speech: Speech;
     imageId?: string;
+    buttons?: string[];
     endSession: boolean;
 };
 //#endregion
@@ -75,11 +76,19 @@ export async function mainDialog(
         }
 
         if (!nextChar && inanimate) {
-            return answers.inanimateCalled(inanimate, sessionData, random100);
+            return {
+                speech: answers.inanimateCalled(inanimate, sessionData, random100),
+                buttons: chooseKnownCharButtons(chars, random100),
+                endSession: false,
+            };
         }
 
         if (!nextChar) {
-            return answers.wrongCommand(sessionData);
+            return {
+                speech: answers.wrongCommand(sessionData),
+                buttons: chooseKnownCharButtons(chars, random100),
+                endSession: false,
+            };
         }
 
         chars.push(nextChar);
@@ -95,7 +104,11 @@ export async function mainDialog(
             };
         }
 
-        return tale;
+        return {
+            speech: tale,
+            buttons: chooseKnownCharButtons(chars, random100),
+            endSession: false,
+        };
     })();
 
     return isDialogResult(result) ? result : { speech: result, endSession: false };

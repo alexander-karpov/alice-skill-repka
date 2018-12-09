@@ -33,6 +33,11 @@ export type WebhookResponse = {
     response: {
         text: string; // 'Здравствуйте! Это мы, хороводоведы.';
         tts?: string; // 'Здравствуйте! Это мы, хоров+одо в+еды.';
+        buttons?: ({
+            title: string;
+            url?: string;
+            hide: boolean; // Признак того, что кнопку нужно убрать после следующей реплики пользователя.
+        })[];
         card?: {
             type: string;
             image_id: string;

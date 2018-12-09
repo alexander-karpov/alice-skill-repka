@@ -29,15 +29,21 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
 
             const answer = await mainDialog(request.request.nlu.tokens, sessionData, {
                 stemmer,
-                random100
+                random100,
             });
 
             const card = answer.imageId
                 ? {
                       type: 'BigImage',
                       image_id: answer.imageId,
-                      description: answer.speech.text
+                      description: answer.speech.text,
                   }
+                : undefined;
+
+            const buttons = answer.buttons
+                ? answer.buttons.map(title => {
+                      return { title, hide: true };
+                  })
                 : undefined;
 
             return {
@@ -45,17 +51,18 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
                     text: answer.speech.text,
                     tts: answer.speech.tts,
                     card,
-                    end_session: answer.endSession
+                    buttons,
+                    end_session: answer.endSession,
                 },
                 session: request.session,
-                version: request.version
+                version: request.version,
             };
         },
         () => {
             killStemmer();
             closeLogFile(logFile);
         },
-        { port }
+        { port },
     );
 }
 
