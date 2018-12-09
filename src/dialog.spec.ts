@@ -249,6 +249,13 @@ describe('Main dialog', () => {
         expect(await act('жучку')).toMatch('Прибежала жучка');
     });
 
+    test('Позвали буратино, пиноккио', async () => {
+        act('');
+        expect(await act('буратино')).toMatch('Буратино за дедку');
+        expect(await act('пиноккио')).toMatch('Пиноккио за буратино,');
+        expect(await act('котик')).toMatch('Котик за пиноккио,');
+    });
+
     beforeEach(() => {
         sessionData = createSessionData();
     });

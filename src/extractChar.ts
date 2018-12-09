@@ -7,7 +7,7 @@ export function extractChar(tokens: Token[]): Character | undefined {
     const indexedChars = [
         extractFullNameChar(tokens),
         extractAttrChar(tokens),
-        extractAnimChar(tokens)
+        extractAnimChar(tokens),
     ].filter(Boolean) as [Character, number][];
 
     const [last] = _.sortBy(indexedChars, [o => -o[1]]);
@@ -23,7 +23,7 @@ function lexemeToWord(lexeme: Lexeme, token: Token): Word {
 
     return {
         nominative,
-        accusative
+        accusative,
     };
 }
 
@@ -80,47 +80,52 @@ function SNomToAcc(lexeme: Lexeme) {
     }
 
     // Богатырь -> богатыря, конь -> коня.
-    if (endsWith('ь') && isMale) {
+    if (isMale && endsWith('ь')) {
         return changeOne('я');
     }
 
     // Евгений -> евгения, злодей -> злодея
-    if (endsWith('й') && isMale) {
+    if (isMale && endsWith('й')) {
         return changeOne('я');
     }
 
-    // Евгений -> евгения, злодей -> злодея
-    if (endsWith('о') && isUnisex) {
+    // ?
+    if (isUnisex && endsWith('о')) {
+        return nomenative;
+    }
+
+    // Буратино
+    if (isMale && endsWith('о')) {
         return nomenative;
     }
 
     // Внучок -> внучка, дружок -> дружка
-    if (endsWith('ок') && isMale) {
+    if (isMale && endsWith('ок')) {
         return changeTwo('ка');
     }
 
     // Гарри
-    if (endsWith('и') && isMale) {
+    if (isMale && endsWith('и')) {
         return nomenative;
     }
 
     // Пес -> пса
-    if (endsWith('ес') && isMale) {
+    if (isMale && endsWith('ес')) {
         return changeTwo('са');
     }
 
     // Гонец -> когца
-    if (endsWith('це') && isMale) {
+    if (isMale && endsWith('це')) {
         return changeTwo('ца');
     }
 
     // Лев -> льва
-    if (endsWith('ев') && isMale) {
+    if (isMale && endsWith('ев')) {
         return changeTwo('ьва');
     }
 
     // Дочь, лошадь?
-    if (endsWith('ь') && isFamela) {
+    if (isFamela && endsWith('ь')) {
         return nomenative;
     }
 
@@ -207,16 +212,16 @@ function extractFullNameChar(tokens: Token[]): [Character, number] | undefined {
         {
             subject: {
                 nominative: `${_.upperFirst(firstNameWord.nominative)} ${_.upperFirst(
-                    lastNameWord.nominative
+                    lastNameWord.nominative,
                 )}`,
                 accusative: `${_.upperFirst(firstNameWord.accusative)} ${_.upperFirst(
-                    lastNameWord.accusative
-                )}`
+                    lastNameWord.accusative,
+                )}`,
             },
             normal: firstNameWord.nominative,
-            gender: extractGender(fullNameLexemes[0][0])
+            gender: extractGender(fullNameLexemes[0][0]),
         },
-        tokenIndex
+        tokenIndex,
     ];
 }
 
@@ -243,12 +248,12 @@ function extractAttrChar(tokens: Token[]): [Character, number] | undefined {
         {
             subject: {
                 nominative: `${adj.nominative} ${noun.nominative}`,
-                accusative: `${adj.accusative} ${noun.accusative}`
+                accusative: `${adj.accusative} ${noun.accusative}`,
             },
             normal: noun.nominative,
-            gender: extractGender(matches[1][0])
+            gender: extractGender(matches[1][0]),
         },
-        tokenIndex
+        tokenIndex,
     ];
 }
 
@@ -267,9 +272,9 @@ function extractAnimChar(tokens: Token[]): [Character, number] | undefined {
         {
             subject: lexemeToWord(char[0], char[1]),
             gender: extractGender(char[0]),
-            normal: char[0].lex
+            normal: char[0].lex,
         },
-        tokenIndex
+        tokenIndex,
     ];
 }
 
@@ -286,6 +291,6 @@ export function extractInanimate(tokens: Token[]): Character | undefined {
     return {
         subject: lexemeToWord(char[0], char[1]),
         normal: char[0].lex,
-        gender: extractGender(char[0])
+        gender: extractGender(char[0]),
     };
 }
