@@ -102,7 +102,7 @@ const knownChars: KnownChar[] = [
     },
     {
         name: 'owl',
-        button: 'Совушку',
+        button: 'Сову',
         trigger: intents.owl,
         answer: answers.chars.owl,
         image: '1030494/246c82db66034ba90a3f',

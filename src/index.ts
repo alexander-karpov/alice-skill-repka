@@ -47,7 +47,7 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
                 : answer.endSession
                     ? [
                           {
-                              title: 'Оставить отзыв',
+                              title: 'Поставить оценку',
                               url:
                                   'https://dialogs.yandex.ru/store/skills/916a8380-skazka-pro-repku',
                               hide: true,

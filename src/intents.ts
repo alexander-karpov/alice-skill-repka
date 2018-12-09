@@ -59,7 +59,7 @@ export function dog(char: Character) {
 }
 
 export function owl(char: Character) {
-    return startsWith(char, 'сова', 'совен', 'филин');
+    return startsWith(char, 'сова', 'совен', 'филин', 'совуш', 'совун');
 }
 
 export function mouse(char: Character) {
