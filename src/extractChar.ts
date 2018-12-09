@@ -129,6 +129,10 @@ function SNomToAcc(lexeme: Lexeme) {
         return nomenative;
     }
 
+    if (nomenative === 'бобер') {
+        return 'бобра';
+    }
+
     // Человек -> человека, кролик -> кролика.
     return add('а');
 }

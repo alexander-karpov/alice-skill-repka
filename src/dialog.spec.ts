@@ -269,6 +269,12 @@ describe('Main dialog', () => {
         expect(await act('котика')).toMatch('Котик за гонца,');
     });
 
+    test('Позвали бобра', async () => {
+        act('');
+        expect(await act('бобра')).toMatch('Бобер за дедку');
+        expect(await act('котика')).toMatch('Котик за бобра,');
+    });
+
     beforeEach(() => {
         sessionData = createSessionData();
     });
