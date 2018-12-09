@@ -1,10 +1,6 @@
-import { Gr, findLexeme, Token } from './tokens';
+import { Token } from './tokens';
 import { Character } from './character';
 import { matchSeq } from './utils/seq';
-
-export function hasMultipleChars(tokens: Token[]) {
-    return tokens.some(t => !!findLexeme(t, [Gr.S, Gr.Acc, Gr.anim, Gr.plural]));
-}
 
 export function repka(tokens: Token[]) {
     return tokens.some(t => t.lexemes.length === 1 && t.lexemes[0].lex === 'репка');

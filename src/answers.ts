@@ -51,13 +51,6 @@ export function help(sessionData: SessionData) {
     return concatSpeech(aboutSkill(), whoCalled(sessionData));
 }
 
-export function onlyOneCharMayCome(sessionData: SessionData) {
-    const answer = `Я точно помню, в этой сказке все приходили по одному.`;
-    const called = whoCalled(sessionData);
-
-    return createSpeech(`${answer} ${called}`);
-}
-
 export function whoCalled(sessionData: SessionData) {
     const char = _.last(sessionData.chars);
 

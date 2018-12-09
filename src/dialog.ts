@@ -57,10 +57,6 @@ export async function mainDialog(
         const nextChar = extractChar(tokens);
         const inanimate = extractInanimate(tokens);
 
-        if (!nextChar && intents.hasMultipleChars(tokens)) {
-            return answers.onlyOneCharMayCome(sessionData);
-        }
-
         const currentChar = _.last(chars);
 
         if (!currentChar) {

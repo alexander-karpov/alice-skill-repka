@@ -64,11 +64,6 @@ describe('Main dialog', () => {
         expect(await act('Серёжку')).toMatch('Кого позвал сережка');
     });
 
-    test('Уникальная фраза на множ. число', async () => {
-        act('');
-        expect(await act('котят')).toMatch('по одному');
-    });
-
     test('Правильно склоняет фразу переспрашивания героя', async () => {
         act('');
         act('внука');
@@ -254,6 +249,12 @@ describe('Main dialog', () => {
         expect(await act('буратино')).toMatch('Буратино за дедку');
         expect(await act('пиноккио')).toMatch('Пиноккио за буратино,');
         expect(await act('котик')).toMatch('Котик за пиноккио,');
+    });
+
+    test('Распознает множ. число как ед.', async () => {
+        act('');
+        expect(await act('кошек')).toMatch('Кошка за дедку');
+        expect(await act('котята')).toMatch('Котенок за кошку');
     });
 
     beforeEach(() => {

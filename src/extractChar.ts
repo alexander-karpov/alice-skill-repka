@@ -258,11 +258,13 @@ function extractAttrChar(tokens: Token[]): [Character, number] | undefined {
 }
 
 function extractAnimChar(tokens: Token[]): [Character, number] | undefined {
-    const sAnimSingle = [Gr.anim, Gr.S, Gr.single];
+    const sAnim = [Gr.anim, Gr.S];
 
     const found =
-        matchSeq(tokens, [tokenSelector(sAnimSingle.concat(Gr.Acc))]) ||
-        matchSeq(tokens, [tokenSelector(sAnimSingle.concat(Gr.Nom))]);
+        matchSeq(tokens, [tokenSelector(sAnim.concat(Gr.Acc, Gr.single))]) ||
+        matchSeq(tokens, [tokenSelector(sAnim.concat(Gr.Nom, Gr.single))]) ||
+        matchSeq(tokens, [tokenSelector(sAnim.concat(Gr.Acc))]) ||
+        matchSeq(tokens, [tokenSelector(sAnim.concat(Gr.Nom))]);
 
     if (!found) return undefined;
     const [char] = found;
