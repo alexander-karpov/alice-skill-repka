@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Stemmer } from './stemmer';
 import { extractChar, extractInanimate } from './extractChar';
 import { SessionData, Dialogs } from './sessionData';
-import { Speech, createSpeech, concatSpeech } from './speech';
+import { Speech, concatSpeech } from './speech';
 import * as answers from './answers';
 import * as intents from './intents';
 import { findKnownChar, chooseKnownCharButtons } from './knownChars';
@@ -37,10 +37,6 @@ export async function mainDialog(
     const { chars } = sessionData;
 
     const result = (function narrative(): DialogResult | Speech {
-        if (intents.help(rawTokens)) {
-            return answers.help(sessionData);
-        }
-
         if (isRepeatQuestionDialog && !intents.no(rawTokens) && !intents.yes(rawTokens)) {
             return answers.yesOrNoExpected();
         }
@@ -54,12 +50,9 @@ export async function mainDialog(
             sessionData.currentDialog = Dialogs.Story;
         }
 
-        if (intents.repka(tokens)) {
-            return answers.repka(sessionData);
+        if (intents.help(rawTokens)) {
+            return answers.help(sessionData);
         }
-
-        const nextChar = extractChar(tokens);
-        const inanimate = extractInanimate(tokens);
 
         const currentChar = _.last(chars);
 
@@ -74,6 +67,9 @@ export async function mainDialog(
         if (!currentChar) {
             return answers.storyBegin();
         }
+
+        const nextChar = extractChar(tokens);
+        const inanimate = extractInanimate(tokens);
 
         if (!nextChar && inanimate) {
             return {
@@ -92,7 +88,11 @@ export async function mainDialog(
         }
 
         chars.push(nextChar);
-        const tale = makeRepkaStory(chars, sessionData);
+        const tale = makeRepkaStory(chars, nextChar);
+
+        if (isStoryOver(chars)) {
+            sessionData.currentDialog = Dialogs.RepeatQuestion;
+        }
 
         const knownChar = findKnownChar(nextChar);
 
@@ -132,39 +132,11 @@ export async function mainDialog(
     return isDialogResult(result) ? result : { speech: result, endSession: false };
 }
 
-function makeRepkaStory(all: Character[], sessionData: SessionData) {
-    const story: Speech[] = [];
-
-    story.push(formatStory(all));
-
-    if (isStoryOver(all)) {
-        story.push(
-            createSpeech('— вытянули репку! Какая интересная сказка! Хочешь послушать снова?'),
-        );
-        sessionData.currentDialog = Dialogs.RepeatQuestion;
-    } else {
-        story.push(concatSpeech(`вытянуть не могут.`, answers.whoCalled(sessionData)));
-    }
-
-    return concatSpeech(...story);
-}
-
-function formatStory(characters: Character[]): Speech {
-    const story = _.reverse(toPairs(characters))
-        .map(pair => `${answers.nom(pair[1])} за ${answers.acc(pair[0])}`)
-        .join(', ');
-
-    return createSpeech(`${_.upperFirst(story)}, дедка за репку — тянут-потянут,`);
-}
-
-function toPairs(characters: Character[]): [Character, Character][] {
-    const [first, ...rest] = characters;
-
-    if (!rest.length) {
-        return [];
-    }
-
-    return [[first, rest[0]], ...toPairs(rest)];
+function makeRepkaStory(all: Character[], char: Character) {
+    return concatSpeech(
+        answers.formatStory(all),
+        isStoryOver(all) ? answers.success() : answers.failure(char),
+    );
 }
 
 function isStoryOver(chars: Character[]) {

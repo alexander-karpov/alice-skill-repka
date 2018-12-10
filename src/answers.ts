@@ -6,25 +6,6 @@ import { createSpeech, Speech, concatSpeech } from './speech';
 
 export type AnswerBuilder = (char: Character, previousChar: Character, random100: number) => Speech;
 
-// const appearanceSpecialPhraseChars = [
-//     createChar('бабушка', 'бабушку', 'бабушка', Gender.Famela),
-//     createChar('чёрная кошка', 'чёрную кошку', 'кошка', Gender.Famela),
-//     createChar('слон', 'слона', 'слон', Gender.Male),
-//     createChar('золотую рыбка', 'золотую рыбку', 'рыбка', Gender.Famela),
-//     createChar('серый волк', 'серого волка', 'волк', Gender.Male),
-//     createChar('ворона', 'ворону', 'ворона', Gender.Famela),
-//     createChar('коровушка', 'коровушку', 'коровушка', Gender.Famela),
-//     createChar('страшный лев', 'страшного льва', 'лев', Gender.Male),
-//     createChar('курочка', 'курочку', 'курочка', Gender.Famela),
-//     createChar('лошадка', 'лошадку', 'лошадка', Gender.Famela),
-//     createChar('лягушка', 'лягушку', 'лягушка', Gender.Famela),
-//     createChar('петушок', 'петушка', 'петушок', Gender.Male),
-//     createChar('собака', 'собаку', 'собака', Gender.Famela),
-//     createChar('сова', 'сову', 'сова', Gender.Famela),
-// ];
-//     createChar('медведь', 'медведя', 'медведь', Gender.Male),
-//     createChar('лиса', 'лису', 'лиса', Gender.Famela),
-
 function aboutSkill(): Speech {
     return concatSpeech(
         'Давайте вместе сочиним сказку.',
@@ -48,7 +29,13 @@ export function intro(random100: number): Speech {
 }
 
 export function help(sessionData: SessionData) {
-    return concatSpeech(aboutSkill(), whoCalled(sessionData));
+    const char = _.last(sessionData.chars);
+
+    if (char) {
+        return concatSpeech(aboutSkill(), whoCalled2(char));
+    }
+
+    return aboutSkill();
 }
 
 export function whoCalled(sessionData: SessionData) {
@@ -61,8 +48,8 @@ export function whoCalled(sessionData: SessionData) {
     return '';
 }
 
-export function repka(sessionData: SessionData) {
-    return createSpeech(`Репка сама себя не вытянет. ${whoCalled(sessionData)}`);
+export function whoCalled2(char: Character) {
+    return `Кого ${called(char)} ${nom(char)}?`;
 }
 
 export function yesOrNoExpected(): Speech {
@@ -132,6 +119,29 @@ export function inanimateCalled(inanimate: Character, sessionData: SessionData, 
         ],
         random100,
     );
+}
+
+export function formatStory(chars: Character[]): Speech {
+    const chain: string[] = [];
+
+    for (let i = 0; i < chars.length - 1; i++) {
+        chain.push(`${nom(chars[i + 1])} за ${acc(chars[i])}`);
+    }
+
+    chain.reverse();
+    const story = chain.join(', ');
+
+    return createSpeech(`${_.upperFirst(story)}, дедка за репку.`);
+}
+
+export function success() {
+    return createSpeech(
+        'Тянут-потянут — вытянули репку! Какая интересная сказка! Хочешь послушать снова?',
+    );
+}
+
+export function failure(char: Character) {
+    return concatSpeech(`Тянут-потянут — вытянуть не могут.`, whoCalled2(char));
 }
 
 export const chars = {
