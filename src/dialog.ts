@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Stemmer } from './stemmer';
 import { extractChar, extractInanimate } from './extractChar';
 import { SessionData, Dialogs } from './sessionData';
-import { Speech, concatSpeech } from './speech';
+import { Speech, concatSpeech, createSpeech } from './speech';
 import * as answers from './answers';
 import * as intents from './intents';
 import { findKnownChar, chooseKnownCharButtons } from './knownChars';
@@ -94,24 +94,34 @@ export async function mainDialog(
             sessionData.currentDialog = Dialogs.RepeatQuestion;
         }
 
+        const url = isStoryOver(chars)
+            ? {
+                  text: 'Поставить оценку',
+                  url: 'https://dialogs.yandex.ru/store/skills/916a8380-skazka-pro-repku',
+              }
+            : undefined;
+
         const knownChar = findKnownChar(nextChar);
 
         if (knownChar) {
-            const speech = concatSpeech(knownChar.answer(nextChar, currentChar, random100), tale);
-
             // Ограничение поля card/description - 254
-            // TODO: Сокращать текст. Оставлтять tts полностью.
-            const isTextFitsImageDescription = speech.text.length <= 253;
+            const isTaleFitsImageDisc = tale.text.length <= 253;
+            const knownCharAnswer = knownChar.answer(nextChar, currentChar, random100);
+            const knownCharTts = createSpeech('', knownCharAnswer.tts);
+
+            if (isTaleFitsImageDisc && knownChar.image) {
+                return {
+                    speech: concatSpeech(knownCharTts, tale),
+                    imageId: knownChar.image,
+                    url,
+                    endSession: false,
+                };
+            }
 
             return {
-                speech: concatSpeech(knownChar.answer(nextChar, currentChar, random100), tale),
-                imageId: isTextFitsImageDescription ? knownChar.image : '',
-                url: isStoryOver(chars)
-                    ? {
-                          text: 'Поставить оценку',
-                          url: 'https://dialogs.yandex.ru/store/skills/916a8380-skazka-pro-repku',
-                      }
-                    : undefined,
+                speech: concatSpeech(knownCharAnswer, tale),
+                imageId: '',
+                url,
                 endSession: false,
             };
         }
@@ -119,12 +129,7 @@ export async function mainDialog(
         return {
             speech: tale,
             buttons: !isStoryOver(chars) ? chooseKnownCharButtons(chars, random100) : undefined,
-            url: isStoryOver(chars)
-                ? {
-                      text: 'Поставить оценку',
-                      url: 'https://dialogs.yandex.ru/store/skills/916a8380-skazka-pro-repku',
-                  }
-                : undefined,
+            url,
             endSession: false,
         };
     })();

@@ -15,6 +15,13 @@ describe('Main dialog', () => {
         return text;
     }
 
+    async function tts(command: string, random100 = 0): Promise<string> {
+        const {
+            speech: { tts },
+        } = await mainDialog(command.toLowerCase().split(' '), sessionData, { stemmer, random100 });
+        return tts;
+    }
+
     test('Классическая сказка: начало', async () => {
         expect(await act('')).toMatch('осадил дед репку');
     });
@@ -99,7 +106,7 @@ describe('Main dialog', () => {
 
     test('Специальная фраза для рыбки', async () => {
         act('');
-        expect(await act('золотую рыбку из сказки Пушкина')).toMatch(
+        expect(await tts('золотую рыбку из сказки Пушкина')).toMatch(
             /кликать золотую рыбку.*приплыла к нему рыбка, спросила/,
         );
 
@@ -109,13 +116,13 @@ describe('Main dialog', () => {
 
     test('Специальная фраза для кошек', async () => {
         act('');
-        expect(await act('черную кошку')).toMatch(/Прибежала черная кошка.*вцепилась в дедку/);
-        expect(await act('кот мартоскин')).toMatch(/Прибежал кот.*вцепился в/);
+        expect(await tts('черную кошку')).toMatch(/Прибежала черная кошка.*вцепилась в дедку/);
+        expect(await tts('кот мартоскин')).toMatch(/Прибежал кот.*вцепился в/);
     });
 
     test('Специальная фраза для мурки', async () => {
         act('');
-        expect(await act('мурку')).toMatch(/Прибежала кошка мурка/);
+        expect(await tts('мурку')).toMatch(/Прибежала кошка мурка/);
     });
 
     test('Отбрасывает неодушевленное специальной фразой', async () => {
@@ -233,7 +240,7 @@ describe('Main dialog', () => {
 
     test('Спецфраза для жучки', async () => {
         act('');
-        expect(await act('жучку')).toMatch('Прибежала жучка');
+        expect(await tts('жучку')).toMatch('Прибежала жучка');
     });
 
     test('Позвали буратино, пиноккио', async () => {
