@@ -135,8 +135,12 @@ export function formatStory(chars: Character[]): Speech {
 }
 
 export function success() {
-    return createSpeech(
-        'Тянут-потянут — вытянули репку! Какая интересная сказка! Хочешь послушать снова?',
+    return concatSpeech(
+        createSpeech(
+            'Тянут-потянут — вытянули репку!',
+            'Тянут-потянут - <speaker audio="alice-sounds-human-kids-1.opus"> - вытянули репку!',
+        ),
+        'Какая интересная сказка! Хотите послушать снова?',
     );
 }
 
