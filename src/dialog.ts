@@ -93,9 +93,15 @@ export async function mainDialog(
         const knownChar = findKnownChar(nextChar);
 
         if (knownChar) {
+            const speech = concatSpeech(knownChar.answer(nextChar, currentChar, random100), tale);
+
+            // Ограничение поля card/description - 254
+            // TODO: Сокращать текст. Оставлтять tts полностью.
+            const isTextFitsImageDescription = speech.text.length <= 253;
+
             return {
                 speech: concatSpeech(knownChar.answer(nextChar, currentChar, random100), tale),
-                imageId: knownChar.image,
+                imageId: isTextFitsImageDescription ? knownChar.image : '',
                 endSession: false,
             };
         }
