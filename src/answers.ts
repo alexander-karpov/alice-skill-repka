@@ -293,7 +293,7 @@ export const chars = {
 
         return concatSpeech(
             `${poshel} ${nom(previousChar)} к синему морю;`,
-            sea(),
+            createSpeech('', '<speaker audio="alice-sounds-nature-sea-1.opus"> - - '),
             `${stalOn} кликать ${acc(char)}, приплыла к ${nemu} рыбка, спросила:`,
             `«Чего тебе надобно ${nom(previousChar)}?»`,
             `Ей с поклоном ${nom(previousChar)} отвечает:`,
@@ -320,12 +320,6 @@ function byGender<T>(char: Character, male: T, famela: T, other: T) {
     }
 
     return isCharFamela(char) ? famela : other;
-}
-
-function sea(): Speech {
-    return createSpeech('', `<speaker audio="alice-sounds-nature-sea-1.opus">`, {
-        ttsOnly: true,
-    });
 }
 
 export function nom(char: Character) {
