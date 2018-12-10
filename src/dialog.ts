@@ -106,6 +106,12 @@ export async function mainDialog(
             return {
                 speech: concatSpeech(knownChar.answer(nextChar, currentChar, random100), tale),
                 imageId: isTextFitsImageDescription ? knownChar.image : '',
+                url: isStoryOver(chars)
+                    ? {
+                          text: 'Поставить оценку',
+                          url: 'https://dialogs.yandex.ru/store/skills/916a8380-skazka-pro-repku',
+                      }
+                    : undefined,
                 endSession: false,
             };
         }
