@@ -129,6 +129,7 @@ function SNomToAcc(lexeme: Lexeme) {
         return nomenative;
     }
 
+    // FIXME: MyStem выдает сначала бобер, потом бобр.
     if (nomenative === 'бобер') {
         return 'бобра';
     }

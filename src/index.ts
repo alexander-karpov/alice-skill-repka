@@ -44,23 +44,24 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
                 ? answer.buttons.map(title => {
                       return { title, hide: true };
                   })
-                : answer.endSession
-                    ? [
-                          {
-                              title: 'Поставить оценку',
-                              url:
-                                  'https://dialogs.yandex.ru/store/skills/916a8380-skazka-pro-repku',
-                              hide: true,
-                          },
-                      ]
-                    : undefined;
+                : undefined;
+
+            const url = answer.url
+                ? [
+                      {
+                          title: answer.url.text,
+                          url: answer.url.url,
+                          hide: true,
+                      },
+                  ]
+                : undefined;
 
             return {
                 response: {
                     text: answer.speech.text,
                     tts: answer.speech.tts,
                     card,
-                    buttons,
+                    buttons: buttons || url,
                     end_session: answer.endSession,
                 },
                 session: request.session,

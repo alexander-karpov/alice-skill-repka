@@ -19,6 +19,10 @@ export type DialogResult = {
     speech: Speech;
     imageId?: string;
     buttons?: string[];
+    url?: {
+        text: string;
+        url: string;
+    };
     endSession: boolean;
 };
 //#endregion
@@ -109,6 +113,12 @@ export async function mainDialog(
         return {
             speech: tale,
             buttons: !isStoryOver(chars) ? chooseKnownCharButtons(chars, random100) : undefined,
+            url: isStoryOver(chars)
+                ? {
+                      text: 'Поставить оценку',
+                      url: 'https://dialogs.yandex.ru/store/skills/916a8380-skazka-pro-repku',
+                  }
+                : undefined,
             endSession: false,
         };
     })();
@@ -123,7 +133,7 @@ function makeRepkaStory(all: Character[], sessionData: SessionData) {
 
     if (isStoryOver(all)) {
         story.push(
-            createSpeech('— вытянули репку! Какая интересная сказка. Хочешь послушать снова?'),
+            createSpeech('— вытянули репку! Какая интересная сказка! Хочешь послушать снова?'),
         );
         sessionData.currentDialog = Dialogs.RepeatQuestion;
     } else {
