@@ -149,11 +149,11 @@ export function failure(char: Character) {
 }
 
 export const chars = {
-    granny(char) {
+    granny(char: Character) {
         const come = comeCapitalized(char);
         return createSpeech(`${come} ${nom(char)}.`);
     },
-    mouse(mouse) {
+    mouse(mouse: Character) {
         const come = comeRunningCapitalized(mouse);
 
         return createSpeech(
@@ -180,7 +180,7 @@ export const chars = {
             `и ${clung} в ${acc(previousChar)}.`,
         );
     },
-    dog(dog, _prev, random100) {
+    dog(dog: Character, _prev, random100: number) {
         const come = comeRunningCapitalized(dog);
         const soundNumber = sample([3, 5], random100);
 
@@ -189,7 +189,7 @@ export const chars = {
             `${come} ${nom(dog)} - <speaker audio="alice-sounds-animals-dog-${soundNumber}.opus">.`,
         );
     },
-    owl(owl, _prev, random100) {
+    owl(owl: Character, _prev, random100: number) {
         const come = flownCapitalized(owl);
         const soundNumber = sample([1, 2], random100);
 
@@ -198,7 +198,7 @@ export const chars = {
             `${come} ${nom(owl)} - <speaker audio="alice-sounds-animals-owl-${soundNumber}.opus">.`,
         );
     },
-    rooster(rooster) {
+    rooster(rooster: Character) {
         const come = flownCapitalized(rooster);
 
         return createSpeech(
@@ -206,7 +206,7 @@ export const chars = {
             `${come} ${nom(rooster)} - <speaker audio="alice-sounds-animals-rooster-1.opus">.`,
         );
     },
-    wolf(wolf) {
+    wolf(wolf: Character) {
         const come = comeRunningCapitalized(wolf);
 
         return createSpeech(
@@ -214,7 +214,7 @@ export const chars = {
             `${come} ${nom(wolf)} - <speaker audio="alice-sounds-animals-wolf-1.opus">.`,
         );
     },
-    fox(char) {
+    fox(char: Character) {
         const come = comeRunningCapitalized(char);
 
         return createSpeech(
@@ -222,11 +222,11 @@ export const chars = {
             `${come} ${nom(char)} - <speaker audio="alice-music-violin-c-1.opus">.`,
         );
     },
-    bear(char) {
+    bear(char: Character) {
         const come = comeCapitalized(char);
         return createSpeech(`${come} ${nom(char)}.`);
     },
-    crow(crow) {
+    crow(crow: Character) {
         const come = flownCapitalized(crow);
 
         return createSpeech(
@@ -234,7 +234,7 @@ export const chars = {
             `${come} ${nom(crow)} - <speaker audio="alice-sounds-animals-crow-1.opus">.`,
         );
     },
-    lion(lion) {
+    lion(lion: Character) {
         const come = comeCapitalized(lion);
 
         return createSpeech(
@@ -242,7 +242,7 @@ export const chars = {
             `${come} ${nom(lion)} - <speaker audio="alice-sounds-animals-lion-1.opus">.`,
         );
     },
-    cow(cow) {
+    cow(cow: Character) {
         const come = comeCapitalized(cow);
 
         return createSpeech(
@@ -250,7 +250,7 @@ export const chars = {
             `${come} ${nom(cow)} - <speaker audio="alice-sounds-animals-cow-2.opus">.`,
         );
     },
-    horse(horse, _prev, random100) {
+    horse(horse: Character, _prev, random100: number) {
         const come = riddenCapitalized(horse);
         const soundNumber = (random100 % 2) + 1;
 
@@ -261,7 +261,7 @@ export const chars = {
             )} - <speaker audio="alice-sounds-animals-horse-${soundNumber}.opus">.`,
         );
     },
-    chicken(chicken) {
+    chicken(chicken: Character) {
         const come = comeRunningCapitalized(chicken);
 
         return createSpeech(
@@ -269,7 +269,7 @@ export const chars = {
             `${come} ${nom(chicken)} - <speaker audio="alice-sounds-animals-chicken-1.opus">.`,
         );
     },
-    frog(frog) {
+    frog(frog: Character) {
         const come = riddenCapitalized(frog);
 
         return createSpeech(
@@ -298,6 +298,14 @@ export const chars = {
             `«Чего тебе надобно ${nom(previousChar)}?»`,
             `Ей с поклоном ${nom(previousChar)} отвечает:`,
             `«Смилуйся, государыня рыбка, помоги вытянуть репку.»`,
+        );
+    },
+    girl(char: Character) {
+        const come = comeRunningCapitalized(char);
+
+        return createSpeech(
+            `${come} ${nom(char)}.`,
+            `${come} ${nom(char)} - <speaker audio="alice-sounds-human-laugh-5.opus">.`,
         );
     },
 };

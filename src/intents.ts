@@ -79,6 +79,10 @@ export function fox(char: Character) {
     return startsWith(char, 'лис');
 }
 
+export function girl(char: Character) {
+    return equals(char, 'внучка', 'девочка', 'маша');
+}
+
 export function help(tokens: string[]) {
     const command = tokens.join(' ');
     return command === 'что ты умеешь' || command === 'помощь';

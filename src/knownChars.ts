@@ -135,4 +135,11 @@ const knownChars: KnownChar[] = [
         answer: answers.chars.fish,
         image: '',
     },
+    {
+        name: 'girm',
+        button: 'Внучку',
+        trigger: intents.girl,
+        answer: answers.chars.girl,
+        image: '',
+    },
 ];
