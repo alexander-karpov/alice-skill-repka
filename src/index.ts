@@ -49,6 +49,14 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
             const url = answer.url
                 ? [
                       {
+                          title: 'Да',
+                          hide: true,
+                      },
+                      {
+                          title: 'Нет',
+                          hide: true,
+                      },
+                      {
                           title: answer.url.text,
                           url: answer.url.url,
                           hide: true,
