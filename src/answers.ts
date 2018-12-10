@@ -129,9 +129,8 @@ export function formatStory(chars: Character[]): Speech {
     }
 
     chain.reverse();
-    const story = chain.join(', ');
-
-    return createSpeech(`${_.upperFirst(story)}, дедка за репку.`);
+    const story = createSpeech(_.upperFirst(chain.join(', ')), chain.join(' - '));
+    return concatSpeech(story, createSpeech(`, дедка за репку.`, ' - дедка за репку.'));
 }
 
 export function success() {
