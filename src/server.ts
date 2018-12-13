@@ -36,7 +36,7 @@ export type WebhookResponse = {
         buttons?: ({
             title: string;
             url?: string;
-            hide: boolean; // Признак того, что кнопку нужно убрать после следующей реплики пользователя.
+            hide?: boolean; // Признак того, что кнопку нужно убрать после следующей реплики пользователя.
         })[];
         card?: {
             type: string;

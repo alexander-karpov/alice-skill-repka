@@ -59,7 +59,6 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
                       {
                           title: answer.url.text,
                           url: answer.url.url,
-                          hide: true,
                       },
                   ]
                 : undefined;
