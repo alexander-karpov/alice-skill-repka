@@ -18,12 +18,14 @@ export type DialogDependencies = {
 export type DialogResult = {
     speech: Speech;
     imageId?: string;
-    buttons?: string[];
-    url?: {
-        text: string;
-        url: string;
-    };
+    buttons?: DialogButton[];
     endSession: boolean;
+};
+
+type DialogButton = {
+    title: string;
+    url?: string;
+    hide?: boolean;
 };
 //#endregion
 
@@ -74,7 +76,7 @@ export async function mainDialog(
         if (!nextChar && inanimate) {
             return {
                 speech: answers.inanimateCalled(inanimate, currentChar),
-                buttons: chooseKnownCharButtons(chars, random100),
+                buttons: makeButtons(chars, random100),
                 endSession: false,
             };
         }
@@ -82,7 +84,7 @@ export async function mainDialog(
         if (!nextChar) {
             return {
                 speech: answers.wrongCommand(sessionData),
-                buttons: chooseKnownCharButtons(chars, random100),
+                buttons: makeButtons(chars, random100),
                 endSession: false,
             };
         }
@@ -90,16 +92,9 @@ export async function mainDialog(
         chars.push(nextChar);
         const tale = makeRepkaStory(chars, nextChar);
 
-        if (isStoryOver(chars)) {
+        if (isEndOfStory(chars)) {
             sessionData.currentDialog = Dialogs.RepeatQuestion;
         }
-
-        const url = isStoryOver(chars)
-            ? {
-                  text: 'Поставить оценку',
-                  url: 'https://dialogs.yandex.ru/store/skills/916a8380-skazka-pro-repku',
-              }
-            : undefined;
 
         const knownChar = findKnownChar(nextChar);
 
@@ -113,7 +108,7 @@ export async function mainDialog(
                 return {
                     speech: concatSpeech(knownCharTts, tale),
                     imageId: knownChar.image,
-                    url,
+                    buttons: makeButtons(chars, random100),
                     endSession: false,
                 };
             }
@@ -121,15 +116,14 @@ export async function mainDialog(
             return {
                 speech: concatSpeech(knownCharAnswer, tale),
                 imageId: '',
-                url,
+                buttons: makeButtons(chars, random100),
                 endSession: false,
             };
         }
 
         return {
             speech: tale,
-            buttons: !isStoryOver(chars) ? chooseKnownCharButtons(chars, random100) : undefined,
-            url,
+            buttons: makeButtons(chars, random100),
             endSession: false,
         };
     })();
@@ -140,11 +134,11 @@ export async function mainDialog(
 function makeRepkaStory(all: Character[], char: Character) {
     return concatSpeech(
         answers.formatStory(all),
-        isStoryOver(all) ? answers.success() : answers.failure(char),
+        isEndOfStory(all) ? answers.success() : answers.failure(char),
     );
 }
 
-function isStoryOver(chars: Character[]) {
+function isEndOfStory(chars: Character[]) {
     const last = _.last(chars);
 
     if (!last) {
@@ -158,4 +152,29 @@ function isStoryOver(chars: Character[]) {
 
 function isDialogResult(x): x is DialogResult {
     return typeof x.speech === 'object' && typeof x.endSession === 'boolean';
+}
+
+function makeButtons(chars: Character[], random100: number): DialogButton[] {
+    // Дадим ребенку сначала понять, что можно
+    // самому придумывать персонажей.
+    if (chars.length < 3) {
+        return [];
+    }
+
+    if (isEndOfStory(chars)) {
+        return [{ title: 'Да', hide: true }, { title: 'Нет', hide: true }, feedbackButton()];
+    }
+
+    return chooseKnownCharButtons(chars, random100).map(text => ({
+        title: text,
+        hide: true,
+    }));
+}
+
+function feedbackButton(): DialogButton {
+    return {
+        title: 'Поставить оценку',
+        url: 'https://dialogs.yandex.ru/store/skills/916a8380-skazka-pro-repku',
+        hide: false,
+    };
 }

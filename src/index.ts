@@ -40,35 +40,12 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
                   }
                 : undefined;
 
-            const buttons = answer.buttons
-                ? answer.buttons.map(title => {
-                      return { title, hide: true };
-                  })
-                : undefined;
-
-            const url = answer.url
-                ? [
-                      {
-                          title: 'Да',
-                          hide: true,
-                      },
-                      {
-                          title: 'Нет',
-                          hide: true,
-                      },
-                      {
-                          title: answer.url.text,
-                          url: answer.url.url,
-                      },
-                  ]
-                : undefined;
-
             return {
                 response: {
                     text: answer.speech.text,
                     tts: answer.speech.tts,
                     card,
-                    buttons: buttons || url,
+                    buttons: answer.buttons,
                     end_session: answer.endSession,
                 },
                 session: request.session,

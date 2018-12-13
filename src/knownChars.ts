@@ -16,17 +16,11 @@ export function findKnownChar(char: Character) {
     return knownChars.find(c => c.trigger(char));
 }
 
-export function chooseKnownCharButtons(allChars: Character[], random100): string[] | undefined {
-    // Дадим ребенку сначала понять, что можно
-    // самому придумывать персонажей.
-    if (allChars.length < 3) {
-        return undefined;
-    }
-
+export function chooseKnownCharButtons(allChars: Character[], random100): string[] {
     const notCalledKnownChars = knownChars.filter(known => !allChars.some(known.trigger));
 
     if (notCalledKnownChars.length === 0) {
-        return undefined;
+        return [];
     }
 
     return [sample(notCalledKnownChars, random100).button];
