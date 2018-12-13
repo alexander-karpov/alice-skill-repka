@@ -131,8 +131,6 @@ describe('Main dialog', () => {
         expect(await act('ведро')).toMatch(/звал дедка ведро.*не дозвался/);
         expect(await act('чайник')).toMatch(/звал дедка чайник.*не дозвался/);
         expect(await act('окно')).toMatch(/звал дедка окно.*не дозвался/);
-        expect(await act('лопату', 1)).toMatch('Долго ждал дедка ответа, не дождался');
-        expect(await act('лопату', 2)).toMatch('лопата имела: говорить она умела');
     });
 
     test('что ты умеешь / помощь', async () => {

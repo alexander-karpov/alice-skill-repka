@@ -73,7 +73,7 @@ export async function mainDialog(
 
         if (!nextChar && inanimate) {
             return {
-                speech: answers.inanimateCalled(inanimate, sessionData, random100),
+                speech: answers.inanimateCalled(inanimate, currentChar),
                 buttons: chooseKnownCharButtons(chars, random100),
                 endSession: false,
             };

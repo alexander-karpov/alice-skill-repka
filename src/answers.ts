@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { Character, isCharMale, isCharFamela, isCharUnisex } from './character';
 import { SessionData } from './sessionData';
-import { sample, lazySample } from './utils';
+import { sample } from './utils';
 import { createSpeech, Speech, concatSpeech } from './speech';
 
 export type AnswerBuilder = (char: Character, previousChar: Character, random100: number) => Speech;
@@ -67,57 +67,17 @@ export function wrongCommand(sessionData: SessionData) {
     return concatSpeech(`Это не похоже на персонажа.`, help(sessionData));
 }
 
-export function inanimateCalled(inanimate: Character, sessionData: SessionData, random100: number) {
-    const lastChar = _.last(sessionData.chars) as Character;
-    const zval = byGender(lastChar, 'звал', 'звала', 'звало');
-    const jdal = byGender(lastChar, 'ждал', 'ждала', 'ждало');
+export function inanimateCalled(inanimate: Character, previousChar: Character) {
+    const zval = byGender(previousChar, 'звал', 'звала', 'звало');
 
-    return lazySample(
-        [
-            () =>
-                concatSpeech(
-                    `Долго ${zval} ${nom(lastChar)} ${acc(inanimate)} —`,
-                    createSpeech(
-                        byGender(lastChar, 'не дозвался.', 'не дозвалась.', 'не дозвалось.'),
-                        byGender(lastChar, 'не дозв+ался.', 'не дозвал+ась.', 'не дозвал+ось.'),
-                    ),
-                    'Давайте позовем другого персонажа.',
-                    whoCalled(sessionData),
-                ),
-            () =>
-                concatSpeech(
-                    `Долго ${jdal} ${nom(lastChar)} ответа,`,
-                    createSpeech(
-                        byGender(lastChar, 'не дождался', 'не дождалась', 'не дождалось'),
-                        byGender(
-                            lastChar,
-                            '- - не дожд+ался - -',
-                            '- - не дождал+ась',
-                            '- - не дождал+ось - -',
-                        ),
-                    ),
-                    `, к репке`,
-                    createSpeech(
-                        byGender(lastChar, 'воротился', 'воротилась', 'воротилось'),
-                        byGender(lastChar, 'ворот+ился', 'ворот+илась', 'ворот+илось'),
-                    ),
-                    `. И ${called(lastChar)} другого персонажа.`,
-                    whoCalled(sessionData),
-                ),
-            () =>
-                concatSpeech(
-                    `Свойство ${nom(inanimate)} ${byGender(
-                        inanimate,
-                        'имел',
-                        'имела',
-                        'имело',
-                    )}: говорить ${byGender(inanimate, 'он умел', 'она умела', 'оно умело')}.`,
-                    byGender(inanimate, 'Попросил', 'Попросила', 'Попросило'),
-                    'позвать другого персонажа.',
-                    whoCalled(sessionData),
-                ),
-        ],
-        random100,
+    return concatSpeech(
+        `Долго ${zval} ${nom(previousChar)} ${acc(inanimate)} —`,
+        createSpeech(
+            byGender(previousChar, 'не дозвался.', 'не дозвалась.', 'не дозвалось.'),
+            byGender(previousChar, ' - не дозв+ался.', ' - не дозвал+ась.', ' - не дозвал+ось.'),
+        ),
+        'Давайте позовем другого персонажа.',
+        whoCalled2(previousChar),
     );
 }
 
