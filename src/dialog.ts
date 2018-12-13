@@ -108,7 +108,7 @@ export async function mainDialog(
                 return {
                     speech: concatSpeech(knownCharTts, tale),
                     imageId: knownChar.image,
-                    buttons: makeButtons(chars, random100),
+                    buttons: isEndOfStory(chars) ? storyEndButtons() : undefined,
                     endSession: false,
                 };
             }
@@ -162,7 +162,7 @@ function makeButtons(chars: Character[], random100: number): DialogButton[] {
     }
 
     if (isEndOfStory(chars)) {
-        return [{ title: 'Да', hide: true }, { title: 'Нет', hide: true }, feedbackButton()];
+        return storyEndButtons();
     }
 
     return chooseKnownCharButtons(chars, random100).map(text => ({
@@ -171,10 +171,14 @@ function makeButtons(chars: Character[], random100: number): DialogButton[] {
     }));
 }
 
-function feedbackButton(): DialogButton {
-    return {
-        title: 'Поставить оценку',
-        url: 'https://dialogs.yandex.ru/store/skills/916a8380-skazka-pro-repku',
-        hide: false,
-    };
+function storyEndButtons(): DialogButton[] {
+    return [
+        { title: 'Да', hide: true },
+        { title: 'Нет', hide: true },
+        {
+            title: 'Поставить оценку',
+            url: 'https://dialogs.yandex.ru/store/skills/916a8380-skazka-pro-repku',
+            hide: false,
+        },
+    ];
 }
