@@ -5,7 +5,6 @@ import * as answers from './answers';
 import { sample } from './utils';
 
 type KnownChar = {
-    name: string;
     button: string;
     image: string;
     trigger: Predicate<Character>;
@@ -13,14 +12,16 @@ type KnownChar = {
 };
 
 export function findKnownChar(char: Character) {
-    return knownChars.find(c => c.trigger(char));
+    return Object.values(knownChars).find(c => c.trigger(char));
 }
 
 export function chooseKnownCharButtons(allChars: Character[], random100): string[] {
-    const notCalledKnownChars = knownChars.filter(known => !allChars.some(known.trigger));
+    const notCalledKnownChars = Object.values(knownChars)
+        .filter(c => c !== knownChars.mouse)
+        .filter(known => !allChars.some(known.trigger));
 
     if (notCalledKnownChars.length === 0) {
-        return [];
+        return [knownChars.mouse.button];
     }
 
     return [sample(notCalledKnownChars, random100).button];
@@ -30,110 +31,95 @@ export function chooseKnownCharButtons(allChars: Character[], random100): string
 //     cr_eateChar('лошадка', 'лошадку', 'лошадка', Gender.Famela)
 //      cr_eateChar('лягушка', 'лягушку', 'лягушка', Gender.Famela)
 
-const knownChars: KnownChar[] = [
-    {
-        name: 'wolf',
+const knownChars = {
+    wolf: {
         button: 'Серого волка',
         trigger: intents.wolf,
         answer: answers.chars.wolf,
         image: '965417/9929614145838c2092ab',
-    },
-    {
-        name: 'crow',
+    } as KnownChar,
+    crow: {
         button: 'Ворону',
         trigger: intents.crow,
         answer: answers.chars.crow,
         image: '997614/61c6fab9d5da7f3a5eba',
-    },
-    {
-        name: 'cat',
+    } as KnownChar,
+    cat: {
         button: 'Маленького котёнка',
         trigger: intents.cat,
         answer: answers.chars.cat,
         image: '1540737/52f138d32164dcfb334b',
-    },
-    {
-        name: 'mouse',
+    } as KnownChar,
+    mouse: {
         button: 'Мышку',
         trigger: intents.mouse,
         answer: answers.chars.mouse,
         image: '1652229/dec46e3a051abd7eef90',
-    },
-    {
-        name: 'dog',
+    } as KnownChar,
+    dog: {
         button: 'Собаку',
         trigger: intents.dog,
         answer: answers.chars.dog,
         image: '1030494/fb311cc1fb2cb7fafa8a',
-    },
-    {
-        name: 'granny',
+    } as KnownChar,
+    granny: {
         button: 'Бабушку',
         trigger: intents.granny,
         answer: answers.chars.granny,
         image: '965417/3f0555dd5901a0823e39',
-    },
-    {
-        name: 'lion',
+    } as KnownChar,
+    lion: {
         button: 'Большого льва',
         trigger: intents.lion,
         answer: answers.chars.lion,
         image: '965417/e6c5fce891628ea6db10',
-    },
-    {
-        name: 'elephant',
+    } as KnownChar,
+    elephant: {
         button: 'Слона',
         trigger: intents.elephant,
         answer: answers.chars.elephant,
         image: '1540737/8d397cb056499591db59',
-    },
-    {
-        name: 'rooster',
+    } as KnownChar,
+    rooster: {
         button: 'Петушка',
         trigger: intents.rooster,
         answer: answers.chars.rooster,
         image: '965417/d12602b30f51439b55b3',
-    },
-    {
-        name: 'owl',
+    } as KnownChar,
+    owl: {
         button: 'Сову',
         trigger: intents.owl,
         answer: answers.chars.owl,
         image: '1030494/246c82db66034ba90a3f',
-    },
-    {
-        name: 'chicken',
+    } as KnownChar,
+    chicken: {
         button: 'Курочку',
         trigger: intents.chicken,
         answer: answers.chars.chicken,
         image: '213044/bb381ed46a4a6ed4cf2b',
-    },
-    {
-        name: 'bear',
+    } as KnownChar,
+    bear: {
         button: 'Бурого мишку',
         trigger: intents.bear,
         answer: answers.chars.bear,
         image: '1656841/1683fc7e7260af4218c4',
-    },
-    {
-        name: 'fox',
+    } as KnownChar,
+    fox: {
         button: 'Лисичку',
         trigger: intents.fox,
         answer: answers.chars.fox,
         image: '965417/a07c3f1a434e63760055',
-    },
-    {
-        name: 'fish',
+    } as KnownChar,
+    fish: {
         button: 'Золотую рыбку',
         trigger: intents.fish,
         answer: answers.chars.fish,
         image: '',
-    },
-    {
-        name: 'girm',
+    } as KnownChar,
+    girm: {
         button: 'Внучку',
         trigger: intents.girl,
         answer: answers.chars.girl,
         image: '',
-    },
-];
+    } as KnownChar,
+};
