@@ -24,7 +24,14 @@ export function chooseKnownCharButtons(allChars: Character[], random100): string
         return [knownChars.mouse.button];
     }
 
-    return [sample(notCalledKnownChars, random100).button];
+    if (notCalledKnownChars.length <= 2) {
+        return notCalledKnownChars.map(c => c.button);
+    }
+
+    return [
+        sample(notCalledKnownChars, random100).button,
+        sample(notCalledKnownChars, random100 + 1).button,
+    ];
 }
 
 //     cr_eateChar('коровушка', 'коровушку', 'коровушка', Gender.Famela),
