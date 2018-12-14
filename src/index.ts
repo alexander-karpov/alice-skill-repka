@@ -17,7 +17,7 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
 
             // Очень много этих пингов
             if (!request.request.nlu.tokens.includes('ping')) {
-                appendToLog(logFile, request.request.nlu.tokens.join(' '));
+                appendToLog(logFile, request, new Date());
             }
 
             if (!userData[sessionKey]) {
