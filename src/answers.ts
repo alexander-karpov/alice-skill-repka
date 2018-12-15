@@ -1,8 +1,9 @@
 import * as _ from 'lodash';
 import { Character, isCharMale, isCharFamela, isCharUnisex } from './character';
-import { SessionData } from './sessionData';
+import { SessionData, Dialogs } from './sessionData';
 import { sample } from './utils';
 import { createSpeech, Speech, concatSpeech } from './speech';
+import { alphabetFirstLetter } from './alphabet';
 
 export type AnswerBuilder = (char: Character, previousChar: Character, random100: number) => Speech;
 
@@ -14,9 +15,32 @@ function aboutSkill(): Speech {
     );
 }
 
-export function storyBegin(): Speech {
+export function storyBegin(dialog: Dialogs): Speech {
     return concatSpeech(
-        'Посадил дед репку. Выросла репка большая-пребольшая. Стал дед репку из земли тянуть. Тянет-потянет, вытянуть не может. Кого позвал дедка?',
+        dialog === Dialogs.BlackCityStory
+            ? createSpeech(
+                  'В одном чёрном-чёрном городе посадил дед репку.',
+                  'В одном чёрном-чёрном городе - - посадил дед репку.',
+              )
+            : 'Посадил дед репку.',
+        ' Выросла репка большая-пребольшая. Стал дед репку из земли тянуть. Тянет-потянет, вытянуть не может. Кого позвал дедка?',
+        dialog === Dialogs.BlackCityStory ? blackCityManual() : '',
+    );
+}
+
+export function blackCityManual() {
+    return concatSpeech(
+        'В чёрном городе все персонажи начинаются на букву',
+        createSpeech('"Ч".', ' - Чэ.'),
+    );
+}
+
+export function blackCityError(char: Character) {
+    return concatSpeech(
+        `${_.upperFirst(nom(char))} начинается на букву`,
+        alphabetFirstLetter(char),
+        '.',
+        blackCityManual(),
     );
 }
 
@@ -24,7 +48,7 @@ export function intro(random100: number): Speech {
     return concatSpeech(
         sample(['Хорошо.', 'С удовольствием!'], random100),
         aboutSkill(),
-        storyBegin(),
+        storyBegin(Dialogs.Story),
     );
 }
 

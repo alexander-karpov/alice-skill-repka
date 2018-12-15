@@ -2,7 +2,8 @@ import { Character } from './character';
 
 export enum Dialogs {
     Story = 'Story',
-    RepeatQuestion = 'RepeatQuestion'
+    RepeatQuestion = 'RepeatQuestion',
+    BlackCityStory = 'BackCityStory',
 }
 
 export type SessionData = {
@@ -15,6 +16,6 @@ export function createSessionData(): SessionData {
     return {
         chars: [],
         currentDialog: Dialogs.Story,
-        isNewSession: false
+        isNewSession: false,
     };
 }

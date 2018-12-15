@@ -150,8 +150,28 @@ describe('Main dialog', () => {
         expect(await act('мышку')).toMatch('вытянули репку');
         expect(await act('давай еще раз')).toMatch('осадил дед репку');
 
-        expect(await act('мышку')).toMatch('вытянули репку');
-        expect(await act('да пожалуйста')).toMatch('осадил дед репку');
+        expect(await act('черную мышку')).toMatch('вытянули репку');
+        expect(await act('да пожалуйста')).toMatch('Посадил дед репку');
+    });
+
+    test('Черный город: начало', async () => {
+        act('');
+        await act('мышку');
+        expect(await act('давай еще раз')).toMatch('В одном чёрном');
+    });
+
+    test('Черный город: правильный персонаж', async () => {
+        act('');
+        await act('мышку');
+        await act('давай еще раз');
+        expect(await act('Человеческий котика')).toMatch('Человеческий котик за дедку');
+    });
+
+    test('Черный город: неправильный персонаж', async () => {
+        act('');
+        await act('мышку');
+        await act('давай еще раз');
+        expect(await act('Котика')).toMatch('Котик начинается на букву "К".');
     });
 
     test('Отказ от продолжения словом Не надо', async () => {

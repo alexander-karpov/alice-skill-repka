@@ -105,6 +105,10 @@ export function no(tokens: string[]) {
     );
 }
 
+export function isBlackCityChar(char: Character) {
+    return char.subject.nominative.charAt(0).toLocaleLowerCase() === 'ч';
+}
+
 function startsWith(char: Character, ...aliases: string[]) {
     return aliases.some(alias => char.normal.startsWith(alias));
 }

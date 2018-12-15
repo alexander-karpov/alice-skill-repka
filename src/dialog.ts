@@ -35,6 +35,7 @@ export async function mainDialog(
     { stemmer, random100 }: DialogDependencies,
 ): Promise<DialogResult> {
     const isRepeatQuestionDialog = sessionData.currentDialog === Dialogs.RepeatQuestion;
+    const isBlackCityDialog = sessionData.currentDialog === Dialogs.BlackCityStory;
     const tokens = await stemmer(rawTokens.join(' '));
     const { chars } = sessionData;
 
@@ -48,8 +49,15 @@ export async function mainDialog(
         }
 
         if (isRepeatQuestionDialog && intents.yes(rawTokens)) {
+            const lastChar = _.last(sessionData.chars);
+
+            if (lastChar && intents.isBlackCityChar(lastChar)) {
+                sessionData.currentDialog = Dialogs.Story;
+            } else {
+                sessionData.currentDialog = Dialogs.BlackCityStory;
+            }
+
             sessionData.chars.length = 0;
-            sessionData.currentDialog = Dialogs.Story;
         }
 
         if (intents.help(rawTokens)) {
@@ -67,7 +75,7 @@ export async function mainDialog(
         }
 
         if (!currentChar) {
-            return answers.storyBegin();
+            return answers.storyBegin(sessionData.currentDialog);
         }
 
         const nextChar = extractChar(tokens);
@@ -87,6 +95,10 @@ export async function mainDialog(
                 buttons: makeButtons(chars, random100),
                 endSession: false,
             };
+        }
+
+        if (isBlackCityDialog && !intents.isBlackCityChar(nextChar)) {
+            return answers.blackCityError(nextChar);
         }
 
         chars.push(nextChar);
