@@ -37,5 +37,5 @@ function formatMessage(request: WebhookRequest, response: WebhookResponse, time:
     const responseText = (response.response.tts || response.response.text).substr(0, 64);
     const prefix = `${timeText.padEnd(16)} ${user}`;
 
-    return `${prefix} ${requestText}\n${''.padStart(prefix.length)} ${responseText}`;
+    return `${prefix} ${requestText}\n${''.padStart(prefix.length)} ${responseText}\n`;
 }
