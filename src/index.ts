@@ -15,11 +15,6 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
             const random100 = _.random(100, false);
             const sessionKey = createSessionKey(request);
 
-            // Очень много этих пингов
-            if (!request.request.nlu.tokens.includes('ping')) {
-                appendToLog(logFile, request, new Date());
-            }
-
             if (!userData[sessionKey]) {
                 userData[sessionKey] = createSessionData();
             }
@@ -40,7 +35,7 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
                   }
                 : undefined;
 
-            return {
+            const response = {
                 response: {
                     text: answer.speech.text,
                     tts: answer.speech.tts,
@@ -51,6 +46,10 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
                 session: request.session,
                 version: request.version,
             };
+
+            appendToLog(logFile, request, response, new Date());
+
+            return response;
         },
         () => {
             killStemmer();

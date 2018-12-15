@@ -21,14 +21,14 @@ export function spawnMystem(): { stemmer: Stemmer; killStemmer: () => void } {
 
     const rl = readline.createInterface({
         input: mystem.stdout,
-        output: mystem.stdin
+        output: mystem.stdin,
     });
 
     const input = new AsyncQueue<string>();
     const output = new AsyncQueue<Token[]>();
 
     /** Прогоняет текст через mystem */
-    function process(message) {
+    function process(message: string) {
         return new Promise<Token[]>(resolve => {
             const preparedMessage = cleanBeforeStemming(message) + '\n';
 
@@ -51,7 +51,7 @@ export function spawnMystem(): { stemmer: Stemmer; killStemmer: () => void } {
         }
     }
 
-    function stemmer(message) {
+    function stemmer(message: string) {
         input.enqueue(message);
         return output.dequeue();
     }
@@ -100,10 +100,10 @@ function cleanBeforeStemming(text: string) {
     return text.replace(' и ', ' ');
 }
 
-function preprocessLexeme({ lex, gr }): Lexeme {
+function preprocessLexeme({ lex, gr }: MyStemLexeme): Lexeme {
     return {
         lex,
-        gr: gr.split(/=|,/) as Gr[]
+        gr: gr.split(/=|,/) as Gr[],
     };
 }
 
