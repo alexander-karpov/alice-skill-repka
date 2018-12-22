@@ -60,7 +60,5 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
 }
 
 function createSessionKey(request: WebhookRequest) {
-    const sessionId = request.session.session_id;
-    const userId = request.session.user_id;
-    return `${userId}-${sessionId}`;
+    return request.session.session_id;
 }
