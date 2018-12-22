@@ -312,6 +312,18 @@ describe('Main dialog', () => {
         expect(await act('черный')).toMatch(/черный за черного/i);
     });
 
+    test('Распознает персонажа из двук существительных', async () => {
+        act('');
+        expect(await act('бабу ягу')).toMatch(/баба яга за дедку/i);
+        expect(await act('деда мороза')).toMatch(/дед мороз за бабу ягу/i);
+        expect(await act('человека паука')).toMatch(/человек паук за деда мороза/i);
+        expect(await act('капитан америка')).toMatch(/капитан америка за человека паука/i);
+
+        expect(await act('дед бабу')).toMatch(/баба за капитана америку/i);
+        expect(await act('баба деда дудка')).toMatch(/дед за бабу/i);
+        expect(await act('холод стул')).toMatch(/долго звал дед холод/i);
+    });
+
     //#region tests infrastructure
     let killStemmer: () => void;
     let stemmer: Stemmer;

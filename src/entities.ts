@@ -34,3 +34,18 @@ export function extractSAnim(tokens: Token[]): Selection | undefined {
 
     return undefined;
 }
+
+export function extractSAnimSInan(tokens: Token[]): [Selection, Selection] | undefined {
+    for (let _case of [Gr.Acc, Gr.Nom, Gr.dat]) {
+        const SAnim = tokenSelector([Gr.S, Gr.anim, _case, Gr.single]);
+        const SInan = tokenSelector([Gr.S, _case, Gr.single]);
+
+        const matches = matchSeq(tokens, [SAnim, SInan]);
+
+        if (matches) {
+            return [matches[0], matches[1]];
+        }
+    }
+
+    return undefined;
+}

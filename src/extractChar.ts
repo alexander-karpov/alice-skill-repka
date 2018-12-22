@@ -1,13 +1,23 @@
 import * as _ from 'lodash';
 import { Character, Word, Gender } from './character';
 import { matchSeq } from './utils/seq';
-import { Lexeme, Gr, matchGrs, Token, tokenSelector, selectionToken, findLexeme } from './tokens';
-import { extractASAnim, extractSAnim } from './entities';
+import {
+    Lexeme,
+    Gr,
+    matchGrs,
+    Token,
+    tokenSelector,
+    selectionToken,
+    findLexeme,
+    selectionLexeme,
+} from './tokens';
+import { extractASAnim, extractSAnim, extractSAnimSInan } from './entities';
 
 export function extractChar(tokens: Token[]): Character | undefined {
     const indexedChars = [
         extractFullNameChar(tokens),
         extractAttrChar(tokens),
+        extractSS(tokens),
         extractAnimChar(tokens),
         extractChipollino(tokens),
     ].filter(Boolean) as [Character, number][];
@@ -58,7 +68,7 @@ function SNomToAcc(lexeme: Lexeme, token: Token) {
     const isFamela = matchGrs(gr, [Gr.Famela]);
     const isNeuter = matchGrs(gr, [Gr.Neuter]);
     const isUnisex = matchGrs(gr, [Gr.Unisex]);
-    const isInanim = matchGrs(gr, [Gr.inanim]);
+    const isInanim = matchGrs(gr, [Gr.inan]);
     const isPlural = matchGrs(gr, [Gr.plural]);
     const isA = token.lexemes.some(l => l.lex === lexeme.lex && l.gr.includes(Gr.A));
 
@@ -302,6 +312,31 @@ function extractAnimChar(tokens: Token[]): [Character, number] | undefined {
     ];
 }
 
+/**
+ * Персо
+ * @param tokens
+ */
+function extractSS(tokens: Token[]): [Character, number] | undefined {
+    const char = extractSAnimSInan(tokens);
+
+    if (!char) return undefined;
+
+    const [anim, inan] = char.map(m => lexemeToWord(...m));
+    const tokenIndex = tokens.indexOf(selectionToken(char[1]));
+
+    return [
+        {
+            subject: {
+                nominative: `${anim.nominative} ${inan.nominative}`,
+                accusative: `${anim.accusative} ${inan.accusative}`,
+            },
+            normal: anim.nominative,
+            gender: extractGender(selectionLexeme(char[0])),
+        },
+        tokenIndex,
+    ];
+}
+
 function extractChipollino(tokens: Token[]): [Character, number] | undefined {
     if (tokens.some(t => t.text === 'чиполлино')) {
         return [
@@ -321,7 +356,7 @@ function extractChipollino(tokens: Token[]): [Character, number] | undefined {
 }
 
 export function extractInanimate(tokens: Token[]): Character | undefined {
-    const inanimSingle = [Gr.inanim, Gr.S];
+    const inanimSingle = [Gr.inan, Gr.S];
 
     const found =
         matchSeq(tokens, [tokenSelector(inanimSingle.concat(Gr.Acc))]) ||
