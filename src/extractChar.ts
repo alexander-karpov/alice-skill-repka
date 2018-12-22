@@ -157,19 +157,25 @@ function SNomToAcc(lexeme: Lexeme) {
  * @param noun Существительное в им. падеже.
  */
 function ANomToAcc(lexeme: Lexeme, token: Token) {
-    if (lexeme.gr.includes(Gr.Acc)) {
+    const text = token.text;
+    const isAcc = lexeme.gr.includes(Gr.Acc);
+    const isSingle = lexeme.gr.includes(Gr.single);
+    const endsWith = (end: string) => text.endsWith(end);
+    const changeTwo = (end: string) => `${text.substring(0, text.length - 2)}${end}`;
+
+    if (isAcc && isSingle) {
+        /**
+         * Mystem привотид пригал. женского рода к мужскому.
+         * Чтобы проще было сохранить род, сохраняем текст как есть в ед. числе.
+         */
         return token.text;
     }
 
-    const nom = token.text;
-    const endsWith = end => nom.endsWith(end);
-    const changeTwo = end => `${nom.substring(0, nom.length - 2)}${end}`;
-
-    if (endsWith('ий')) {
+    if (endsWith('ий') || endsWith('ие')) {
         return changeTwo('его');
     }
 
-    if (endsWith('ый')) {
+    if (endsWith('ый') || endsWith('ые')) {
         return changeTwo('ого');
     }
 
@@ -181,7 +187,7 @@ function ANomToAcc(lexeme: Lexeme, token: Token) {
         return changeTwo('юю');
     }
 
-    return nom;
+    return text;
 }
 
 /**
@@ -292,8 +298,8 @@ function extractChipollino(tokens: Token[]): [Character, number] | undefined {
                 normal: 'чиполлино',
                 gender: Gender.Male,
                 subject: {
-                    nominative: 'чиполлино 🥦',
-                    accusative: 'чиполлино 🥦',
+                    nominative: 'чиполлино',
+                    accusative: 'чиполлино',
                 },
             },
             0,

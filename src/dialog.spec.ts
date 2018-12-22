@@ -288,6 +288,7 @@ describe('Main dialog', () => {
     test('Правильно склоняет милых конец', async () => {
         act('');
         expect(await tts('милые кони')).toMatch(/милый конь за дедку/i);
+        expect(await tts('милые кони')).toMatch(/милый конь за милого коня/i);
     });
 
     test('В конце концов распоздавать сущ. в любом падеже', async () => {
@@ -298,6 +299,11 @@ describe('Main dialog', () => {
     test('Чернила - неодущевленная сущность', async () => {
         act('');
         expect(await tts('чернила')).toMatch(/звал дедка чернила/i);
+    });
+
+    test('Распознает Чиполлино', async () => {
+        act('');
+        expect(await act('Чиполлино')).toMatch(/чиполлино за дедку/i);
     });
 
     //#region tests infrastructure

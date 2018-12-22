@@ -6,8 +6,6 @@
         "module": "commonjs",
         "target": "es2017",
         "strict": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
         "baseUrl": "."
     },
     "include": [
