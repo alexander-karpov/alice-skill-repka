@@ -57,12 +57,19 @@ function SNomToAcc(lexeme: Lexeme) {
     const isNeuter = matchGrs(gr, [Gr.Neuter]);
     const isUnisex = matchGrs(gr, [Gr.Unisex]);
     const isInanim = matchGrs(gr, [Gr.inanim]);
+    const isPlural = matchGrs(gr, [Gr.plural]);
 
     const endsWith = end => nomenative.endsWith(end);
     const changeOne = end => `${nomenative.substring(0, nomenative.length - 1)}${end}`;
     const changeTwo = end => `${nomenative.substring(0, nomenative.length - 2)}${end}`;
     const add = end => `${nomenative}${end}`;
 
+    // Чернила -> чернила
+    if (isInanim && isPlural) {
+        return nomenative;
+    }
+
+    // Замок -> замок
     if (isMale && isInanim) {
         return nomenative;
     }
@@ -297,7 +304,7 @@ function extractChipollino(tokens: Token[]): [Character, number] | undefined {
 }
 
 export function extractInanimate(tokens: Token[]): Character | undefined {
-    const inanimSingle = [Gr.inanim, Gr.S, Gr.single];
+    const inanimSingle = [Gr.inanim, Gr.S];
 
     const found =
         matchSeq(tokens, [tokenSelector(inanimSingle.concat(Gr.Acc))]) ||
