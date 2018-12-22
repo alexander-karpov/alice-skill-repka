@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Character, Word, Gender } from './character';
 import { matchSeq } from './utils/seq';
 import { Lexeme, Gr, matchGrs, Token, tokenSelector, selectionToken } from './tokens';
-import { extractASAnim } from './entities';
+import { extractASAnim, extractSAnim } from './entities';
 
 export function extractChar(tokens: Token[]): Character | undefined {
     const indexedChars = [
@@ -241,14 +241,12 @@ function extractFullNameChar(tokens: Token[]): [Character, number] | undefined {
  * @param tokens
  */
 function extractAttrChar(tokens: Token[]): [Character, number] | undefined {
-    const matches = extractASAnim(tokens);
+    const char = extractASAnim(tokens);
 
-    if (!matches) {
-        return undefined;
-    }
+    if (!char) return undefined;
 
-    const [adj, noun] = matches.map(m => lexemeToWord(...m));
-    const tokenIndex = tokens.indexOf(selectionToken(matches[1]));
+    const [adj, noun] = char.map(m => lexemeToWord(...m));
+    const tokenIndex = tokens.indexOf(selectionToken(char[1]));
 
     return [
         {
@@ -257,28 +255,21 @@ function extractAttrChar(tokens: Token[]): [Character, number] | undefined {
                 accusative: `${adj.accusative} ${noun.accusative}`,
             },
             normal: noun.nominative,
-            gender: extractGender(matches[1][0]),
+            gender: extractGender(char[1][0]),
         },
         tokenIndex,
     ];
 }
 
 function extractAnimChar(tokens: Token[]): [Character, number] | undefined {
-    const sAnim = [Gr.anim, Gr.S];
+    const char = extractSAnim(tokens);
 
-    const found =
-        matchSeq(tokens, [tokenSelector(sAnim.concat(Gr.Acc, Gr.single))]) ||
-        matchSeq(tokens, [tokenSelector(sAnim.concat(Gr.Nom, Gr.single))]) ||
-        matchSeq(tokens, [tokenSelector(sAnim.concat(Gr.Acc))]) ||
-        matchSeq(tokens, [tokenSelector(sAnim.concat(Gr.Nom))]);
-
-    if (!found) return undefined;
-    const [char] = found;
-    const tokenIndex = tokens.indexOf(found[0][1]);
+    if (!char) return undefined;
+    const tokenIndex = tokens.indexOf(selectionToken(char));
 
     return [
         {
-            subject: lexemeToWord(char[0], char[1]),
+            subject: lexemeToWord(...char),
             gender: extractGender(char[0]),
             normal: char[0].lex,
         },

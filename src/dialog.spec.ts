@@ -4,24 +4,6 @@ import { spawnMystem, Stemmer } from './stemmer';
 import { SessionData, createSessionData } from './sessionData';
 
 describe('Main dialog', () => {
-    let killStemmer: () => void;
-    let stemmer: Stemmer;
-    let sessionData: SessionData;
-
-    async function act(command: string, random100 = 0): Promise<string> {
-        const {
-            speech: { text },
-        } = await mainDialog(command.toLowerCase().split(' '), sessionData, { stemmer, random100 });
-        return text;
-    }
-
-    async function tts(command: string, random100 = 0): Promise<string> {
-        const {
-            speech: { tts },
-        } = await mainDialog(command.toLowerCase().split(' '), sessionData, { stemmer, random100 });
-        return tts;
-    }
-
     test('Классическая сказка: начало', async () => {
         expect(await act('')).toMatch('осадил дед репку');
     });
@@ -308,6 +290,30 @@ describe('Main dialog', () => {
         expect(await tts('милые кони')).toMatch(/милый конь за дедку/i);
     });
 
+    test('В конце концов распоздавать сущ. в любом падеже', async () => {
+        act('');
+        expect(await tts('мальчику')).toMatch(/мальчик за дедку/i);
+    });
+
+    //#region tests infrastructure
+    let killStemmer: () => void;
+    let stemmer: Stemmer;
+    let sessionData: SessionData;
+
+    async function act(command: string, random100 = 0): Promise<string> {
+        const {
+            speech: { text },
+        } = await mainDialog(command.toLowerCase().split(' '), sessionData, { stemmer, random100 });
+        return text;
+    }
+
+    async function tts(command: string, random100 = 0): Promise<string> {
+        const {
+            speech: { tts },
+        } = await mainDialog(command.toLowerCase().split(' '), sessionData, { stemmer, random100 });
+        return tts;
+    }
+
     beforeEach(() => {
         sessionData = createSessionData();
     });
@@ -319,4 +325,5 @@ describe('Main dialog', () => {
     });
 
     afterAll(() => killStemmer());
+    //#endregion
 });
