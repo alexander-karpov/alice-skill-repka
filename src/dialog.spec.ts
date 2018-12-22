@@ -292,6 +292,12 @@ describe('Main dialog', () => {
         expect(await act('котика')).toMatch('Котик за бобра,');
     });
 
+    test('Чёрный ворон не заменяется на ворону', async () => {
+        act('');
+        expect(await tts('чёрного ворона')).toMatch(/Прилетел черный ворон .*черный ворон за/i);
+        expect(await tts('чёрный ворон')).toMatch(/Прилетел черный ворон .*черный ворон за/i);
+    });
+
     beforeEach(() => {
         sessionData = createSessionData();
     });

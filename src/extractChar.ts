@@ -235,10 +235,10 @@ function extractFullNameChar(tokens: Token[]): [Character, number] | undefined {
  * @param tokens
  */
 function extractAttrChar(tokens: Token[]): [Character, number] | undefined {
-    const ANom = tokenSelector([Gr.A, Gr.Nom]);
-    const AAcc = tokenSelector([Gr.A, Gr.Acc]);
-    const SNom = tokenSelector([Gr.S, Gr.Nom, Gr.anim]);
-    const SAcc = tokenSelector([Gr.S, Gr.Acc, Gr.anim]);
+    const ANom = tokenSelector([Gr.single, Gr.A, Gr.Nom]);
+    const AAcc = tokenSelector([Gr.single, Gr.A, Gr.Acc]);
+    const SNom = tokenSelector([Gr.single, Gr.S, Gr.Nom, Gr.anim]);
+    const SAcc = tokenSelector([Gr.single, Gr.S, Gr.Acc, Gr.anim]);
 
     const matches = matchSeq(tokens, [AAcc, SAcc]) || matchSeq(tokens, [ANom, SNom]);
 
