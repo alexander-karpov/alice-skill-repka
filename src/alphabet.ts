@@ -1,5 +1,5 @@
 import { Character } from './character';
-import { Speech, createSpeech } from './speech';
+import { Speech, speak } from './speech';
 
 const alphabet = {
     а: 'А',
@@ -36,8 +36,8 @@ export function alphabetFirstLetter(char: Character): Speech {
     const alphabetLetter = alphabet[firstLetter];
 
     if (alphabetLetter) {
-        return createSpeech(`"${firstLetter.toUpperCase()}"`, alphabetLetter);
+        return speak([`"${firstLetter.toUpperCase()}"`, alphabetLetter]);
     }
 
-    return createSpeech(`"${firstLetter.toUpperCase()}"`);
+    return speak(`"${firstLetter.toUpperCase()}"`);
 }

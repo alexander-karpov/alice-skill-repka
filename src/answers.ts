@@ -2,41 +2,35 @@ import * as _ from 'lodash';
 import { Character, isCharMale, isCharFamela, isCharUnisex } from './character';
 import { SessionData, Dialogs } from './sessionData';
 import { sample } from './utils';
-import { createSpeech, Speech, concatSpeech } from './speech';
+import { createSpeech, Speech, speak, tts } from './speech';
 import { alphabetFirstLetter } from './alphabet';
 
 export type AnswerBuilder = (char: Character, previousChar: Character, random100: number) => Speech;
 
 function aboutSkill(): Speech {
-    return concatSpeech(
-        'Давайте вместе сочиним сказку.',
-        createSpeech('Вы слышали, как посадил дед репку?', 'Вы слышали - как посадил дед репку?'),
-        ' А кто помогал её тянуть? Давайте придумаем вместе.',
+    return speak(
+        'Давайте вместе сочиним сказку 📖.',
+        tts`Вы слышали ${'-'} как посадил дед 👨‍🦳 репку?`,
+        'А кто помогал её тянуть? Давайте придумаем вместе.',
     );
 }
 
 export function storyBegin(dialog: Dialogs): Speech {
-    return concatSpeech(
+    return speak(
         dialog === Dialogs.BlackCityStory
-            ? createSpeech(
-                  'Хорошо! В одном чёрном-чёрном городе посадил дед репку.',
-                  'Хорошо! В одном чёрном-чёрном городе - - посадил дед репку.',
-              )
+            ? tts`Хорошо! В одном чёрном-чёрном городе ${'- -'} посадил дед репку.`
             : 'Посадил дед репку.',
-        ' Выросла репка большая-пребольшая. Стал дед репку из земли тянуть. Тянет-потянет, вытянуть не может. Кого позвал дедка?',
+        'Выросла репка большая-пребольшая. Стал дед репку из земли тянуть. Тянет-потянет, вытянуть не может. Кого позвал дедка?',
         dialog === Dialogs.BlackCityStory ? blackCityManual() : '',
     );
 }
 
 export function blackCityManual() {
-    return concatSpeech(
-        'В чёрном городе все персонажи начинаются на букву',
-        createSpeech('"Ч".', ' - Чэ.'),
-    );
+    return speak('В чёрном городе все персонажи начинаются на букву', speak(['"Ч".', ' - Чэ.']));
 }
 
 export function blackCityError(char: Character) {
-    return concatSpeech(
+    return speak(
         `${_.upperFirst(nom(char))} начинается на букву`,
         alphabetFirstLetter(char),
         '.',
@@ -45,7 +39,7 @@ export function blackCityError(char: Character) {
 }
 
 export function intro(random100: number): Speech {
-    return concatSpeech(
+    return speak(
         sample(['Хорошо.', 'С удовольствием!'], random100),
         aboutSkill(),
         storyBegin(Dialogs.Story),
@@ -56,7 +50,7 @@ export function help(sessionData: SessionData) {
     const char = _.last(sessionData.chars);
 
     if (char) {
-        return concatSpeech(aboutSkill(), whoCalled2(char));
+        return speak(aboutSkill(), whoCalled2(char));
     }
 
     return aboutSkill();
@@ -77,29 +71,29 @@ export function whoCalled2(char: Character) {
 }
 
 export function yesOrNoExpected(): Speech {
-    return createSpeech(
+    return speak([
         'Сейчас я ожидаю в ответ "Да" или "Нет".',
         'сейчас я ожидаю в ответ - - да - - или  нет.',
-    );
+    ]);
 }
 
 export function endOfStory() {
-    return createSpeech('Вот и сказке конец, А кто слушал — молодец.');
+    return speak('Вот и сказке конец, а кто слушал — молодец.');
 }
 
 export function wrongCommand(sessionData: SessionData) {
-    return concatSpeech(`Это не похоже на персонажа.`, help(sessionData));
+    return speak(`Это не похоже на персонажа.`, help(sessionData));
 }
 
 export function inanimateCalled(inanimate: Character, previousChar: Character) {
     const zval = byGender(previousChar, 'звал', 'звала', 'звало');
 
-    return concatSpeech(
+    return speak(
         `Долго ${zval} ${nom(previousChar)} ${acc(inanimate)} —`,
-        createSpeech(
+        speak([
             byGender(previousChar, 'не дозвался.', 'не дозвалась.', 'не дозвалось.'),
             byGender(previousChar, ' - не дозв+ался.', ' - не дозвал+ась.', ' - не дозвал+ось.'),
-        ),
+        ]),
         'Давайте позовем другого персонажа.',
         whoCalled2(previousChar),
     );
@@ -113,50 +107,52 @@ export function formatStory(chars: Character[]): Speech {
     }
 
     chain.reverse();
-    const story = createSpeech(_.upperFirst(chain.join(', ')), chain.join(' - '));
-    return concatSpeech(story, createSpeech(`, дедка за репку.`, ' - дедка за репку.'));
+    return speak(
+        [_.upperFirst(chain.join(', ')), chain.join(' - ')],
+        [`, дедка за репку.`, ' - дедка за репку.'],
+    );
 }
 
 export function success() {
-    return concatSpeech(
-        createSpeech(
+    return speak(
+        [
             'Тянут-потянут — вытянули репку!',
             'Тянут-потянут - <speaker audio="alice-sounds-human-kids-1.opus"> - вытянули репку!',
-        ),
+        ],
         'Какая интересная сказка! Хотите продолжить игру?',
     );
 }
 
 export function failure(char: Character) {
-    return concatSpeech(`Тянут-потянут — вытянуть не могут.`, whoCalled2(char));
+    return speak(`Тянут-потянут — вытянуть не могут.`, whoCalled2(char));
 }
 
 export const chars = {
     granny(char: Character) {
         const come = comeCapitalized(char);
-        return createSpeech(`${come} ${nom(char)}.`);
+        return speak(`${come} ${nom(char)}.`);
     },
     mouse(mouse: Character) {
         const come = comeRunningCapitalized(mouse);
 
-        return createSpeech(
+        return speak([
             `${come} ${nom(mouse)}.`,
             `${come} ${nom(mouse)} - <speaker audio="alice-music-violin-b-1.opus">.`,
-        );
+        ]);
     },
     cat(char: Character, previousChar: Character, random100: number) {
         const useSOftMeow = isCharFamela(char) || nom(char).includes('котен');
         const soundNumber = sample(useSOftMeow ? [3, 4] : [1, 2], random100);
-        const meow = createSpeech(
+        const meow = speak([
             '- мяу -',
             `<speaker audio="alice-sounds-animals-cat-${soundNumber}.opus">`,
-        );
+        ]);
 
         const clung = byGender(char, 'вцепился', 'вцепилась', 'вцепилось');
         const name = nom(char);
         const description = name === 'мурка' ? 'кошка ' : '';
 
-        return concatSpeech(
+        return speak(
             byGender(char, 'Прибежал', 'Прибежала', 'Прибежало'),
             `${description}${name}`,
             meow,
@@ -274,7 +270,7 @@ export const chars = {
         const poshel = byGender(previousChar, 'Пошёл', 'Пошла', 'Пошло');
         const stalOn = byGender(previousChar, 'стал он', 'стала она', 'стало оно');
 
-        return concatSpeech(
+        return speak(
             `${poshel} ${nom(previousChar)} к синему морю;`,
             createSpeech('', '<speaker audio="alice-sounds-nature-sea-1.opus"> - - '),
             `${stalOn} кликать ${acc(char)}, приплыла к ${nemu} рыбка, спросила:`,

@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Stemmer } from './stemmer';
 import { extractChar, extractInanimate } from './extractChar';
 import { SessionData, Dialogs } from './sessionData';
-import { Speech, concatSpeech, createSpeech } from './speech';
+import { Speech, speak } from './speech';
 import * as answers from './answers';
 import * as intents from './intents';
 import { findKnownChar, chooseKnownCharButtons } from './knownChars';
@@ -114,11 +114,11 @@ export async function mainDialog(
             // Ограничение поля card/description - 254
             const isTaleFitsImageDisc = tale.text.length <= 253;
             const knownCharAnswer = knownChar.answer(nextChar, currentChar, random100);
-            const knownCharTts = createSpeech('', knownCharAnswer.tts);
+            const knownCharTts = speak(['', knownCharAnswer.tts]);
 
             if (isTaleFitsImageDisc && knownChar.image) {
                 return {
-                    speech: concatSpeech(knownCharTts, tale),
+                    speech: speak(knownCharTts, tale),
                     imageId: knownChar.image,
                     buttons: isEndOfStory(chars) ? storyEndButtons() : undefined,
                     endSession: false,
@@ -126,7 +126,7 @@ export async function mainDialog(
             }
 
             return {
-                speech: concatSpeech(knownCharAnswer, tale),
+                speech: speak(knownCharAnswer, tale),
                 imageId: '',
                 buttons: makeButtons(chars, random100),
                 endSession: false,
@@ -144,7 +144,7 @@ export async function mainDialog(
 }
 
 function makeRepkaStory(all: Character[], char: Character) {
-    return concatSpeech(
+    return speak(
         answers.formatStory(all),
         isEndOfStory(all) ? answers.success() : answers.failure(char),
     );
