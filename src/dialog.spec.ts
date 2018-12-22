@@ -295,6 +295,11 @@ describe('Main dialog', () => {
         expect(await tts('мальчику')).toMatch(/мальчик за дедку/i);
     });
 
+    test('Распознает чиполлино', async () => {
+        act('');
+        expect(await tts('чиполлино')).toMatch(/чиполлино 🥦 за дедку/i);
+    });
+
     //#region tests infrastructure
     let killStemmer: () => void;
     let stemmer: Stemmer;

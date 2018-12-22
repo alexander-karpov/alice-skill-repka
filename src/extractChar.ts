@@ -9,6 +9,7 @@ export function extractChar(tokens: Token[]): Character | undefined {
         extractFullNameChar(tokens),
         extractAttrChar(tokens),
         extractAnimChar(tokens),
+        extractChipollino(tokens),
     ].filter(Boolean) as [Character, number][];
 
     const [last] = _.sortBy(indexedChars, [o => -o[1]]);
@@ -275,6 +276,24 @@ function extractAnimChar(tokens: Token[]): [Character, number] | undefined {
         },
         tokenIndex,
     ];
+}
+
+function extractChipollino(tokens: Token[]): [Character, number] | undefined {
+    if (tokens.some(t => t.text === 'чиполлино')) {
+        return [
+            {
+                normal: 'чиполлино',
+                gender: Gender.Male,
+                subject: {
+                    nominative: 'чиполлино 🥦',
+                    accusative: 'чиполлино 🥦',
+                },
+            },
+            0,
+        ];
+    }
+
+    return undefined;
 }
 
 export function extractInanimate(tokens: Token[]): Character | undefined {
