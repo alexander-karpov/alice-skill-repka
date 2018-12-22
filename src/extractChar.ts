@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { Character, Word, Gender } from './character';
 import { matchSeq } from './utils/seq';
-import { Lexeme, Gr, matchGrs, Token, tokenSelector, selectionToken } from './tokens';
+import { Lexeme, Gr, matchGrs, Token, tokenSelector, selectionToken, findLexeme } from './tokens';
 import { extractASAnim, extractSAnim } from './entities';
 
 export function extractChar(tokens: Token[]): Character | undefined {
@@ -17,7 +17,9 @@ export function extractChar(tokens: Token[]): Character | undefined {
 }
 
 function lexemeToWord(lexeme: Lexeme, token: Token): Word {
-    const accusative = lexeme.gr.includes(Gr.S) ? SNomToAcc(lexeme) : ANomToAcc(lexeme, token);
+    const accusative = lexeme.gr.includes(Gr.S)
+        ? SNomToAcc(lexeme, token)
+        : ANomToAcc(lexeme, token);
     const nominative =
         lexeme.gr.includes(Gr.Famela) && lexeme.gr.includes(Gr.A)
             ? ANomMaleToFamela(lexeme, token)
@@ -49,7 +51,7 @@ function extractGender(lexeme: Lexeme): Gender {
  * Меняет падеж существительного с им. на вин.
  * @param noun Существительное в им. падеже.
  */
-function SNomToAcc(lexeme: Lexeme) {
+function SNomToAcc(lexeme: Lexeme, token: Token) {
     const gr = lexeme.gr;
     const nomenative = lexeme.lex;
     const isMale = matchGrs(gr, [Gr.Male]);
@@ -58,11 +60,20 @@ function SNomToAcc(lexeme: Lexeme) {
     const isUnisex = matchGrs(gr, [Gr.Unisex]);
     const isInanim = matchGrs(gr, [Gr.inanim]);
     const isPlural = matchGrs(gr, [Gr.plural]);
+    const isA = token.lexemes.some(l => l.lex === lexeme.lex && l.gr.includes(Gr.A));
 
-    const endsWith = end => nomenative.endsWith(end);
-    const changeOne = end => `${nomenative.substring(0, nomenative.length - 1)}${end}`;
-    const changeTwo = end => `${nomenative.substring(0, nomenative.length - 2)}${end}`;
-    const add = end => `${nomenative}${end}`;
+    const endsWith = (end: string) => nomenative.endsWith(end);
+    const changeOne = (end: string) => `${nomenative.substring(0, nomenative.length - 1)}${end}`;
+    const changeTwo = (end: string) => `${nomenative.substring(0, nomenative.length - 2)}${end}`;
+    const add = (end: string) => `${nomenative}${end}`;
+
+    /**
+     * Для существительных от прилагательных (напр. черный)
+     * нужно использовать правила склонения как для пригалат.
+     */
+    if (isA) {
+        return ANomToAcc(lexeme, token);
+    }
 
     // Чернила -> чернила
     if (isInanim && isPlural) {
