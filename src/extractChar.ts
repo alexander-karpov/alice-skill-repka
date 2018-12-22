@@ -54,11 +54,16 @@ function SNomToAcc(lexeme: Lexeme) {
     const isFamela = matchGrs(gr, [Gr.Famela]);
     const isNeuter = matchGrs(gr, [Gr.Neuter]);
     const isUnisex = matchGrs(gr, [Gr.Unisex]);
+    const isInanim = matchGrs(gr, [Gr.inanim]);
 
     const endsWith = end => nomenative.endsWith(end);
     const changeOne = end => `${nomenative.substring(0, nomenative.length - 1)}${end}`;
     const changeTwo = end => `${nomenative.substring(0, nomenative.length - 2)}${end}`;
     const add = end => `${nomenative}${end}`;
+
+    if (isMale && isInanim) {
+        return nomenative;
+    }
 
     if (isNeuter) {
         return nomenative;

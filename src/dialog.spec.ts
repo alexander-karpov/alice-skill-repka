@@ -298,6 +298,11 @@ describe('Main dialog', () => {
         expect(await tts('чёрный ворон')).toMatch(/Прилетел черный ворон .*черный ворон за/i);
     });
 
+    test('Не склоняет неод. сущности', async () => {
+        act('');
+        expect(await tts('замок')).toMatch(/звал дедка замок/i);
+    });
+
     beforeEach(() => {
         sessionData = createSessionData();
     });
