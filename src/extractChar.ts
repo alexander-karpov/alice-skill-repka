@@ -1,7 +1,8 @@
 import * as _ from 'lodash';
 import { Character, Word, Gender } from './character';
 import { matchSeq } from './utils/seq';
-import { Lexeme, Gr, matchGrs, Token, tokenSelector } from './tokens';
+import { Lexeme, Gr, matchGrs, Token, tokenSelector, selectionToken } from './tokens';
+import { extractASAnim } from './entities';
 
 export function extractChar(tokens: Token[]): Character | undefined {
     const indexedChars = [
@@ -240,19 +241,14 @@ function extractFullNameChar(tokens: Token[]): [Character, number] | undefined {
  * @param tokens
  */
 function extractAttrChar(tokens: Token[]): [Character, number] | undefined {
-    const ANom = tokenSelector([Gr.single, Gr.A, Gr.Nom]);
-    const AAcc = tokenSelector([Gr.single, Gr.A, Gr.Acc]);
-    const SNom = tokenSelector([Gr.single, Gr.S, Gr.Nom, Gr.anim]);
-    const SAcc = tokenSelector([Gr.single, Gr.S, Gr.Acc, Gr.anim]);
-
-    const matches = matchSeq(tokens, [AAcc, SAcc]) || matchSeq(tokens, [ANom, SNom]);
+    const matches = extractASAnim(tokens);
 
     if (!matches) {
         return undefined;
     }
 
     const [adj, noun] = matches.map(m => lexemeToWord(...m));
-    const tokenIndex = tokens.indexOf(matches[1][1]);
+    const tokenIndex = tokens.indexOf(selectionToken(matches[1]));
 
     return [
         {

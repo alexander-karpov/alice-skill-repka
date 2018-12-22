@@ -114,9 +114,19 @@ export enum Gr {
     /** устаревшая форма */
     obsol = 'устар',
     /** фамилия */
-    famn = 'фам'
+    famn = 'фам',
 }
 //#endregion
+
+export type Selection = [Lexeme, Token];
+
+export function selectionToken(sel: Selection): Token {
+    return sel[1];
+}
+
+export function selectionLexeme(sel: Selection): Lexeme {
+    return sel[0];
+}
 
 export function matchGrs(gr: string[], pattern: Gr[]) {
     return pattern.every(p => gr.includes(p));
@@ -129,10 +139,10 @@ export function findLexeme(token: Token, grs: Gr[]): Lexeme | undefined {
 }
 
 export function tokenSelector(...orPatterns: (Gr[])[]) {
-    return function selector(token: Token): [Lexeme, Token] | undefined {
+    return function selector(token: Token): Selection | undefined {
         for (let pattern of orPatterns) {
             const found = findLexeme(token, pattern);
-            if (found) return [found, token];
+            if (found) return [found, token] as Selection;
         }
 
         return undefined;

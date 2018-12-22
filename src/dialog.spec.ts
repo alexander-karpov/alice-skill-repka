@@ -303,6 +303,11 @@ describe('Main dialog', () => {
         expect(await tts('замок')).toMatch(/звал дедка замок/i);
     });
 
+    test('Правильно склоняет милых конец', async () => {
+        act('');
+        expect(await tts('милые кони')).toMatch(/милый конь за дедку/i);
+    });
+
     beforeEach(() => {
         sessionData = createSessionData();
     });
