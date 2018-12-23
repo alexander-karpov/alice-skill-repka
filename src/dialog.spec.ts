@@ -132,7 +132,7 @@ describe('Main dialog', () => {
         expect(await act('мышку')).toMatch('вытянули репку');
         expect(await act('давай еще раз')).toMatch('осадил дед репку');
 
-        expect(await act('черную мышку')).toMatch('вытянули репку');
+        expect(await act('мышку')).toMatch('вытянули репку');
         expect(await act('да пожалуйста')).toMatch('Посадил дед репку');
     });
 
@@ -146,7 +146,7 @@ describe('Main dialog', () => {
         act('');
         await act('мышку');
         await act('давай еще раз');
-        expect(await act('Человеческий котика')).toMatch('Человеческий котик за дедку');
+        expect(await act('Черныша')).toMatch('Черныш за дедку');
     });
 
     test('Черный город: неправильный персонаж', async () => {
