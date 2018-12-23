@@ -324,6 +324,11 @@ describe('Main dialog', () => {
         expect(await act('холод стул')).toMatch(/долго звал дед холод/i);
     });
 
+    test('Не принимает два существительныз разного пола', async () => {
+        act('');
+        expect(await act('Собака красный')).toMatch(/собака за дедку/i);
+    });
+
     //#region tests infrastructure
     let killStemmer: () => void;
     let stemmer: Stemmer;

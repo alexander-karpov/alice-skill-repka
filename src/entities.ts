@@ -1,5 +1,14 @@
-import { Token, Selection, Gr, tokenSelector } from './tokens';
 import { matchSeq } from './utils/seq';
+
+import {
+    Token,
+    Selection,
+    Gr,
+    tokenSelector,
+    findLemma,
+    selectionToken,
+    selectionLexeme,
+} from './tokens';
 
 /**  Милый конь, милые кони */
 export function extractASAnim(tokens: Token[]): [Selection, Selection] | undefined {
@@ -43,7 +52,18 @@ export function extractSAnimSInan(tokens: Token[]): [Selection, Selection] | und
         const matches = matchSeq(tokens, [SAnim, SInan]);
 
         if (matches) {
-            return [matches[0], matches[1]];
+            const [sAnim, s] = matches;
+            const isSecondWordA = findLemma(selectionToken(s), [Gr.A], selectionLexeme(s).lex);
+
+            /**
+             * Откидывает варианты где второе слово - прилагательное тоже.
+             * Напр. "Собака красный".
+             */
+            if (isSecondWordA) {
+                return undefined;
+            }
+
+            return [sAnim, s];
         }
     }
 

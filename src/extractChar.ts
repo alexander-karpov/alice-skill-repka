@@ -8,7 +8,7 @@ import {
     Token,
     tokenSelector,
     selectionToken,
-    findLexeme,
+    findLemma,
     selectionLexeme,
 } from './tokens';
 import { extractASAnim, extractSAnim, extractSAnimSInan } from './entities';
@@ -69,7 +69,7 @@ function SNomToAcc(lexeme: Lexeme, token: Token) {
     const isUnisex = matchGrs(gr, [Gr.Unisex]);
     const isInanim = matchGrs(gr, [Gr.inan]);
     const isPlural = matchGrs(gr, [Gr.plural]);
-    const isA = token.lexemes.some(l => l.lex === lexeme.lex && l.gr.includes(Gr.A));
+    const isA = Boolean(findLemma(token, [Gr.A], nomenative));
 
     const endsWith = (end: string) => nomenative.endsWith(end);
     const changeOne = (end: string) => `${nomenative.substring(0, nomenative.length - 1)}${end}`;

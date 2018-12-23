@@ -140,6 +140,12 @@ export function findLexeme(token: Token, grs: Gr[]): Lexeme | undefined {
     });
 }
 
+export function findLemma(token: Token, grs: Gr[], lemma: string): Lexeme | undefined {
+    return token.lexemes.find(l => {
+        return grs.every(gr => l.gr.includes(gr) && l.lex === lemma);
+    });
+}
+
 export function tokenSelector(...orPatterns: (Gr[])[]) {
     return function selector(token: Token): Selection | undefined {
         for (let pattern of orPatterns) {
