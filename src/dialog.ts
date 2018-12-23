@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { Stemmer } from './stemmer';
 import { extractChar, extractInanimate } from './extractChar';
-import { SessionData, Dialogs } from './sessionData';
+import { SessionData, Dialogs, GameMode } from './sessionData';
 import { Speech, speak } from './speech';
 import * as answers from './answers';
 import * as intents from './intents';
@@ -35,7 +35,7 @@ export async function mainDialog(
     { stemmer, random100 }: DialogDependencies,
 ): Promise<DialogResult> {
     const isRepeatQuestionDialog = sessionData.currentDialog === Dialogs.RepeatQuestion;
-    const isBlackCityDialog = sessionData.currentDialog === Dialogs.BlackCityStory;
+
     const tokens = await stemmer(rawTokens.join(' '));
     const { chars } = sessionData;
 
@@ -49,16 +49,17 @@ export async function mainDialog(
         }
 
         if (isRepeatQuestionDialog && intents.yes(rawTokens)) {
-            const lastChar = _.last(sessionData.chars);
-
-            if (lastChar && intents.isBlackCityChar(lastChar)) {
-                sessionData.currentDialog = Dialogs.Story;
+            if (sessionData.mode === GameMode.Classic) {
+                sessionData.mode = GameMode.BlackCity;
             } else {
-                sessionData.currentDialog = Dialogs.BlackCityStory;
+                sessionData.mode = GameMode.Classic;
             }
 
+            sessionData.currentDialog = Dialogs.Story;
             sessionData.chars.length = 0;
         }
+
+        const isBlackCityDialog = sessionData.mode === GameMode.BlackCity;
 
         if (intents.help(rawTokens)) {
             return answers.help(sessionData);
@@ -75,7 +76,7 @@ export async function mainDialog(
         }
 
         if (!currentChar) {
-            return answers.storyBegin(sessionData.currentDialog);
+            return answers.storyBegin(sessionData.mode);
         }
 
         const nextChar = extractChar(tokens);

@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { Character, isCharMale, isCharFamela, isCharUnisex } from './character';
-import { SessionData, Dialogs } from './sessionData';
+import { SessionData, Dialogs, GameMode } from './sessionData';
 import { sample } from './utils';
 import { createSpeech, Speech, speak, tts } from './speech';
 import { alphabetFirstLetter } from './alphabet';
@@ -16,13 +16,13 @@ function aboutSkill(): Speech {
     );
 }
 
-export function storyBegin(dialog: Dialogs): Speech {
+export function storyBegin(mode: GameMode): Speech {
     return speak(
-        dialog === Dialogs.BlackCityStory
+        mode === GameMode.BlackCity
             ? tts`Хорошо! В одном чёрном-чёрном городе ${'- -'} посадил дед репку.`
             : 'Посадил дед репку.',
         'Выросла репка большая-пребольшая. Стал дед репку из земли тянуть. Тянет-потянет, вытянуть не может. Кого позвал дедка?',
-        dialog === Dialogs.BlackCityStory ? blackCityManual() : '',
+        mode === GameMode.BlackCity ? blackCityManual() : '',
     );
 }
 
@@ -43,7 +43,7 @@ export function intro(random100: number): Speech {
     return speak(
         sample(['Хорошо.', 'С удовольствием!'], random100),
         aboutSkill(),
-        storyBegin(Dialogs.Story),
+        storyBegin(GameMode.Classic),
     );
 }
 
