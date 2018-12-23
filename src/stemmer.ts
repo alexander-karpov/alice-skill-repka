@@ -97,7 +97,7 @@ class AsyncQueue<TItem> {
 
 function cleanBeforeStemming(text: string) {
     // Буква И в mystem получает очень большой набор свойств
-    return text.replace(' и ', ' ');
+    return text.replace(' и ', ' ').replace(' с ', ' ');
 }
 
 function preprocessLexeme({ lex, gr }: MyStemLexeme): Lexeme {

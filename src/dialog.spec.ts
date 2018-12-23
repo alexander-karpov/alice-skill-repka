@@ -330,6 +330,11 @@ describe('Main dialog', () => {
         expect(await act('Собака красный')).toMatch(/собака за дедку/i);
     });
 
+    test('Отбрасывает С', async () => {
+        act('');
+        expect(await act('Дурачка с переулочка')).toMatch(/дурачок за дедку/i);
+    });
+
     //#region tests infrastructure
     let killStemmer: () => void;
     let stemmer: Stemmer;
