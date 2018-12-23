@@ -15,7 +15,6 @@ import { extractASAnim, extractSAnim, extractSAnimSInan } from './entities';
 
 export function extractChar(tokens: Token[]): Character | undefined {
     const indexedChars = [
-        extractFullNameChar(tokens),
         extractAttrChar(tokens),
         extractSS(tokens),
         extractAnimChar(tokens),
@@ -233,42 +232,6 @@ function ANomMaleToFamela(lexeme: Lexeme, token: Token) {
     }
 
     return nom;
-}
-
-function extractFullNameChar(tokens: Token[]): [Character, number] | undefined {
-    const maleFirstName = tokenSelector([Gr.persn, Gr.Male], [Gr.persn, Gr.Unisex]);
-    const maleLastName = tokenSelector([Gr.famn, Gr.Male], [Gr.famn, Gr.Unisex]);
-
-    const famelaFirstName = tokenSelector([Gr.persn, Gr.Famela], [Gr.persn, Gr.Unisex]);
-    const famelaLastName = tokenSelector([Gr.famn, Gr.Famela], [Gr.famn, Gr.Unisex]);
-
-    const fullNameLexemes =
-        matchSeq(tokens, [maleFirstName, maleLastName]) ||
-        matchSeq(tokens, [famelaFirstName, famelaLastName]);
-
-    if (!fullNameLexemes) {
-        return undefined;
-    }
-
-    const firstNameWord = lexemeToWord(...fullNameLexemes[0]);
-    const lastNameWord = lexemeToWord(...fullNameLexemes[1]);
-    const tokenIndex = tokens.indexOf(fullNameLexemes[1][1]);
-
-    return [
-        {
-            subject: {
-                nominative: `${_.upperFirst(firstNameWord.nominative)} ${_.upperFirst(
-                    lastNameWord.nominative,
-                )}`,
-                accusative: `${_.upperFirst(firstNameWord.accusative)} ${_.upperFirst(
-                    lastNameWord.accusative,
-                )}`,
-            },
-            normal: firstNameWord.nominative,
-            gender: extractGender(fullNameLexemes[0][0]),
-        },
-        tokenIndex,
-    ];
 }
 
 /**
