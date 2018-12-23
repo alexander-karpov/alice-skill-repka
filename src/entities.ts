@@ -8,6 +8,7 @@ import {
     findLemma,
     selectionToken,
     selectionLexeme,
+    selectionLemma,
 } from './tokens';
 
 /**  Милый конь, милые кони */
@@ -56,10 +57,18 @@ export function extractSAnimSInan(tokens: Token[]): [Selection, Selection] | und
             const isSecondWordA = findLemma(selectionToken(s), [Gr.A], selectionLexeme(s).lex);
 
             /**
-             * Откидывает варианты где второе слово - прилагательное тоже.
+             * Отбрасывает варианты где второе слово - прилагательное тоже.
              * Напр. "Собака красный".
              */
             if (isSecondWordA) {
+                return undefined;
+            }
+
+            /**
+             * Отбрасывает повторение одного слова (иногда случайно так получается)
+             * Напр. "Чебурашку чебурашку".
+             */
+            if (selectionLemma(sAnim) === selectionLemma(s)) {
                 return undefined;
             }
 

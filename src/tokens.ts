@@ -130,6 +130,10 @@ export function selectionLexeme(sel: Selection): Lexeme {
     return sel[0];
 }
 
+export function selectionLemma(sel: Selection): string {
+    return sel[0].lex;
+}
+
 export function matchGrs(gr: string[], pattern: Gr[]) {
     return pattern.every(p => gr.includes(p));
 }

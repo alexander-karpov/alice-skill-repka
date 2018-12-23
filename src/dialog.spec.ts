@@ -335,6 +335,11 @@ describe('Main dialog', () => {
         expect(await act('Дурачка с переулочка')).toMatch(/дурачок за дедку/i);
     });
 
+    test('Отбрасывает повторение одного слова (такое случайно бывает)', async () => {
+        act('');
+        expect(await act('Чебурашку чебурашку')).toMatch(/^Чебурашка за дедку/i);
+    });
+
     //#region tests infrastructure
     let killStemmer: () => void;
     let stemmer: Stemmer;
