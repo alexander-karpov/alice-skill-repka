@@ -32,7 +32,7 @@ const alphabet = {
     я: 'Я',
 };
 export function alphabetFirstLetter(char: Character): Speech {
-    const firstLetter = char.subject.nominative.charAt(0).toLocaleLowerCase();
+    const firstLetter = char.normal.charAt(0).toLocaleLowerCase();
     const alphabetLetter = alphabet[firstLetter];
 
     if (alphabetLetter) {

@@ -32,7 +32,7 @@ export function blackCityManual() {
 
 export function blackCityError(char: Character) {
     return speak(
-        `${_.upperFirst(nom(char))} начинается на букву`,
+        `${_.upperFirst(norm(char))} начинается на букву`,
         alphabetFirstLetter(char),
         '.',
         blackCityManual(),
@@ -308,6 +308,10 @@ export function nom(char: Character) {
 
 export function acc(char: Character) {
     return char.subject.accusative;
+}
+
+export function norm(char: Character) {
+    return char.normal;
 }
 
 function comeRunningCapitalized(char: Character) {

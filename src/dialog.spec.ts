@@ -154,6 +154,7 @@ describe('Main dialog', () => {
         await act('мышку');
         await act('давай еще раз');
         expect(await act('Котика')).toMatch('Котик начинается на букву "К".');
+        expect(await act('Белый котика')).toMatch('Котик начинается на букву "К".');
     });
 
     test('Отказ от продолжения словом Не надо', async () => {
