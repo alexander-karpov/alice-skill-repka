@@ -42,11 +42,15 @@ export function tts(parts: TemplateStringsArray, ...inserts: string[]): Speech {
     });
 
     return {
-        text: parts.join('').replace('  ', ' '),
-        tts: ttsAcc.join(''),
+        text: fixSpeceBeforeComma(parts.join('')),
+        tts: fixSpeceBeforeComma(ttsAcc.join('')),
     };
 }
 
 function fixSpeceBeforeComma(text) {
-    return text.replace(' ,', ',').replace(' .', '.');
+    return text
+        .replace(' ,', ',')
+        .replace(' .', '.')
+        .replace('  ', ' ')
+        .replace('   ', ' ');
 }

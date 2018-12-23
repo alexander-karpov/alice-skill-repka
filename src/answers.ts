@@ -4,6 +4,7 @@ import { SessionData, Dialogs, GameMode } from './sessionData';
 import { sample } from './utils';
 import { createSpeech, Speech, speak, tts } from './speech';
 import { alphabetFirstLetter } from './alphabet';
+import { emoji } from './emoji';
 
 export type AnswerBuilder = (char: Character, previousChar: Character, random100: number) => Speech;
 
@@ -105,7 +106,12 @@ export function formatStory(chars: Character[]): Speech {
     const chain: string[] = [];
 
     for (let i = 0; i < chars.length - 1; i++) {
-        chain.push(`${nom(chars[i + 1])} за ${acc(chars[i])}`);
+        const sub = chars[i + 1];
+        const obj = chars[i];
+        const em = emoji[nom(sub)] || emoji[norm(sub)];
+        const emojiPart = em ? ` ${em} ` : ' ';
+
+        chain.push(`${nom(sub)}${emojiPart}за ${acc(obj)}`);
     }
 
     chain.reverse();
@@ -118,7 +124,7 @@ export function formatStory(chars: Character[]): Speech {
 export function success() {
     return speak(
         [
-            'Тянут-потянут — вытянули репку!',
+            'Тянут-потянут — вытянули репку 👨‍🌾!',
             'Тянут-потянут - <speaker audio="alice-sounds-human-kids-1.opus"> - вытянули репку!',
         ],
         'Какая интересная сказка! Хотите продолжить игру?',
