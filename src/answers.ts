@@ -36,6 +36,7 @@ export function blackCityError(char: Character) {
         alphabetFirstLetter(char),
         '.',
         blackCityManual(),
+        whoCalled2(char),
     );
 }
 
