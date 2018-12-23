@@ -103,7 +103,8 @@ export function inanimateCalled(inanimate: Character, previousChar: Character) {
 }
 
 export function formatStory(chars: Character[]): Speech {
-    const chain: string[] = [];
+    const text: string[] = [];
+    const tts: string[] = [];
 
     for (let i = 0; i < chars.length - 1; i++) {
         const sub = chars[i + 1];
@@ -111,12 +112,15 @@ export function formatStory(chars: Character[]): Speech {
         const em = emoji[nom(sub)] || emoji[norm(sub)];
         const emojiPart = em ? ` ${em} ` : ' ';
 
-        chain.push(`${nom(sub)}${emojiPart}за ${acc(obj)}`);
+        text.push(`${nom(sub)}${emojiPart}за ${acc(obj)}`);
+        tts.push(`${nom(sub)} за ${acc(obj)}`);
     }
 
-    chain.reverse();
+    text.reverse();
+    tts.reverse();
+
     return speak(
-        [_.upperFirst(chain.join(', ')), chain.join(' - ')],
+        [_.upperFirst(text.join(', ')), tts.join(' - ')],
         [`, дедка за репку.`, ' - дедка за репку.'],
     );
 }
