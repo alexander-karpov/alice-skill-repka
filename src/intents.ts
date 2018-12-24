@@ -106,7 +106,9 @@ export function no(tokens: string[]) {
 }
 
 export function isBlackCityChar(char: Character) {
-    return startsWith(char, 'ч') || equals(char, 'мышка');
+    return (
+        startsWith(char, 'ч') || char.subject.nominative.startsWith('ч') || equals(char, 'мышка')
+    );
 }
 
 function startsWith(char: Character, ...aliases: string[]) {

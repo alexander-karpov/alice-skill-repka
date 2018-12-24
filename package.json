@@ -13,7 +13,7 @@
     "test": "jest",
     "test:start": "npm run test -- --watch",
     "precommit": "pretty-quick --staged",
-    "prepublish": "yarn run test && yarn build"
+    "prepare": "yarn run test && yarn build"
   },
   "devDependencies": {
     "@types/jest": "^23.3.10",
