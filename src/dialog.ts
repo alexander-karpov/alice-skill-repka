@@ -179,10 +179,14 @@ function makeButtons(chars: Character[], mode: GameMode, random100: number): Dia
         return storyEndButtons();
     }
 
-    return chooseKnownCharButtons(chars, random100).map(text => ({
-        title: text,
-        hide: true,
-    }));
+    if (mode === GameMode.Classic) {
+        return chooseKnownCharButtons(chars, random100).map(text => ({
+            title: text,
+            hide: true,
+        }));
+    }
+
+    return [];
 }
 
 function storyEndButtons(): DialogButton[] {
