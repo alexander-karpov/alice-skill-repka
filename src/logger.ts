@@ -34,8 +34,10 @@ function formatMessage(request: WebhookRequest, response: WebhookResponse, time:
     const user = request.session.user_id.substr(0, 10);
     const timeText = `${time.getDate()}d ${time.getHours()}h ${time.getMinutes()}m ${time.getSeconds()}s`;
     const requestText = request.request.nlu.tokens.join(' ');
-    const responseText = (response.response.tts || response.response.text).substr(0, 64);
+    const responseTts = (response.response.tts || '').substr(0, 64);
+    const responseText = response.response.text.substr(0, 64);
     const prefix = `${timeText.padEnd(16)} ${user}`;
+    const padding = ''.padStart(prefix.length);
 
-    return `${prefix} ${requestText}\n${''.padStart(prefix.length)} ${responseText}\n`;
+    return `${prefix} ${requestText}\n${padding} ${responseTts}\n${padding} ${responseText}\n`;
 }
