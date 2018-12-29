@@ -1,9 +1,5 @@
 import { Character } from './character';
-
-export enum Dialogs {
-    Story = 'Story',
-    RepeatQuestion = 'RepeatQuestion',
-}
+import { Scene } from './scene';
 
 export enum GameMode {
     Classic = 'Classic',
@@ -12,16 +8,16 @@ export enum GameMode {
 
 export type SessionData = {
     chars: Character[];
-    currentDialog: Dialogs;
     mode: GameMode;
+    scene: Scene;
     isNewSession: boolean;
 };
 
 export function createSessionData(): SessionData {
     return {
         chars: [],
-        currentDialog: Dialogs.Story,
         isNewSession: false,
         mode: GameMode.Classic,
+        scene: Scene.Intro,
     };
 }

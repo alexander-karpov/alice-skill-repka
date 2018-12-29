@@ -22,7 +22,7 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
             const sessionData = userData[sessionKey];
             sessionData.isNewSession = request.session.new;
 
-            const answer = await mainDialog(request.request.nlu.tokens, sessionData, {
+            const answer = await mainDialog(request.request.command, sessionData, {
                 stemmer,
                 random100,
             });

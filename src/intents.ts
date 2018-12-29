@@ -83,25 +83,28 @@ export function girl(char: Character) {
     return equals(char, 'внучка', 'девочка', 'маша');
 }
 
-export function help(tokens: string[]) {
-    const command = tokens.join(' ');
-    return command === 'что ты умеешь' || command === 'помощь';
+export function help(tokens: Token[]) {
+    const text = tokens.map(t => t.text).join(' ');
+    return text === 'что ты умеешь' || text === 'помощь';
 }
 
-export function yes(tokens: string[]) {
-    return tokens.some(t => ['да', 'давай', 'давайте', 'продолжай', 'ладно', 'хочу'].includes(t));
+export function yes(tokens: Token[]) {
+    const text = tokens.map(t => t.text);
+    return text.some(t => ['да', 'давай', 'давайте', 'продолжай', 'ладно', 'хочу'].includes(t));
 }
 
-export function no(tokens: string[]) {
+export function no(tokens: Token[]) {
     function eq<T>(value: T) {
         return (x: T) => (x === value ? x : undefined);
     }
 
+    const text = tokens.map(t => t.text);
+
     return Boolean(
-        tokens.includes('достаточно') ||
-            tokens.includes('хватит') ||
-            tokens.includes('нет') ||
-            matchSeq(tokens, [eq('не'), eq('надо')]),
+        text.includes('достаточно') ||
+            text.includes('хватит') ||
+            text.includes('нет') ||
+            text.join(' ').includes('не надо'),
     );
 }
 

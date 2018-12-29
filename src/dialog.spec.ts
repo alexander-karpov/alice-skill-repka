@@ -227,7 +227,7 @@ describe('Main dialog', () => {
         const {
             speech: { text },
             endSession,
-        } = await mainDialog('нет спасибо'.split(' '), sessionData, { stemmer, random100: 0 });
+        } = await mainDialog('нет спасибо', sessionData, { stemmer, random100: 0 });
 
         expect(text).toMatch('конец');
         expect(endSession).toEqual(true);
@@ -355,14 +355,14 @@ describe('Main dialog', () => {
     async function act(command: string, random100 = 0): Promise<string> {
         const {
             speech: { text },
-        } = await mainDialog(command.toLowerCase().split(' '), sessionData, { stemmer, random100 });
+        } = await mainDialog(command.toLowerCase(), sessionData, { stemmer, random100 });
         return text;
     }
 
     async function tts(command: string, random100 = 0): Promise<string> {
         const {
             speech: { tts },
-        } = await mainDialog(command.toLowerCase().split(' '), sessionData, { stemmer, random100 });
+        } = await mainDialog(command.toLowerCase(), sessionData, { stemmer, random100 });
         return tts;
     }
 

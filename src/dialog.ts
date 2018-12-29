@@ -1,13 +1,14 @@
 import * as _ from 'lodash';
 import { Stemmer } from './stemmer';
 import { extractChar, extractInanimate } from './extractChar';
-import { SessionData, Dialogs, GameMode } from './sessionData';
+import { SessionData, GameMode } from './sessionData';
 import { Speech, speak } from './speech';
 import * as answers from './answers';
 import * as intents from './intents';
 import { findKnownChar, chooseKnownCharButtons } from './knownChars';
 
 import { Character, createDedka } from './character';
+import { Scene, scenes } from './scene';
 
 //#region types
 export type DialogDependencies = {
@@ -30,55 +31,39 @@ type DialogButton = {
 //#endregion
 
 export async function mainDialog(
-    rawTokens: string[],
+    command: string,
     sessionData: SessionData,
     { stemmer, random100 }: DialogDependencies,
 ): Promise<DialogResult> {
-    const isRepeatQuestionDialog = sessionData.currentDialog === Dialogs.RepeatQuestion;
     const mode = sessionData.mode;
-    const tokens = await stemmer(rawTokens.join(' '));
+    const tokens = await stemmer(command);
     const { chars } = sessionData;
 
+    if (intents.help(tokens)) {
+        return { speech: answers.help(sessionData), endSession: false };
+    }
+
     const result = (function narrative(): DialogResult | Speech {
-        if (isRepeatQuestionDialog && !intents.no(rawTokens) && !intents.yes(rawTokens)) {
-            return answers.yesOrNoExpected();
-        }
+        if ([Scene.Intro, Scene.RepeatOffer].includes(sessionData.scene)) {
+            const res = scenes[sessionData.scene]({ tokens, random100, mode: sessionData.mode });
 
-        if (isRepeatQuestionDialog && intents.no(rawTokens)) {
-            return { speech: answers.endOfStory(), endSession: true };
-        }
-
-        if (isRepeatQuestionDialog && intents.yes(rawTokens)) {
-            if (sessionData.mode === GameMode.Classic) {
-                sessionData.mode = GameMode.BlackCity;
-            } else {
-                sessionData.mode = GameMode.Classic;
+            if (res.chars) {
+                sessionData.chars = res.chars;
             }
 
-            sessionData.currentDialog = Dialogs.Story;
-            sessionData.chars.length = 0;
+            if (res.next) {
+                sessionData.scene = res.next;
+            }
+
+            if (res.mode) {
+                sessionData.mode = res.mode;
+            }
+
+            return { speech: res.speech, endSession: !!res.endSession };
         }
 
         const isBlackCityDialog = sessionData.mode === GameMode.BlackCity;
-
-        if (intents.help(rawTokens)) {
-            return answers.help(sessionData);
-        }
-
-        const currentChar = _.last(chars);
-
-        if (!currentChar) {
-            chars.push(createDedka());
-        }
-
-        if (sessionData.isNewSession) {
-            return answers.intro(random100);
-        }
-
-        if (!currentChar) {
-            return answers.storyBegin(sessionData.mode);
-        }
-
+        const currentChar = _.last(chars) as Character;
         const nextChar = extractChar(tokens);
         const inanimate = extractInanimate(tokens);
 
@@ -106,7 +91,7 @@ export async function mainDialog(
         const tale = makeRepkaStory(chars, nextChar, mode);
 
         if (isEndOfStory(chars, mode)) {
-            sessionData.currentDialog = Dialogs.RepeatQuestion;
+            sessionData.scene = Scene.RepeatOffer;
         }
 
         const knownChar = findKnownChar(nextChar);
