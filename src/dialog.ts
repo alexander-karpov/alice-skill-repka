@@ -4,6 +4,8 @@ import { SessionData } from './sessionData';
 import { Speech, speak } from './speech';
 import * as intents from './intents';
 import { scenes } from './scene';
+import { whoCalled2 } from './answers';
+import { Character } from './character';
 
 //#region types
 export type DialogDependencies = {
@@ -32,12 +34,14 @@ export async function mainDialog(
 ): Promise<DialogResult> {
     const tokens = await stemmer(command);
     const { chars } = sessionData;
+    const char = _.last(chars) as Character;
 
     if (intents.help(tokens)) {
         return {
             speech: speak(
                 'В этой игре мы вместе сочиним сказку про репку.',
                 'Называйте персонажей и слушайте получившуюся историю.',
+                whoCalled2(char),
             ),
             endSession: false,
         };

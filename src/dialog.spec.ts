@@ -118,8 +118,10 @@ describe('Main dialog', () => {
     });
 
     test('что ты умеешь / помощь', async () => {
+        act('');
         expect(await act('что ты умеешь')).toMatch('вместе сочиним сказку');
-        expect(await act('помощь')).toMatch('вместе сочиним сказку');
+        act('кошку');
+        expect(await act('помощь')).toMatch(/вместе сочиним сказку.*кошка/i);
     });
 
     test('Повтор истории: подтверждение', async () => {
