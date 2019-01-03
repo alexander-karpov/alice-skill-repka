@@ -1,21 +1,12 @@
 import * as _ from 'lodash';
 import { Character, isCharMale, isCharFamela, isCharUnisex } from './character';
-import { SessionData, Dialogs, GameMode } from './sessionData';
+import { SessionData, GameMode } from './sessionData';
 import { sample } from './utils';
 import { createSpeech, Speech, speak, tts } from './speech';
 import { alphabetFirstLetter } from './alphabet';
 import { emoji } from './emoji';
 
 export type AnswerBuilder = (char: Character, previousChar: Character, random100: number) => Speech;
-
-function aboutSkill(): Speech {
-    return speak(
-        'Давайте вместе сочиним сказку.',
-        tts`Вы слышали ${'-'} как посадил дед`,
-        ['👴', ''],
-        'репку? А кто помогал её тянуть? Давайте придумаем вместе.',
-    );
-}
 
 export function storyBegin(mode: GameMode): Speech {
     return speak(
@@ -44,19 +35,12 @@ export function blackCityError(char: Character) {
 export function intro(random100: number): Speech {
     return speak(
         sample(['Хорошо.', 'С удовольствием!'], random100),
-        aboutSkill(),
+        'Давайте вместе сочиним сказку.',
+        tts`Вы слышали ${'-'} как посадил дед`,
+        ['👴', ''],
+        'репку? А кто помогал её тянуть? Давайте придумаем вместе.',
         storyBegin(GameMode.Classic),
     );
-}
-
-export function help(sessionData: SessionData) {
-    const char = _.last(sessionData.chars);
-
-    if (char) {
-        return speak(aboutSkill(), whoCalled2(char));
-    }
-
-    return aboutSkill();
 }
 
 export function whoCalled(sessionData: SessionData) {
@@ -84,8 +68,12 @@ export function endOfStory() {
     return speak('Вот и сказке конец, а кто слушал — молодец.');
 }
 
-export function wrongCommand(sessionData: SessionData) {
-    return speak(`Это не похоже на персонажа.`, help(sessionData));
+export function wrongCommand(char: Character) {
+    return speak(
+        `Это не похоже на персонажа.`,
+        tts`Для подсказки скажите ${'-'} "Помощь".`,
+        whoCalled2(char),
+    );
 }
 
 export function inanimateCalled(inanimate: Character, previousChar: Character) {

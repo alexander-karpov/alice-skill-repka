@@ -4,7 +4,7 @@ import * as intents from './intents';
 import * as answers from './answers';
 import { sample } from './utils';
 
-type KnownChar = {
+export type KnownChar = {
     button: string;
     image: string;
     trigger: Predicate<Character>;
