@@ -31,13 +31,12 @@ export function closeLogFile(fd: number) {
 }
 
 function formatMessage(request: WebhookRequest, response: WebhookResponse, time: Date) {
-    const user = request.session.user_id.substr(0, 10);
-    const timeText = `${time.getDate()}d ${time.getHours()}h ${time.getMinutes()}m ${time.getSeconds()}s`;
+    const user = request.session.user_id;
+    const timeText = `${time.getMonth() +
+        1}mo ${time.getDate()}d ${time.getHours()}h ${time.getMinutes()}m ${time.getSeconds()}s`;
     const requestText = request.request.nlu.tokens.join(' ');
     const responseTts = (response.response.tts || '').substr(0, 64);
     const responseText = response.response.text.substr(0, 64);
-    const prefix = `${timeText.padEnd(16)} ${user}`;
-    const padding = ''.padStart(prefix.length);
 
-    return `${prefix} ${requestText}\n${padding} ${responseTts}\n${padding} ${responseText}\n`;
+    return `${timeText} ${user}\n${requestText}\n${responseTts}\n${responseText}\n\n`;
 }
