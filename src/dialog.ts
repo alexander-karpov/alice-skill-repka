@@ -32,7 +32,7 @@ export async function mainDialog(
     sessionData: SessionData,
     { stemmer, random100 }: DialogDependencies,
 ): Promise<DialogResult> {
-    const tokens = await stemmer(command);
+    const tokens = await stemmer(command.toLowerCase());
     const { chars } = sessionData;
     const char = _.last(chars) as Character;
 

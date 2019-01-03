@@ -342,6 +342,12 @@ describe('Main dialog', () => {
         expect(await act('Чебурашку чебурашку')).toMatch(/^Чебурашка за дедку/i);
     });
 
+    test('Распознание ответов Да и Нет не чуствительно к регистру', async () => {
+        act('');
+        await act('Мышку');
+        expect(await act('Да')).toMatch(/посадил дед репку/i);
+    });
+
     //#region tests infrastructure
     let killStemmer: () => void;
     let stemmer: Stemmer;
@@ -350,14 +356,14 @@ describe('Main dialog', () => {
     async function act(command: string, random100 = 0): Promise<string> {
         const {
             speech: { text },
-        } = await mainDialog(command.toLowerCase(), sessionData, { stemmer, random100 });
+        } = await mainDialog(command, sessionData, { stemmer, random100 });
         return text;
     }
 
     async function tts(command: string, random100 = 0): Promise<string> {
         const {
             speech: { tts },
-        } = await mainDialog(command.toLowerCase(), sessionData, { stemmer, random100 });
+        } = await mainDialog(command, sessionData, { stemmer, random100 });
         return tts;
     }
 
