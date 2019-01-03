@@ -58,10 +58,10 @@ export function whoCalled2(char: Character) {
 }
 
 export function yesOrNoExpected(): Speech {
-    return speak([
-        'Сейчас я ожидаю в ответ "Да" или "Нет".',
-        'сейчас я ожидаю в ответ - - да - - или  нет.',
-    ]);
+    return speak(
+        ['Сейчас я ожидаю в ответ "Да" или "Нет".', 'сейчас я ожидаю в ответ - - да - - или  нет.'],
+        'Хотите продолжить игру?',
+    );
 }
 
 export function endOfStory() {

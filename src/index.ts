@@ -35,12 +35,22 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
                   }
                 : undefined;
 
+            const buttons = answer.buttons
+                ? answer.buttons.map(b => {
+                      return {
+                          title: b.text,
+                          url: b.url,
+                          hide: true,
+                      };
+                  })
+                : undefined;
+
             const response = {
                 response: {
                     text: answer.speech.text,
                     tts: answer.speech.tts,
                     card,
-                    buttons: answer.buttons,
+                    buttons,
                     end_session: answer.endSession,
                 },
                 session: request.session,

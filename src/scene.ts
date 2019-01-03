@@ -5,7 +5,6 @@ import { Speech, tts, speak } from './speech';
 import { Token } from './tokens';
 import { Character, createChar, Gender } from './character';
 import { GameMode } from './sessionData';
-import { DialogButton } from './dialog';
 import { findKnownChar, chooseKnownCharButtons, KnownChar } from './knownChars';
 import { extractChar, extractInanimate } from './extractChar';
 import { cutText } from './utils';
@@ -15,6 +14,11 @@ export enum Scene {
     Repka = 'Repka',
     RepeatOffer = 'RepeatOffer',
 }
+
+export type SceneButton = {
+    text: string;
+    url?: string;
+};
 
 type SceneDependencies = {
     random100: number;
@@ -29,6 +33,8 @@ type SceneResult = {
     next?: Scene;
     mode?: GameMode;
     endSession?: boolean;
+    imageId?: string;
+    buttons?: SceneButton[];
 };
 
 const DEDKA = createChar('дедка', 'дедку', 'дедка', Gender.Male);
@@ -79,10 +85,6 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
             chars: chars.concat(nextChar),
             next,
         };
-
-        return {
-            speech: tts``,
-        };
     },
     [Scene.RepeatOffer]({ tokens, mode }) {
         const nextMode = mode === GameMode.Classic ? GameMode.BlackCity : GameMode.Classic;
@@ -105,7 +107,7 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
             };
         }
 
-        return { speech: answers.yesOrNoExpected() };
+        return { speech: answers.yesOrNoExpected(), buttons: storyEndButtons() };
     },
 };
 
@@ -138,7 +140,7 @@ function makeButtons(
     char: Character,
     mode: GameMode,
     random100: number,
-): DialogButton[] {
+): SceneButton[] {
     // Дадим ребенку сначала понять, что можно
     // самому придумывать персонажей.
     if (chars.length < 3) {
@@ -156,25 +158,21 @@ function makeButtons(
     return [];
 }
 
-function knownCharButtons(chars: Character[], mode: GameMode, random100: number): DialogButton[] {
+function knownCharButtons(chars: Character[], mode: GameMode, random100: number): SceneButton[] {
     if (mode === GameMode.Classic) {
-        return chooseKnownCharButtons(chars, random100).map(text => ({
-            title: text,
-            hide: true,
-        }));
+        return chooseKnownCharButtons(chars, random100).map(text => ({ text }));
     }
 
     return [];
 }
 
-function storyEndButtons(): DialogButton[] {
+function storyEndButtons(): SceneButton[] {
     return [
-        { title: 'Да', hide: true },
-        { title: 'Нет', hide: true },
+        { text: 'Да' },
+        { text: 'Нет' },
         {
-            title: 'Поставить оценку',
+            text: '⭐️ Поставить оценку',
             url: 'https://dialogs.yandex.ru/store/skills/916a8380-skazka-pro-repku',
-            hide: true,
         },
     ];
 }
