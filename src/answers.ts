@@ -109,7 +109,7 @@ export function formatStory(chars: Character[]): Speech {
 
     return speak(
         [_.upperFirst(text.join(', ')), tts.join(' - ')],
-        [`, дедка за репку.`, ' - дедка 👴 за репку.'],
+        [`, дедка 👴 за репку.`, ' - дедка за репку.'],
     );
 }
 
