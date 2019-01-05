@@ -40,11 +40,13 @@ function splitByLines(text) {
 }
 
 function isRequestLine(line) {
-    return /^\d+d /.test(line);
+    return /^\d+mo /.test(line);
 }
 
 function parseRequestLine(line) {
-    const [all, d, h, m, s, user] = line.match(/^(\d+)d (\d+)h (\d+)m (\d+)s +([A-Z|0-9]+)/);
+    const [all, mo, d, h, m, s, user] = line.match(
+        /^(\d+)mo (\d+)d (\d+)h (\d+)m (\d+)s ([A-Z|0-9]+)/,
+    );
     return { d, h, m, s, user };
 }
 

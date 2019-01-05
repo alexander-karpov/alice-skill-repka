@@ -30,9 +30,7 @@ export function spawnMystem(): { stemmer: Stemmer; killStemmer: () => void } {
     /** Прогоняет текст через mystem */
     function process(message: string) {
         return new Promise<Token[]>(resolve => {
-            const preparedMessage = cleanBeforeStemming(message) + '\n';
-
-            rl.question(preparedMessage, answer => {
+            rl.question(message + '\n', answer => {
                 const tokens = JSON.parse(answer).map(preprocessToken);
                 resolve(tokens);
             });
@@ -93,11 +91,6 @@ class AsyncQueue<TItem> {
 
         return new Promise(resolve => this.resolves.push(resolve));
     }
-}
-
-function cleanBeforeStemming(text: string) {
-    // Буква И в mystem получает очень большой набор свойств
-    return text.replace(' и ', ' ').replace(' с ', ' ');
 }
 
 function preprocessLexeme({ lex, gr }: MyStemLexeme): Lexeme {

@@ -6,6 +6,7 @@ import * as intents from './intents';
 import { SceneButton, scenes } from './scene';
 import { whoCalled2 } from './answers';
 import { Character } from './character';
+import { Token } from './tokens';
 
 //#region types
 export type DialogDependencies = {
@@ -26,7 +27,7 @@ export async function mainDialog(
     sessionData: SessionData,
     { stemmer, random100 }: DialogDependencies,
 ): Promise<DialogResult> {
-    const tokens = await stemmer(command.toLowerCase());
+    const tokens = filterStopWords(await stemmer(command.toLowerCase()));
     const { chars } = sessionData;
     const char = _.last(chars) as Character;
 
@@ -61,4 +62,11 @@ export async function mainDialog(
         imageId: res.imageId,
         buttons: res.buttons,
     };
+}
+
+/** Удаляет проблемные слова типа "и", "из", "в". */
+function filterStopWords(tokens: Token[]): Token[] {
+    const stopWords = ['и', 'с', 'в', 'из', 'под', 'на'];
+
+    return tokens.filter(t => !stopWords.includes(t.text));
 }
