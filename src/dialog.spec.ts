@@ -348,6 +348,16 @@ describe('Main dialog', () => {
         expect(await act('Да')).toMatch(/посадил дед репку/i);
     });
 
+    test.skip('Когда зовут себя не зовут меня?', async () => {
+        act('');
+        expect(await act('меня')).toMatch(/кто вы/i);
+    });
+
+    test.skip('Принимает За зайцем (регрессия)', async () => {
+        act('');
+        expect(await act('за зайцем')).toMatch(/заяц за дедку/i);
+    });
+
     //#region tests infrastructure
     let killStemmer: () => void;
     let stemmer: Stemmer;

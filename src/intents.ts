@@ -116,6 +116,10 @@ export function isBlackCityChar(char: Character) {
     );
 }
 
+export function myself([token]: Token[]) {
+    return ['я', 'меня'].includes(token.text);
+}
+
 function startsWith(char: Character, ...aliases: string[]) {
     return aliases.some(alias => char.normal.startsWith(alias));
 }
