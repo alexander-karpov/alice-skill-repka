@@ -1,7 +1,6 @@
 const axios = require('axios');
 const _ = require('lodash');
-
-const SRC = '';
+const { logsUrl } = require('./secret.json');
 
 function printStats(log) {
     const records = splitByLines(log.data)
@@ -9,7 +8,7 @@ function printStats(log) {
         .map(parseRequestLine);
 
     const knownUsers = [];
-    _.forEach(_.groupBy(records, rec => rec.d), (byDay, day) => {
+    _.forEach(_.groupBy(records, rec => `${rec.d} ${rec.mo}`), (byDay, day) => {
         const byUser = _.groupBy(byDay, rec => rec.user);
         const newUsers = _.filter(_.keys(byUser), user => !knownUsers.includes(user));
         const requests = byDay.length;
@@ -47,7 +46,7 @@ function parseRequestLine(line) {
     const [all, mo, d, h, m, s, user] = line.match(
         /^(\d+)mo (\d+)d (\d+)h (\d+)m (\d+)s ([A-Z|0-9]+)/,
     );
-    return { d, h, m, s, user };
+    return { mo, d, h, m, s, user };
 }
 
-axios.get(SRC).then(printStats);
+axios.get(logsUrl).then(printStats);
