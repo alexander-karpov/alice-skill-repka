@@ -89,7 +89,7 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
     [Scene.RepeatOffer]({ tokens, mode }) {
         const nextMode = mode === GameMode.Classic ? GameMode.BlackCity : GameMode.Classic;
 
-        if (intents.no(tokens)) {
+        if (intents.notWantRepeat(tokens)) {
             return {
                 speech: answers.endOfStory(),
                 chars: [DEDKA],
@@ -98,7 +98,7 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
             };
         }
 
-        if (intents.yes(tokens)) {
+        if (intents.wantsRepeat(tokens)) {
             return {
                 speech: answers.storyBegin(nextMode),
                 chars: [DEDKA],

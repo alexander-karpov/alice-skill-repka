@@ -88,12 +88,14 @@ export function help(tokens: Token[]) {
     return text === 'что ты умеешь' || text === 'помощь';
 }
 
-export function yes(tokens: Token[]) {
+export function wantsRepeat(tokens: Token[]) {
     const text = tokens.map(t => t.text);
-    return text.some(t => ['да', 'давай', 'давайте', 'продолжай', 'ладно', 'хочу'].includes(t));
+    return text.some(t =>
+        ['да', 'давай', 'давайте', 'продолжай', 'ладно', 'хочу', 'заново', 'хотим'].includes(t),
+    );
 }
 
-export function no(tokens: Token[]) {
+export function notWantRepeat(tokens: Token[]) {
     function eq<T>(value: T) {
         return (x: T) => (x === value ? x : undefined);
     }
