@@ -6,14 +6,12 @@ const { spawnMystem } = require('./stemmer');
 async function printStats(log) {
     const { stemmer, killStemmer } = spawnMystem();
 
-    console.log('Extract messages...');
     const records = splitRequests(log.data)
         .map(extractMessage)
         .filter(Boolean);
 
     const counters = {};
 
-    console.log('Calculate stats...');
     for (let word of records) {
         const lemmas = await stemmer(word);
         const clear = lemmas.replace(/{|}/g, '');
@@ -29,7 +27,7 @@ async function printStats(log) {
 
     const mapped = Object.keys(counters).map(key => ({ word: key, count: counters[key] }));
     const sorted = _.sortBy(mapped, o => -o.count);
-    sorted.forEach(r => console.log(r));
+    sorted.forEach(r => console.log(`${r.word} ${r.count}`));
 }
 
 function splitRequests(text) {
@@ -40,5 +38,4 @@ function extractMessage(req) {
     return req.split('\n')[1];
 }
 
-console.log('Download data...');
 axios.get(logsUrl).then(printStats);
