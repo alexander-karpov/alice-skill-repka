@@ -42,7 +42,7 @@ export async function mainDialog(
         };
     }
 
-    const res = scenes[sessionData.scene]({ chars, tokens, random100, mode: sessionData.mode });
+    const res = scenes[sessionData.scene]({ chars, tokens, random100 });
 
     if (res.chars) {
         sessionData.chars = res.chars;
@@ -50,10 +50,6 @@ export async function mainDialog(
 
     if (res.next) {
         sessionData.scene = res.next;
-    }
-
-    if (res.mode) {
-        sessionData.mode = res.mode;
     }
 
     return {

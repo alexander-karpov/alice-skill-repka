@@ -110,12 +110,6 @@ export function notWantRepeat(tokens: Token[]) {
     );
 }
 
-export function isBlackCityChar(char: Character) {
-    return (
-        startsWith(char, 'ч') || char.subject.nominative.startsWith('ч') || equals(char, 'мышка')
-    );
-}
-
 export function myself([token]: Token[]) {
     return ['я', 'меня'].includes(token.text);
 }

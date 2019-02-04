@@ -4,7 +4,6 @@ import * as intents from './intents';
 import { Speech, tts, speak } from './speech';
 import { Token } from './tokens';
 import { Character, createChar, Gender } from './character';
-import { GameMode } from './sessionData';
 import { findKnownChar, chooseKnownCharButtons, KnownChar } from './knownChars';
 import { extractChar, extractInanimate } from './extractChar';
 import { cutText } from './utils';
@@ -23,7 +22,6 @@ export type SceneButton = {
 type SceneDependencies = {
     random100: number;
     tokens: Token[];
-    mode: GameMode;
     chars: Character[];
 };
 
@@ -31,7 +29,6 @@ type SceneResult = {
     speech: Speech;
     chars?: Character[];
     next?: Scene;
-    mode?: GameMode;
     endSession?: boolean;
     imageId?: string;
     buttons?: SceneButton[];
@@ -47,8 +44,7 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
             next: Scene.Repka,
         };
     },
-    [Scene.Repka]({ mode, tokens, chars, random100 }) {
-        const isBlackCityDialog = mode === GameMode.BlackCity;
+    [Scene.Repka]({ tokens, chars, random100 }) {
         const currentChar = _.last(chars) as Character;
         const nextChar = extractChar(tokens);
         const inanimate = extractInanimate(tokens);
@@ -56,26 +52,22 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
         if (!nextChar && inanimate) {
             return {
                 speech: answers.inanimateCalled(inanimate, currentChar),
-                buttons: knownCharButtons(chars, mode, random100),
+                buttons: knownCharButtons(chars, random100),
             };
         }
 
         if (!nextChar) {
             return {
                 speech: answers.wrongCommand(currentChar),
-                buttons: knownCharButtons(chars, mode, random100),
+                buttons: knownCharButtons(chars, random100),
             };
         }
 
-        if (isBlackCityDialog && !intents.isBlackCityChar(nextChar)) {
-            return { speech: answers.blackCityError(nextChar) };
-        }
-
-        const next = isEndOfStory(chars, nextChar, mode) ? Scene.RepeatOffer : Scene.Repka;
+        const next = isEndOfStory(chars, nextChar) ? Scene.RepeatOffer : Scene.Repka;
         const knownChar = findKnownChar(nextChar);
-        const tale = makeRepkaStory(chars, nextChar, knownChar, mode, random100);
+        const tale = makeRepkaStory(chars, nextChar, knownChar, random100);
         const image = knownChar && knownChar.image;
-        const buttons = makeButtons(chars, nextChar, mode, random100);
+        const buttons = makeButtons(chars, nextChar, random100);
         const cutTale = image ? speak([cutText(tale.text, 254), tale.tts]) : tale;
 
         return {
@@ -86,9 +78,7 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
             next,
         };
     },
-    [Scene.RepeatOffer]({ tokens, mode }) {
-        const nextMode = mode === GameMode.Classic ? GameMode.BlackCity : GameMode.Classic;
-
+    [Scene.RepeatOffer]({ tokens }) {
         if (intents.notWantRepeat(tokens)) {
             return {
                 speech: answers.endOfStory(),
@@ -100,10 +90,9 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
 
         if (intents.wantsRepeat(tokens)) {
             return {
-                speech: answers.storyBegin(nextMode),
+                speech: answers.storyBegin(),
                 chars: [DEDKA],
                 next: Scene.Repka,
-                mode: nextMode,
             };
         }
 
@@ -115,55 +104,41 @@ function makeRepkaStory(
     chars: Character[],
     char: Character,
     knownChar: KnownChar | undefined,
-    mode: GameMode,
     random100: number,
 ) {
     const allChars = chars.concat(char);
     const previousChar = _.last(chars) as Character;
     const chain = answers.formatStory(allChars);
-    const end = isEndOfStory(chars, char, mode) ? answers.success() : answers.failure(char);
+    const end = isEndOfStory(chars, char) ? answers.success() : answers.failure(char);
     const knownAnswer = knownChar ? knownChar.answer(char, previousChar, random100) : speak();
 
     return speak(knownAnswer, chain, end);
 }
 
-function isEndOfStory(chars: Character[], nextChar: Character, mode: GameMode) {
+function isEndOfStory(chars: Character[], nextChar: Character) {
     const isLastMouse = nextChar.normal.startsWith('мыш');
-    const maxCharsCount = mode === GameMode.Classic ? 12 : 8;
+    const maxCharsCount = 12;
     const tooManyCharacters = chars.length + 1 >= maxCharsCount;
 
     return isLastMouse || tooManyCharacters;
 }
 
-function makeButtons(
-    chars: Character[],
-    char: Character,
-    mode: GameMode,
-    random100: number,
-): SceneButton[] {
+function makeButtons(chars: Character[], char: Character, random100: number): SceneButton[] {
     // Дадим ребенку сначала понять, что можно
     // самому придумывать персонажей.
     if (chars.length < 3) {
         return [];
     }
 
-    if (isEndOfStory(chars, char, mode)) {
+    if (isEndOfStory(chars, char)) {
         return storyEndButtons();
     }
 
-    if (mode === GameMode.Classic) {
-        return knownCharButtons(chars, mode, random100);
-    }
-
-    return [];
+    return knownCharButtons(chars, random100);
 }
 
-function knownCharButtons(chars: Character[], mode: GameMode, random100: number): SceneButton[] {
-    if (mode === GameMode.Classic) {
-        return chooseKnownCharButtons(chars, random100).map(text => ({ text }));
-    }
-
-    return [];
+function knownCharButtons(chars: Character[], random100: number): SceneButton[] {
+    return chooseKnownCharButtons(chars, random100).map(text => ({ text }));
 }
 
 function storyEndButtons(): SceneButton[] {

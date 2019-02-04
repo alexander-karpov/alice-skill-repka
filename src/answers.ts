@@ -1,34 +1,16 @@
 import * as _ from 'lodash';
 import { Character, isCharMale, isCharFamela, isCharUnisex } from './character';
-import { SessionData, GameMode } from './sessionData';
+import { SessionData } from './sessionData';
 import { sample } from './utils';
 import { createSpeech, Speech, speak, tts } from './speech';
-import { alphabetFirstLetter } from './alphabet';
 import { emoji } from './emoji';
 
 export type AnswerBuilder = (char: Character, previousChar: Character, random100: number) => Speech;
 
-export function storyBegin(mode: GameMode): Speech {
+export function storyBegin(): Speech {
     return speak(
-        mode === GameMode.BlackCity
-            ? tts`Хорошо! В одном чёрном-чёрном городе ${'- -'} посадил дед репку.`
-            : 'Посадил дед репку.',
+        'Посадил дед репку.',
         'Выросла репка большая-пребольшая. Стал дед репку из земли тянуть. Тянет-потянет, вытянуть не может. Кого позвал дедка?',
-        mode === GameMode.BlackCity ? blackCityManual() : '',
-    );
-}
-
-export function blackCityManual() {
-    return speak('В чёрном городе все персонажи начинаются на букву', speak(['"Ч".', ' - Чэ.']));
-}
-
-export function blackCityError(char: Character) {
-    return speak(
-        `${_.upperFirst(norm(char))} начинается на букву`,
-        alphabetFirstLetter(char),
-        '.',
-        blackCityManual(),
-        whoCalled2(char),
     );
 }
 
@@ -39,7 +21,7 @@ export function intro(random100: number): Speech {
         tts`Вы слышали ${'-'} как посадил дед`,
         ['👴', ''],
         'репку? А кто помогал её тянуть? Давайте придумаем вместе.',
-        storyBegin(GameMode.Classic),
+        storyBegin(),
     );
 }
 
