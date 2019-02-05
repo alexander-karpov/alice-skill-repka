@@ -63,12 +63,17 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
             };
         }
 
-        const next = isEndOfStory(chars, nextChar) ? Scene.RepeatOffer : Scene.Repka;
         const knownChar = findKnownChar(nextChar);
-        const tale = makeRepkaStory(chars, nextChar, knownChar, random100);
+        const tale = makeRepkaTale(chars, nextChar, knownChar, random100);
+        const isEnd = isTaleEnd(tale, nextChar);
+        const end = isEnd ? answers.success() : answers.failure(nextChar);
+        const taleWithEnd = speak(tale, end);
         const image = knownChar && knownChar.image;
-        const buttons = makeButtons(chars, nextChar, random100);
-        const cutTale = image ? speak([cutText(tale.text, 254), tale.tts]) : tale;
+        const buttons = makeButtons(chars, isEnd, random100);
+        const cutTale = image
+            ? speak([cutText(taleWithEnd.text, 254), cutText(taleWithEnd.tts, 1023)])
+            : speak([cutText(taleWithEnd.text, 1023), cutText(taleWithEnd.tts, 1023)]);
+        const next = isEnd ? Scene.RepeatOffer : Scene.Repka;
 
         return {
             speech: cutTale,
@@ -100,7 +105,7 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
     },
 };
 
-function makeRepkaStory(
+function makeRepkaTale(
     chars: Character[],
     char: Character,
     knownChar: KnownChar | undefined,
@@ -109,28 +114,29 @@ function makeRepkaStory(
     const allChars = chars.concat(char);
     const previousChar = _.last(chars) as Character;
     const chain = answers.formatStory(allChars);
-    const end = isEndOfStory(chars, char) ? answers.success() : answers.failure(char);
     const knownAnswer = knownChar ? knownChar.answer(char, previousChar, random100) : speak();
 
-    return speak(knownAnswer, chain, end);
+    return speak(knownAnswer, chain);
 }
 
-function isEndOfStory(chars: Character[], nextChar: Character) {
+function isTaleEnd(tale: Speech, nextChar: Character) {
+    const taleLength = Math.max(tale.text.length, tale.tts.length);
+
     const isLastMouse = nextChar.normal.startsWith('мыш');
-    const maxCharsCount = 12;
-    const tooManyCharacters = chars.length + 1 >= maxCharsCount;
+    /**  Максимальная длинна text и tts - 1024 */
+    const isTaleTooLong = taleLength >= 800;
 
-    return isLastMouse || tooManyCharacters;
+    return isLastMouse || isTaleTooLong;
 }
 
-function makeButtons(chars: Character[], char: Character, random100: number): SceneButton[] {
+function makeButtons(chars: Character[], isEnd: boolean, random100: number): SceneButton[] {
     // Дадим ребенку сначала понять, что можно
     // самому придумывать персонажей.
     if (chars.length < 3) {
         return [];
     }
 
-    if (isEndOfStory(chars, char)) {
+    if (isEnd) {
         return storyEndButtons();
     }
 

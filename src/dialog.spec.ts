@@ -336,6 +336,16 @@ describe('Main dialog', () => {
         expect(await act('за зайцем')).toMatch(/заяц за дедку/i);
     });
 
+    test('История заканчивается когда становится очень длинной', async () => {
+        let tale = await tts('');
+
+        while (tale.length < 1024 && !/вытянули репку/i.test(tale)) {
+            tale = await tts('маленького коненка');
+        }
+
+        expect(tale).toMatch(/вытянули репку/i);
+    });
+
     //#region tests infrastructure
     let killStemmer: () => void;
     let stemmer: Stemmer;
