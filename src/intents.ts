@@ -83,6 +83,10 @@ export function girl(char: Character) {
     return equals(char, 'внучка', 'девочка', 'маша');
 }
 
+export function zombie(char: Character) {
+    return equals(char, 'зомби');
+}
+
 export function help(tokens: Token[]) {
     const text = tokens.map(t => t.text).join(' ');
     return text === 'что ты умеешь' || text === 'помощь';

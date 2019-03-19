@@ -18,6 +18,7 @@ export function findKnownChar(char: Character) {
 export function chooseKnownCharButtons(allChars: Character[], random100): string[] {
     const notCalledKnownChars = Object.values(knownChars)
         .filter(c => c !== knownChars.mouse)
+        .filter(c => c !== knownChars.zombie)
         .filter(known => !allChars.some(known.trigger));
 
     if (notCalledKnownChars.length === 0) {
@@ -127,6 +128,12 @@ const knownChars = {
         button: '👧 Внучку',
         trigger: intents.girl,
         answer: answers.chars.girl,
+        image: '',
+    } as KnownChar,
+    zombie: {
+        button: '🧟‍ Зомби',
+        trigger: intents.zombie,
+        answer: answers.chars.zombie,
         image: '',
     } as KnownChar,
 };

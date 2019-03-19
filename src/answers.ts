@@ -269,6 +269,19 @@ export const chars = {
             `${come} ${nom(char)} - <speaker audio="alice-sounds-human-laugh-5.opus">.`,
         );
     },
+
+    zombie(char: Character, previousChar: Character) {
+        const come = comeRunningCapitalized(char);
+
+        return createSpeech(
+            `И вот пришло страшное зомби ${nom(char)} и схватило ${acc(previousChar)}.`,
+            `И вот пришло страшное зомби ${nom(
+                char,
+            )} - <speaker audio="alice-sounds-human-walking-dead-2.opus"> и схватило ${acc(
+                previousChar,
+            )}.`,
+        );
+    },
 };
 
 function called(char: Character) {
