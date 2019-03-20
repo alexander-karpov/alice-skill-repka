@@ -274,10 +274,10 @@ export const chars = {
         const come = comeRunningCapitalized(char);
 
         return createSpeech(
-            `И вот пришло страшное зомби ${nom(char)} и схватило ${acc(previousChar)}.`,
-            `И вот пришло страшное зомби ${nom(
+            `Пришло страшное ${nom(char)} и схватило ${acc(previousChar)}.`,
+            `Пришло страшное ${nom(
                 char,
-            )} - <speaker audio="alice-sounds-human-walking-dead-2.opus"> и схватило ${acc(
+            )} - <speaker audio="alice-sounds-human-walking-dead-2.opus"> - и схватило ${acc(
                 previousChar,
             )}.`,
         );
