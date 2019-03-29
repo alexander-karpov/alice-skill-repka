@@ -12,8 +12,9 @@
     "build": "rm -rf ./dist && tsc",
     "test": "jest",
     "test:start": "npm run test -- --watch",
-    "precommit": "pretty-quick --staged",
-    "prepare": "yarn run test && yarn build"
+    "precommit": "pretty-quick --staged && yarn tslint",
+    "tslint": "tslint --project './'",
+    "prepare": "yarn build && yarn test"
   },
   "devDependencies": {
     "@types/jest": "^23.3.10",
@@ -25,6 +26,8 @@
     "prettier": "^1.15.3",
     "pretty-quick": "^1.8.0",
     "ts-jest": "^23.10.5",
+    "tslint": "^5.14.0",
+    "tslint-microsoft-contrib": "^6.1.0",
     "typescript": "^3.2.2"
   },
   "dependencies": {

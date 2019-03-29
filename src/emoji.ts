@@ -171,5 +171,3 @@ export const emoji = {
     зауропод: '🦕',
     микроб: '🦠',
 };
-
-export const pawPrints = '🐾';

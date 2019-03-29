@@ -1,7 +1,7 @@
-import { Predicate } from './core';
-import { Character } from './character';
-import * as intents from './intents';
 import * as answers from './answers';
+import { Character } from './character';
+import { Predicate } from './core';
+import * as intents from './intents';
 import { sample } from './utils';
 
 export type KnownChar = {
