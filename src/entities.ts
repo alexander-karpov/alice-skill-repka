@@ -1,14 +1,14 @@
 import { matchSeq } from './utils/seq';
 
 import {
-    Token,
-    Selection,
-    Gr,
-    tokenSelector,
     findLemma,
-    selectionToken,
-    selectionLexeme,
+    Gr,
+    Selection,
     selectionLemma,
+    selectionLexeme,
+    selectionToken,
+    Token,
+    tokenSelector,
 } from './tokens';
 
 /**  Милый конь, милые кони */
