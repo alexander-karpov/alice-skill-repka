@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import { random } from './utils';
 import { startServer, WebhookRequest } from './server';
 import { mainDialog } from './dialog';
 import { spawnMystem } from './stemmer';
@@ -8,11 +8,11 @@ import { SessionData, createSessionData } from './sessionData';
 export function startSkillServer({ port, logsDir }: { port: number; logsDir: string }) {
     const { stemmer, killStemmer } = spawnMystem();
     const logFile = openLogFile(logsDir);
-    const userData: { [sessionKey: string]: SessionData } = {};
+    const userData: { [name: string]: SessionData } = {};
 
     startServer(
         async request => {
-            const random100 = _.random(100, false);
+            const random100 = random(100);
             const sessionKey = createSessionKey(request);
 
             if (!userData[sessionKey]) {

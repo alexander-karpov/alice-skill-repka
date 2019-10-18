@@ -1,5 +1,3 @@
-import * as _ from 'lodash';
-import { Action } from './core';
 import { Gr, Lexeme, Token } from './tokens';
 import { spawn } from './spawn';
 
@@ -36,6 +34,6 @@ function preprocessLexeme({ lex, gr }: MyStemLexeme): Lexeme {
     };
 }
 
-function preprocessToken({ analysis, text }: MyStemToken): Token {
-    return { lexemes: _.map(analysis, preprocessLexeme), text };
+function preprocessToken({ analysis = [], text }: MyStemToken): Token {
+    return { lexemes: analysis.map(preprocessLexeme), text };
 }

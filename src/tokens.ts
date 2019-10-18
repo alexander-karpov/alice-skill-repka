@@ -1,5 +1,3 @@
-import * as _ from 'lodash';
-
 //#region types
 export type Lexeme = { lex: string; gr: Gr[] };
 export type Token = { lexemes: Lexeme[]; text: string };

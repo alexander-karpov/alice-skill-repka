@@ -1,5 +1,3 @@
-import * as _ from 'lodash';
-
 export type Word = {
     nominative: string;
     accusative: string;
@@ -9,7 +7,7 @@ export enum Gender {
     Male,
     Famela,
     Neuter,
-    Unisex
+    Unisex,
 }
 
 export type Character = {
@@ -24,10 +22,10 @@ export function createChar(nom: string, acc: string, normal: string, gender: Gen
     return {
         subject: {
             nominative: nom,
-            accusative: acc
+            accusative: acc,
         },
         normal,
-        gender
+        gender,
     };
 }
 
@@ -46,6 +44,6 @@ export function createDedka(): Character {
     return {
         subject: { nominative: 'дедка', accusative: 'дедку' },
         normal: 'дедка',
-        gender: Gender.Male
+        gender: Gender.Male,
     };
 }

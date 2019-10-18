@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import { last } from './utils';
 import * as answers from './answers';
 import * as intents from './intents';
 import { Speech, tts, speak } from './speech';
@@ -45,7 +45,7 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
         };
     },
     [Scene.Repka]({ tokens, chars, random100 }) {
-        const currentChar = _.last(chars) as Character;
+        const currentChar = last(chars) as Character;
         const nextChar = extractChar(tokens);
         const inanimate = extractInanimate(tokens);
 
@@ -112,7 +112,7 @@ function makeRepkaTale(
     random100: number,
 ) {
     const allChars = chars.concat(char);
-    const previousChar = _.last(chars) as Character;
+    const previousChar = last(chars) as Character;
     const chain = answers.formatStory(allChars);
     const knownAnswer = knownChar ? knownChar.answer(char, previousChar, random100) : speak();
 

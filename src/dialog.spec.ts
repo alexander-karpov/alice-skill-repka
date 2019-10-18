@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import { mainDialog } from './dialog';
 import { spawnMystem, Stemmer } from './stemmer';
 import { SessionData, createSessionData } from './sessionData';

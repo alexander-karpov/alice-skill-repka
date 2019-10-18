@@ -1,7 +1,6 @@
-import * as _ from 'lodash';
 import { Character, isCharMale, isCharFamela, isCharUnisex } from './character';
 import { SessionData } from './sessionData';
-import { sample } from './utils';
+import { sample, last, upperFirst } from './utils';
 import { createSpeech, Speech, speak, tts } from './speech';
 import { emoji } from './emoji';
 
@@ -26,7 +25,7 @@ export function intro(random100: number): Speech {
 }
 
 export function whoCalled(sessionData: SessionData) {
-    const char = _.last(sessionData.chars);
+    const char = last(sessionData.chars);
 
     if (char) {
         return `Кого ${called(char)} ${nom(char)}?`;
@@ -90,7 +89,7 @@ export function formatStory(chars: Character[]): Speech {
     tts.reverse();
 
     return speak(
-        [_.upperFirst(text.join(', ')), tts.join(' - ')],
+        [upperFirst(text.join(', ')), tts.join(' - ')],
         [`, дедка 👴 за репку.`, ' - дедка за репку.'],
     );
 }

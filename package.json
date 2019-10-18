@@ -28,7 +28,5 @@
     "tslint-microsoft-contrib": "^6.1.0",
     "typescript": "^3.2.2"
   },
-  "dependencies": {
-    "lodash": "4.17.15"
-  }
+  "dependencies": {}
 }

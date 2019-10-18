@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import { last } from './utils';
 import { Stemmer } from './stemmer';
 import { SessionData } from './sessionData';
 import { Speech, speak } from './speech';
@@ -29,7 +29,7 @@ export async function mainDialog(
 ): Promise<DialogResult> {
     const tokens = filterStopWords(await stemmer(command.toLowerCase()));
     const { chars } = sessionData;
-    const char = _.last(chars) as Character;
+    const char = last(chars) as Character;
 
     if (intents.help(tokens)) {
         return {

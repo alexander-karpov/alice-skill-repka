@@ -1,5 +1,3 @@
-import * as _ from 'lodash';
-
 export type Selector<T, TResult> = (x: T) => TResult | undefined;
 export type Maybe<T> = T | undefined;
 
@@ -11,7 +9,7 @@ export type Maybe<T> = T | undefined;
  */
 export function matchSeq<T, TResult>(
     seq: Maybe<T[]>,
-    pattern: Selector<T, TResult>[]
+    pattern: Selector<T, TResult>[],
 ): Maybe<TResult[]> {
     if (!seq) {
         return undefined;
@@ -31,7 +29,7 @@ export function matchSeq<T, TResult>(
 }
 
 function areLengthsCompatible<TItem, TResult>(seq: TItem[], pattern: Selector<TItem, TResult>[]) {
-    return !_.isEmpty(seq) && !_.isEmpty(pattern) && pattern.length <= seq.length;
+    return seq.length && pattern.length && pattern.length <= seq.length;
 }
 
 function startsWithf<T, TResult>(seq: T[], pattern: Selector<T, TResult>[], offset = 0) {

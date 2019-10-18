@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import { Character, Word, Gender } from './character';
 import { matchSeq } from './utils/seq';
 import {
@@ -21,7 +20,7 @@ export function extractChar(tokens: Token[]): Character | undefined {
         extractChipollino(tokens),
     ].filter(Boolean) as [Character, number][];
 
-    const [last] = _.sortBy(indexedChars, [o => -o[1]]);
+    const [last] = indexedChars.sort((a, b) => b[1] - a[1]);
     return last && last[0];
 }
 

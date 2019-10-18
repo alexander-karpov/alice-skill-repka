@@ -1,3 +1,7 @@
+export * from './last';
+export * from './random';
+export * from './upperFirst';
+
 export function sample<TItem>(items: TItem[], random: number) {
     return items[random % items.length];
 }
