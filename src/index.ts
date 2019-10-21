@@ -2,12 +2,10 @@ import { random } from './utils';
 import { startServer, WebhookRequest } from './server';
 import { mainDialog } from './dialog';
 import { spawnMystem } from './stemmer';
-import { openLogFile, appendToLog, closeLogFile } from './logger';
 import { SessionData, createSessionData } from './sessionData';
 
-export function startSkillServer({ port, logsDir }: { port: number; logsDir: string }) {
+export function startSkillServer({ port }: { port: number }) {
     const { stemmer, killStemmer } = spawnMystem();
-    const logFile = openLogFile(logsDir);
     const userData: { [name: string]: SessionData } = {};
 
     startServer(
@@ -57,13 +55,10 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
                 version: request.version,
             };
 
-            appendToLog(logFile, request, response, new Date());
-
             return response;
         },
         () => {
             killStemmer();
-            closeLogFile(logFile);
         },
         { port },
     );
@@ -72,3 +67,5 @@ export function startSkillServer({ port, logsDir }: { port: number; logsDir: str
 function createSessionKey(request: WebhookRequest) {
     return request.session.session_id;
 }
+
+startSkillServer({ port: 3000 });
