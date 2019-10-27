@@ -1,5 +1,5 @@
 //#region types
-export type Lexeme = { lex: string; gr: Gr[] };
+export type Lexeme = { text: string; lex: string; gr: Gr[]; grs: Gr[][]; position: number };
 export type Token = { lexemes: Lexeme[]; text: string };
 
 export enum Gr {
@@ -140,6 +140,14 @@ export function findLexeme(token: Token, grs: Gr[]): Lexeme | undefined {
     return token.lexemes.find(l => {
         return grs.every(gr => l.gr.includes(gr));
     });
+}
+
+export function isLexemeAccept(lexeme: Lexeme, grs: Gr[]): boolean {
+    return grs.every(gr => lexeme.gr.includes(gr));
+}
+
+export function isLexemeGrsAccept(lexeme: Lexeme, grs: Gr[]): boolean {
+    return grs.every(gr => lexeme.grs.some(lgr => lgr.includes(gr)));
 }
 
 export function findLemma(token: Token, grs: Gr[], lemma: string): Lexeme | undefined {

@@ -1,6 +1,5 @@
 import { Token } from './tokens';
 import { Character } from './character';
-import { matchSeq } from './utils/seq';
 
 export function repka(tokens: Token[]) {
     return tokens.some(t => t.lexemes.length === 1 && t.lexemes[0].lex === 'репка');

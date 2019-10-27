@@ -1,5 +1,5 @@
 import { Character, Word, Gender } from './character';
-import { matchSeq } from './utils/seq';
+import { findSeq } from './utils/seq';
 import {
     Lexeme,
     Gr,
@@ -7,10 +7,12 @@ import {
     Token,
     tokenSelector,
     selectionToken,
-    findLemma,
     selectionLexeme,
+    isLexemeGrsAccept,
+    isLexemeAccept,
 } from './tokens';
-import { extractASAnim, extractSAnim, extractSAnimSInan } from './entities';
+import { extractSAnim, extractSAnimSInan, extractASAnim2 } from './entities';
+import { multiplyArrays } from './utils/multiplyArrays';
 
 export function extractChar(tokens: Token[]): Character | undefined {
     const indexedChars = [
@@ -24,13 +26,11 @@ export function extractChar(tokens: Token[]): Character | undefined {
     return last && last[0];
 }
 
-function lexemeToWord(lexeme: Lexeme, token: Token): Word {
-    const accusative = lexeme.gr.includes(Gr.S)
-        ? SNomToAcc(lexeme, token)
-        : ANomToAcc(lexeme, token);
+function lexemeToWord(lexeme: Lexeme): Word {
+    const accusative = lexeme.gr.includes(Gr.S) ? SNomToAcc(lexeme) : ANomToAcc(lexeme);
     const nominative =
         lexeme.gr.includes(Gr.Famela) && lexeme.gr.includes(Gr.A)
-            ? ANomMaleToFamela(lexeme, token)
+            ? ANomMaleToFamela(lexeme)
             : lexeme.lex;
 
     return {
@@ -59,7 +59,7 @@ function extractGender(lexeme: Lexeme): Gender {
  * Меняет падеж существительного с им. на вин.
  * @param noun Существительное в им. падеже.
  */
-function SNomToAcc(lexeme: Lexeme, token: Token) {
+function SNomToAcc(lexeme: Lexeme) {
     const gr = lexeme.gr;
     const nomenative = lexeme.lex;
     const isMale = matchGrs(gr, [Gr.Male]);
@@ -68,7 +68,7 @@ function SNomToAcc(lexeme: Lexeme, token: Token) {
     const isUnisex = matchGrs(gr, [Gr.Unisex]);
     const isInanim = matchGrs(gr, [Gr.inan]);
     const isPlural = matchGrs(gr, [Gr.plural]);
-    const isA = Boolean(findLemma(token, [Gr.A], nomenative));
+    const isA = isLexemeGrsAccept(lexeme, [Gr.A]);
 
     const endsWith = (end: string) => nomenative.endsWith(end);
     const changeOne = (end: string) => `${nomenative.substring(0, nomenative.length - 1)}${end}`;
@@ -80,7 +80,7 @@ function SNomToAcc(lexeme: Lexeme, token: Token) {
      * нужно использовать правила склонения как для пригалат.
      */
     if (isA) {
-        return ANomToAcc(lexeme, token);
+        return ANomToAcc(lexeme);
     }
 
     // Чернила -> чернила
@@ -175,8 +175,8 @@ function SNomToAcc(lexeme: Lexeme, token: Token) {
  * Меняет падеж прилагательного с им. на вин.
  * @param noun Существительное в им. падеже.
  */
-function ANomToAcc(lexeme: Lexeme, token: Token) {
-    const text = token.text;
+function ANomToAcc(lexeme: Lexeme) {
+    const text = lexeme.text;
     const isAcc = lexeme.gr.includes(Gr.Acc);
     const isSingle = lexeme.gr.includes(Gr.single);
     const endsWith = (end: string) => text.endsWith(end);
@@ -187,7 +187,7 @@ function ANomToAcc(lexeme: Lexeme, token: Token) {
          * Mystem привотид пригал. женского рода к мужскому.
          * Чтобы проще было сохранить род, сохраняем текст как есть в ед. числе.
          */
-        return token.text;
+        return text;
     }
 
     if (endsWith('ий') || endsWith('ие')) {
@@ -213,12 +213,12 @@ function ANomToAcc(lexeme: Lexeme, token: Token) {
  * Меняет род прилагательного с муж. на жен.
  * @param lexeme
  */
-function ANomMaleToFamela(lexeme: Lexeme, token: Token) {
+function ANomMaleToFamela(lexeme: Lexeme) {
     if (lexeme.gr.includes(Gr.Nom)) {
-        return token.text;
+        return lexeme.text;
     }
 
-    const nom = token.text;
+    const nom = lexeme.text;
     const endsWith = end => nom.endsWith(end);
     const changeTwo = end => `${nom.substring(0, nom.length - 2)}${end}`;
 
@@ -238,12 +238,11 @@ function ANomMaleToFamela(lexeme: Lexeme, token: Token) {
  * @param tokens
  */
 function extractAttrChar(tokens: Token[]): [Character, number] | undefined {
-    const char = extractASAnim(tokens);
+    const char = extractASAnim2(tokens);
 
     if (!char) return undefined;
 
-    const [adj, noun] = char.map(m => lexemeToWord(...m));
-    const tokenIndex = tokens.indexOf(selectionToken(char[1]));
+    const [adj, noun] = char.map(l => lexemeToWord(l));
 
     return [
         {
@@ -252,9 +251,9 @@ function extractAttrChar(tokens: Token[]): [Character, number] | undefined {
                 accusative: `${adj.accusative} ${noun.accusative}`,
             },
             normal: noun.nominative,
-            gender: extractGender(char[1][0]),
+            gender: extractGender(char[1]),
         },
-        tokenIndex,
+        char[1].position,
     ];
 }
 
@@ -262,15 +261,14 @@ function extractAnimChar(tokens: Token[]): [Character, number] | undefined {
     const char = extractSAnim(tokens);
 
     if (!char) return undefined;
-    const tokenIndex = tokens.indexOf(selectionToken(char));
 
     return [
         {
-            subject: lexemeToWord(...char),
-            gender: extractGender(char[0]),
-            normal: char[0].lex,
+            subject: lexemeToWord(char),
+            gender: extractGender(char),
+            normal: char.lex,
         },
-        tokenIndex,
+        char.position,
     ];
 }
 
@@ -283,8 +281,7 @@ function extractSS(tokens: Token[]): [Character, number] | undefined {
 
     if (!char) return undefined;
 
-    const [anim, inan] = char.map(m => lexemeToWord(...m));
-    const tokenIndex = tokens.indexOf(selectionToken(char[1]));
+    const [anim, inan] = char.map(m => lexemeToWord(m));
 
     return [
         {
@@ -293,9 +290,9 @@ function extractSS(tokens: Token[]): [Character, number] | undefined {
                 accusative: `${anim.accusative} ${inan.accusative}`,
             },
             normal: anim.nominative,
-            gender: extractGender(selectionLexeme(char[0])),
+            gender: extractGender(char[0]),
         },
-        tokenIndex,
+        char[1].position,
     ];
 }
 
@@ -318,18 +315,24 @@ function extractChipollino(tokens: Token[]): [Character, number] | undefined {
 }
 
 export function extractInanimate(tokens: Token[]): Character | undefined {
-    const inanimSingle = [Gr.inan, Gr.S];
+    const production = multiplyArrays(...tokens.map(t => t.lexemes));
 
-    const found =
-        matchSeq(tokens, [tokenSelector(inanimSingle.concat(Gr.Acc))]) ||
-        matchSeq(tokens, [tokenSelector(inanimSingle.concat(Gr.Nom))]);
+    const SInanAcc = (l: Lexeme) => isLexemeAccept(l, [Gr.inan, Gr.S, Gr.Acc]);
+    const SInanNom = (l: Lexeme) => isLexemeAccept(l, [Gr.inan, Gr.S, Gr.Nom]);
 
-    if (!found) return undefined;
-    const [char] = found;
+    for (let sentence of production) {
+        const found = findSeq(sentence, [SInanAcc]) || findSeq(sentence, [SInanNom]);
 
-    return {
-        subject: lexemeToWord(char[0], char[1]),
-        normal: char[0].lex,
-        gender: extractGender(char[0]),
-    };
+        if (found) {
+            const [char] = found;
+
+            return {
+                subject: lexemeToWord(char),
+                normal: char.lex,
+                gender: extractGender(char),
+            };
+        }
+    }
+
+    return undefined;
 }

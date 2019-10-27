@@ -1,4 +1,5 @@
-import { matchSeq } from './utils/seq';
+import { findSeq } from './utils/seq';
+import { multiplyArrays } from './utils/multiplyArrays';
 
 import {
     findLemma,
@@ -9,19 +10,26 @@ import {
     selectionToken,
     Token,
     tokenSelector,
+    isLexemeAccept,
+    Lexeme,
+    isLexemeGrsAccept,
 } from './tokens';
 
 /**  Милый конь, милые кони */
-export function extractASAnim(tokens: Token[]): [Selection, Selection] | undefined {
+export function extractASAnim2(tokens: Token[]): [Lexeme, Lexeme] | undefined {
+    const production = multiplyArrays(...tokens.map(t => t.lexemes));
+
     for (let number of [Gr.single, Gr.plural]) {
         for (let _case of [Gr.Acc, Gr.Nom]) {
-            const A = tokenSelector([Gr.A, _case, number]);
-            const S = tokenSelector([Gr.S, Gr.anim, _case, number]);
+            const A = (l: Lexeme) => isLexemeAccept(l, [Gr.A, _case, number]);
+            const S = (l: Lexeme) => isLexemeAccept(l, [Gr.S, Gr.anim, _case, number]);
 
-            const matches = matchSeq(tokens, [A, S]);
+            for (let sentence of production) {
+                const matches = findSeq(sentence, [A, S]);
 
-            if (matches) {
-                return [matches[0], matches[1]];
+                if (matches && matches[0] && matches[1]) {
+                    return [matches[0], matches[1]];
+                }
             }
         }
     }
@@ -30,14 +38,19 @@ export function extractASAnim(tokens: Token[]): [Selection, Selection] | undefin
 }
 
 /** мальчика, мальчик, мальчику */
-export function extractSAnim(tokens: Token[]): Selection | undefined {
+export function extractSAnim(tokens: Token[]): Lexeme | undefined {
+    const production = multiplyArrays(...tokens.map(t => t.lexemes));
+
     for (let number of [Gr.single, Gr.plural]) {
         for (let _case of [Gr.Acc, Gr.Nom, Gr.dat]) {
-            const S = tokenSelector([Gr.S, Gr.anim, _case, number]);
-            const matches = matchSeq(tokens, [S]);
+            const S = (l: Lexeme) => isLexemeAccept(l, [Gr.S, Gr.anim, _case, number]);
 
-            if (matches) {
-                return matches[0];
+            for (let sentence of production) {
+                const matches = findSeq(sentence, [S]);
+
+                if (matches && matches[0]) {
+                    return matches[0];
+                }
             }
         }
     }
@@ -45,34 +58,30 @@ export function extractSAnim(tokens: Token[]): Selection | undefined {
     return undefined;
 }
 
-export function extractSAnimSInan(tokens: Token[]): [Selection, Selection] | undefined {
+export function extractSAnimSInan(tokens: Token[]): [Lexeme, Lexeme] | undefined {
+    const production = multiplyArrays(...tokens.map(t => t.lexemes));
+
     for (let _case of [Gr.Acc, Gr.Nom, Gr.dat]) {
-        const SAnim = tokenSelector([Gr.S, Gr.anim, _case, Gr.single]);
-        const SInan = tokenSelector([Gr.S, _case, Gr.single]);
+        const SAnim = (l: Lexeme) => isLexemeAccept(l, [Gr.S, Gr.anim, _case, Gr.single]);
+        const SInan = (l: Lexeme) => isLexemeAccept(l, [Gr.S, _case, Gr.single]);
 
-        const matches = matchSeq(tokens, [SAnim, SInan]);
+        for (let sentence of production) {
+            const matches = findSeq(sentence, [SAnim, SInan]);
 
-        if (matches) {
-            const [sAnim, s] = matches;
-            const isSecondWordA = findLemma(selectionToken(s), [Gr.A], selectionLexeme(s).lex);
+            if (matches && matches[0] && matches[1]) {
+                const [sAnim, s] = matches;
+                const isSecondWordA = isLexemeGrsAccept(s, [Gr.A]);
 
-            /**
-             * Отбрасывает варианты где второе слово - прилагательное тоже.
-             * Напр. "Собака красный".
-             */
-            if (isSecondWordA) {
-                return undefined;
+                /**
+                 * Отбрасывает варианты где второе слово - прилагательное тоже.
+                 * Напр. "Собака красный".
+                 */
+                if (isSecondWordA) {
+                    return undefined;
+                }
+
+                return [sAnim, s];
             }
-
-            /**
-             * Отбрасывает повторение одного слова (иногда случайно так получается)
-             * Напр. "Чебурашку чебурашку".
-             */
-            if (selectionLemma(sAnim) === selectionLemma(s)) {
-                return undefined;
-            }
-
-            return [sAnim, s];
         }
     }
 
