@@ -1,10 +1,6 @@
 import { Token } from './tokens';
 import { Character } from './character';
 
-export function repka(tokens: Token[]) {
-    return tokens.some(t => t.lexemes.length === 1 && t.lexemes[0].lex === 'репка');
-}
-
 export function granny(char: Character) {
     return equals(char, 'бабка', 'бабушка', 'баба');
 }
@@ -39,14 +35,6 @@ export function chicken(char: Character) {
 
 export function lion(char: Character) {
     return startsWith(char, 'льв') || equals(char, 'лев');
-}
-
-export function horse(char: Character) {
-    return startsWith(char, 'лошад', 'жереб') || equals(char, 'конь');
-}
-
-export function frog(char: Character) {
-    return startsWith(char, 'лягуш');
 }
 
 export function rooster(char: Character) {
@@ -111,10 +99,6 @@ export function notWantRepeat(tokens: Token[]) {
             text.includes('нет') ||
             text.join(' ').includes('не надо'),
     );
-}
-
-export function myself([token]: Token[]) {
-    return ['я', 'меня'].includes(token.text);
 }
 
 function startsWith(char: Character, ...aliases: string[]) {

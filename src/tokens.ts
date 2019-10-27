@@ -118,51 +118,10 @@ export enum Gr {
 }
 //#endregion
 
-export type Selection = [Lexeme, Token];
-
-export function selectionToken(sel: Selection): Token {
-    return sel[1];
-}
-
-export function selectionLexeme(sel: Selection): Lexeme {
-    return sel[0];
-}
-
-export function selectionLemma(sel: Selection): string {
-    return sel[0].lex;
-}
-
-export function matchGrs(gr: string[], pattern: Gr[]) {
-    return pattern.every(p => gr.includes(p));
-}
-
-export function findLexeme(token: Token, grs: Gr[]): Lexeme | undefined {
-    return token.lexemes.find(l => {
-        return grs.every(gr => l.gr.includes(gr));
-    });
-}
-
 export function isLexemeAccept(lexeme: Lexeme, grs: Gr[]): boolean {
     return grs.every(gr => lexeme.gr.includes(gr));
 }
 
 export function isLexemeGrsAccept(lexeme: Lexeme, grs: Gr[]): boolean {
     return grs.every(gr => lexeme.grs.some(lgr => lgr.includes(gr)));
-}
-
-export function findLemma(token: Token, grs: Gr[], lemma: string): Lexeme | undefined {
-    return token.lexemes.find(l => {
-        return grs.every(gr => l.gr.includes(gr) && l.lex === lemma);
-    });
-}
-
-export function tokenSelector(...orPatterns: (Gr[])[]) {
-    return function selector(token: Token): Selection | undefined {
-        for (let pattern of orPatterns) {
-            const found = findLexeme(token, pattern);
-            if (found) return [found, token] as Selection;
-        }
-
-        return undefined;
-    };
 }

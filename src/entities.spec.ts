@@ -1,6 +1,5 @@
 import { spawnMystem, Stemmer } from './stemmer';
 import { extractSAnim, extractASAnim2 } from './entities';
-import { selectionLexeme } from './tokens';
 
 describe('Entities', () => {
     //#region tests infrastructure

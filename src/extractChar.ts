@@ -1,16 +1,6 @@
 import { Character, Word, Gender } from './character';
 import { findSeq } from './utils/seq';
-import {
-    Lexeme,
-    Gr,
-    matchGrs,
-    Token,
-    tokenSelector,
-    selectionToken,
-    selectionLexeme,
-    isLexemeGrsAccept,
-    isLexemeAccept,
-} from './tokens';
+import { Lexeme, Gr, Token, isLexemeGrsAccept, isLexemeAccept } from './tokens';
 import { extractSAnim, extractSAnimSInan, extractASAnim2 } from './entities';
 import { multiplyArrays } from './utils/multiplyArrays';
 
@@ -60,14 +50,13 @@ function extractGender(lexeme: Lexeme): Gender {
  * @param noun Существительное в им. падеже.
  */
 function SNomToAcc(lexeme: Lexeme) {
-    const gr = lexeme.gr;
     const nomenative = lexeme.lex;
-    const isMale = matchGrs(gr, [Gr.Male]);
-    const isFamela = matchGrs(gr, [Gr.Famela]);
-    const isNeuter = matchGrs(gr, [Gr.Neuter]);
-    const isUnisex = matchGrs(gr, [Gr.Unisex]);
-    const isInanim = matchGrs(gr, [Gr.inan]);
-    const isPlural = matchGrs(gr, [Gr.plural]);
+    const isMale = isLexemeAccept(lexeme, [Gr.Male]);
+    const isFamela = isLexemeAccept(lexeme, [Gr.Famela]);
+    const isNeuter = isLexemeAccept(lexeme, [Gr.Neuter]);
+    const isUnisex = isLexemeAccept(lexeme, [Gr.Unisex]);
+    const isInanim = isLexemeAccept(lexeme, [Gr.inan]);
+    const isPlural = isLexemeAccept(lexeme, [Gr.plural]);
     const isA = isLexemeGrsAccept(lexeme, [Gr.A]);
 
     const endsWith = (end: string) => nomenative.endsWith(end);

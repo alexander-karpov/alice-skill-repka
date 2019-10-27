@@ -1,19 +1,7 @@
 import { findSeq } from './utils/seq';
 import { multiplyArrays } from './utils/multiplyArrays';
 
-import {
-    findLemma,
-    Gr,
-    Selection,
-    selectionLemma,
-    selectionLexeme,
-    selectionToken,
-    Token,
-    tokenSelector,
-    isLexemeAccept,
-    Lexeme,
-    isLexemeGrsAccept,
-} from './tokens';
+import { Gr, Token, isLexemeAccept, Lexeme, isLexemeGrsAccept } from './tokens';
 
 /**  Милый конь, милые кони */
 export function extractASAnim2(tokens: Token[]): [Lexeme, Lexeme] | undefined {
