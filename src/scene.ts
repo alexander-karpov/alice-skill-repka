@@ -152,7 +152,7 @@ function storyEndButtons(): SceneButton[] {
         { text: 'Да' },
         { text: 'Нет' },
         {
-            text: '⭐️ Поставить оценку',
+            text: '❤️ Поставить оценку',
             url: 'https://dialogs.yandex.ru/store/skills/916a8380-skazka-pro-repku',
         },
     ];
