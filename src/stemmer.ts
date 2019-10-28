@@ -19,7 +19,7 @@ export function spawnMystem(): { stemmer: Stemmer; killStemmer: () => void } {
 
     return {
         async stemmer(message) {
-            const answer = await mystem.send(message);
+            const answer = await mystem.send(removeNonCyrillic(message));
             const tokens = JSON.parse(answer).map((token, position) =>
                 preprocessToken(token, position),
             );
@@ -72,4 +72,13 @@ function removeDuplicateWords(tokens: Token[]): Token[] {
     }
 
     return deduplicated;
+}
+
+/**
+ * Оставляет в тексте только кирилические симводы и пробелы
+ * Удаляет из текст то, что мы явно не можем обработать
+ * @param message
+ */
+function removeNonCyrillic(message) {
+    return message.replace(/[^а-яА-Я ]+/g, '');
 }

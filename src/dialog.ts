@@ -17,7 +17,7 @@ export type DialogDependencies = {
 export type DialogResult = {
     speech: Speech;
     imageId?: string;
-    buttons?: SceneButton[];
+    buttons: SceneButton[];
     endSession: boolean;
 };
 //#endregion
@@ -39,6 +39,7 @@ export async function mainDialog(
                 whoCalled2(char),
             ),
             endSession: false,
+            buttons: [],
         };
     }
 
@@ -56,7 +57,7 @@ export async function mainDialog(
         speech: res.speech,
         endSession: !!res.endSession,
         imageId: res.imageId,
-        buttons: res.buttons,
+        buttons: res.buttons || [],
     };
 }
 

@@ -345,6 +345,33 @@ describe('Main dialog', () => {
         expect(tale).toMatch(/вытянули репку/i);
     });
 
+    test('Игнорирует эмоджи в команде', async () => {
+        await tts('');
+        expect(await tts('🐺 Серого волка')).toMatch(/серый волк/i);
+    });
+
+    test.only('Кнопки с уже выбранными персонажами не должны приходить повторно', async () => {
+        const shown = {};
+
+        // Первые три вызова кнопки не приходят
+        expect(await buttons('')).toEqual([]);
+        expect(await buttons('Андрея')).toEqual([]);
+        expect(await buttons('Андрея')).toEqual([]);
+
+        let btns = await buttons('Андрея');
+        expect(btns).toHaveLength(2);
+
+        do {
+            const [first, second] = btns;
+
+            expect(shown).not.toHaveProperty(first.text);
+            second && expect(shown).not.toHaveProperty(second.text);
+
+            shown[first.text] = true;
+            btns = await buttons(first.text);
+        } while (btns.length);
+    });
+
     //#region tests infrastructure
     let killStemmer: () => void;
     let stemmer: Stemmer;
@@ -362,6 +389,14 @@ describe('Main dialog', () => {
             speech: { tts },
         } = await mainDialog(command, sessionData, { stemmer, random100 });
         return tts;
+    }
+
+    async function buttons(command: string, random100 = 0) {
+        const {
+            buttons,
+            speech: { text },
+        } = await mainDialog(command, sessionData, { stemmer, random100 });
+        return buttons;
     }
 
     beforeEach(() => {

@@ -69,7 +69,7 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
         const end = isEnd ? answers.success() : answers.failure(nextChar);
         const taleWithEnd = speak(tale, end);
         const image = knownChar && knownChar.image;
-        const buttons = makeButtons(chars, isEnd, random100);
+        const buttons = makeButtons([...chars, nextChar], isEnd, random100);
         const cutTale = image
             ? speak([cutText(taleWithEnd.text, 254), cutText(taleWithEnd.tts, 1023)])
             : speak([cutText(taleWithEnd.text, 1023), cutText(taleWithEnd.tts, 1023)]);
@@ -132,7 +132,7 @@ function isTaleEnd(tale: Speech, nextChar: Character) {
 function makeButtons(chars: Character[], isEnd: boolean, random100: number): SceneButton[] {
     // Дадим ребенку сначала понять, что можно
     // самому придумывать персонажей.
-    if (chars.length < 3) {
+    if (chars.length < 4) {
         return [];
     }
 
