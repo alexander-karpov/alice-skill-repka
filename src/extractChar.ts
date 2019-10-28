@@ -8,6 +8,7 @@ export function extractChar(tokens: Token[]): Character | undefined {
     const indexedChars = [
         extractAttrChar(tokens),
         extractSS(tokens),
+        extractJuchka(tokens),
         extractAnimChar(tokens),
         extractChipollino(tokens),
     ].filter(Boolean) as [Character, number][];
@@ -283,6 +284,29 @@ function extractSS(tokens: Token[]): [Character, number] | undefined {
         },
         char[1].position,
     ];
+}
+
+/**
+ * Распознаёт Жучку. Решает проблему, когда команжа «жучка»
+ * распознаётся как »жучок»
+ * @param tokens
+ */
+function extractJuchka(tokens: Token[]): [Character, number] | undefined {
+    if (tokens.some(t => t.text === 'жучка')) {
+        return [
+            {
+                normal: 'жучка',
+                gender: Gender.Famela,
+                subject: {
+                    nominative: 'жучка',
+                    accusative: 'жучку',
+                },
+            },
+            0,
+        ];
+    }
+
+    return undefined;
 }
 
 function extractChipollino(tokens: Token[]): [Character, number] | undefined {

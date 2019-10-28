@@ -355,6 +355,11 @@ describe('Main dialog', () => {
         expect(await tts('Позвал сучку')).toMatch(/жучка/i);
     });
 
+    test('Распознаёт Жучку вместо Жучка независимо от падежа', async () => {
+        await tts('');
+        expect(await tts('Жучка')).toMatch(/жучка/i);
+    });
+
     test('Кнопки с уже выбранными персонажами не должны приходить повторно', async () => {
         const shown = {};
 
