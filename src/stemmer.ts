@@ -19,7 +19,9 @@ export function spawnMystem(): { stemmer: Stemmer; killStemmer: () => void } {
 
     return {
         async stemmer(message) {
-            const answer = await mystem.send(removeNonCyrillic(message));
+            const answer = await mystem.send(
+                fixSpeechRecognitionIssues(removeNonCyrillic(message)),
+            );
             const tokens = JSON.parse(answer).map((token, position) =>
                 preprocessToken(token, position),
             );
@@ -79,6 +81,10 @@ function removeDuplicateWords(tokens: Token[]): Token[] {
  * Удаляет из текст то, что мы явно не можем обработать
  * @param message
  */
-function removeNonCyrillic(message) {
-    return message.replace(/[^а-яА-Я ]+/g, '');
+function removeNonCyrillic(message: string) {
+    return message.replace(/[^а-яА-ЯёЁ ]+/g, '');
+}
+
+function fixSpeechRecognitionIssues(message: string) {
+    return message.replace(/сучк/gi, 'жучк');
 }
