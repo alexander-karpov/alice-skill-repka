@@ -9,6 +9,7 @@ export function extractChar(tokens: Token[]): Character | undefined {
         extractAttrChar(tokens),
         extractSS(tokens),
         extractJuchka(tokens),
+        extractBabka(tokens),
         extractAnimChar(tokens),
         extractChipollino(tokens),
     ].filter(Boolean) as [Character, number][];
@@ -284,6 +285,29 @@ function extractSS(tokens: Token[]): [Character, number] | undefined {
         },
         char[1].position,
     ];
+}
+
+/**
+ * Распознаёт Бабку. Её частно произносят как «баку»
+ * распознаётся как »жучок»
+ * @param tokens
+ */
+function extractBabka(tokens: Token[]): [Character, number] | undefined {
+    if (tokens.some(t => t.text === 'баку')) {
+        return [
+            {
+                normal: 'бабка',
+                gender: Gender.Famela,
+                subject: {
+                    nominative: 'бабка',
+                    accusative: 'бабку',
+                },
+            },
+            0,
+        ];
+    }
+
+    return undefined;
 }
 
 /**
