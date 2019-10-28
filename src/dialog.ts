@@ -36,7 +36,7 @@ export async function mainDialog(
             speech: speak(
                 'В этой игре мы вместе сочиним сказку про репку.',
                 'Называйте персонажей и слушайте получившуюся историю.',
-                whoCalled2(char),
+                char ? whoCalled2(char) : '',
             ),
             endSession: false,
             buttons: [],
