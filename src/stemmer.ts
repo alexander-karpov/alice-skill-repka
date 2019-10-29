@@ -21,27 +21,40 @@ export function stemmer(message: string): Promise<Token[]> {
     const mystem = spawn('mystem', ['--format=json', '-i']);
 
     const promise = new Promise<Token[]>((resolve, reject) => {
+        let outDate: Buffer | undefined;
+
         mystem.stdout.on('data', data => {
-            // В ответ почему-то добавляются симовлы «[]»
-            const answer = data.toString().replace(/\[\]/gi, '');
-
-            try {
-                const tokens = JSON.parse(answer).map((token, position) =>
-                    preprocessToken(token, position),
-                );
-
-                return resolve(removeDuplicateWords(tokens));
-            } catch (e) {
-                resolve([]);
-            }
+            outDate = data;
         });
 
         mystem.stderr.on('data', data => {
             reject(data);
         });
+
+        mystem.stdout.on('close', () => {
+            if (!outDate) {
+                resolve([]);
+                return;
+            }
+
+            try {
+                // В ответ почему-то добавляются симовлы «[]»
+                const json = outDate.toString().replace(/\[\]/gi, '');
+                const parsed = JSON.parse(json);
+                const tokens = parsed.map(preprocessToken);
+                const deduplicated = removeDuplicateWords(tokens);
+
+                resolve(deduplicated);
+            } catch (e) {
+                resolve([]);
+            }
+        });
     });
 
-    mystem.stdin.write(`${fixSpeechRecognitionIssues(removeNonCyrillic(message))}\n`);
+    const cyrillic = removeNonCyrillic(message);
+    const fixed = fixSpeechRecognitionIssues(cyrillic);
+
+    mystem.stdin.write(`${fixed}\n`);
     mystem.stdin.end();
 
     return promise;
