@@ -1,28 +1,26 @@
 import { random } from './utils';
-import { startServer, WebhookRequest } from './server';
+import { startServer } from './server';
 import { mainDialog } from './dialog';
 import { stemmer } from './stemmer';
-import { SessionData, createSessionData } from './sessionData';
+import { SessionStorage } from './SessionStorage';
 
 export function startSkillServer({ port }: { port: number }) {
-    const userData: { [name: string]: SessionData } = {};
+    const sessions = SessionStorage.create();
 
     startServer(
         async request => {
             const random100 = random(100);
-            const sessionKey = createSessionKey(request);
 
-            if (!userData[sessionKey]) {
-                userData[sessionKey] = createSessionData();
-            }
+            const answer = await mainDialog(
+                request.request.command,
+                sessions.$ensureSession(request),
+                {
+                    stemmer,
+                    random100,
+                },
+            );
 
-            const sessionData = userData[sessionKey];
-            sessionData.isNewSession = request.session.new;
-
-            const answer = await mainDialog(request.request.command, sessionData, {
-                stemmer,
-                random100,
-            });
+            sessions.$updateSession(request, answer.session);
 
             const card = answer.imageId
                 ? {
@@ -56,13 +54,8 @@ export function startSkillServer({ port }: { port: number }) {
 
             return response;
         },
-        () => {},
         { port },
     );
-}
-
-function createSessionKey(request: WebhookRequest) {
-    return request.session.session_id;
 }
 
 startSkillServer({ port: 3000 });

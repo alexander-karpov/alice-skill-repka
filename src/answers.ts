@@ -1,5 +1,5 @@
 import { Character, isCharMale, isCharFamela, isCharUnisex } from './character';
-import { SessionData } from './sessionData';
+import { Session } from './Session';
 import { sample, last, upperFirst } from './utils';
 import { createSpeech, Speech, speak, tts } from './speech';
 import { emoji } from './emoji';
@@ -24,8 +24,8 @@ export function intro(random100: number): Speech {
     );
 }
 
-export function whoCalled(sessionData: SessionData) {
-    const char = last(sessionData.chars);
+export function whoCalled(session: Session) {
+    const char = session.findLastCharacter();
 
     if (char) {
         return `Кого ${called(char)} ${nom(char)}?`;
@@ -71,7 +71,7 @@ export function inanimateCalled(inanimate: Character, previousChar: Character) {
     );
 }
 
-export function formatStory(chars: Character[]): Speech {
+export function formatStory(chars: readonly Character[]): Speech {
     const text: string[] = [];
     const tts: string[] = [];
 

@@ -1,6 +1,6 @@
 import { mainDialog } from './dialog';
 import { stemmer } from './stemmer';
-import { SessionData, createSessionData } from './sessionData';
+import { Session } from './Session';
 
 describe('Main dialog', () => {
     test('Классическая сказка: начало', async () => {
@@ -199,7 +199,7 @@ describe('Main dialog', () => {
         const {
             speech: { text },
             endSession,
-        } = await mainDialog('нет спасибо', sessionData, { stemmer, random100: 0 });
+        } = await mainDialog('нет спасибо', session, { stemmer, random100: 0 });
 
         expect(text).toMatch('конец');
         expect(endSession).toEqual(true);
@@ -385,29 +385,37 @@ describe('Main dialog', () => {
     });
 
     //#region tests infrastructure
-    let sessionData: SessionData;
+    let session: Session;
 
     async function act(command: string, random100 = 0): Promise<string> {
         const {
             speech: { text },
-        } = await mainDialog(command, sessionData, { stemmer, random100 });
+            session: nextSession,
+        } = await mainDialog(command, session, { stemmer, random100 });
+        session = nextSession;
         return text;
     }
 
     async function tts(command: string, random100 = 0): Promise<string> {
         const {
             speech: { tts },
-        } = await mainDialog(command, sessionData, { stemmer, random100 });
+            session: nextSession,
+        } = await mainDialog(command, session, { stemmer, random100 });
+        session = nextSession;
         return tts;
     }
 
     async function buttons(command: string, random100 = 0) {
-        const { buttons } = await mainDialog(command, sessionData, { stemmer, random100 });
+        const { buttons, session: nextSession } = await mainDialog(command, session, {
+            stemmer,
+            random100,
+        });
+        session = nextSession;
         return buttons;
     }
 
     beforeEach(() => {
-        sessionData = createSessionData();
+        session = Session.create();
     });
     //#endregion
 });

@@ -22,12 +22,12 @@ export type SceneButton = {
 type SceneDependencies = {
     random100: number;
     tokens: Token[];
-    chars: Character[];
+    chars: readonly Character[];
 };
 
 type SceneResult = {
     speech: Speech;
-    chars?: Character[];
+    chars?: readonly Character[];
     next?: Scene;
     endSession?: boolean;
     imageId?: string;
@@ -106,7 +106,7 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
 };
 
 function makeRepkaTale(
-    chars: Character[],
+    chars: readonly Character[],
     char: Character,
     knownChar: KnownChar | undefined,
     random100: number,
@@ -129,7 +129,11 @@ function isTaleEnd(tale: Speech, nextChar: Character) {
     return isLastMouse || isTaleTooLong;
 }
 
-function makeButtons(chars: Character[], isEnd: boolean, random100: number): SceneButton[] {
+function makeButtons(
+    chars: readonly Character[],
+    isEnd: boolean,
+    random100: number,
+): SceneButton[] {
     // Дадим ребенку сначала понять, что можно
     // самому придумывать персонажей.
     if (chars.length < 4) {
@@ -143,7 +147,7 @@ function makeButtons(chars: Character[], isEnd: boolean, random100: number): Sce
     return knownCharButtons(chars, random100);
 }
 
-function knownCharButtons(chars: Character[], random100: number): SceneButton[] {
+function knownCharButtons(chars: readonly Character[], random100: number): SceneButton[] {
     return chooseKnownCharButtons(chars, random100).map(text => ({ text }));
 }
 

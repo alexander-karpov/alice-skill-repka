@@ -55,7 +55,7 @@ export type WebhookResponse = {
 };
 //#endregion
 
-export function startServer(handleRequest: RequestHandler, handleCLose: () => void, { port }) {
+export function startServer(handleRequest: RequestHandler, { port }) {
     const server = http.createServer((request, response) => {
         if (request.method !== 'POST') {
             response.writeHead(200);
@@ -94,7 +94,6 @@ export function startServer(handleRequest: RequestHandler, handleCLose: () => vo
 
     server.on('close', () => {
         console.log(`Alice Repka server is closing...`);
-        handleCLose();
     });
 
     process.on('SIGINT', () => server.close());
