@@ -1,20 +1,7 @@
-import { spawnMystem, Stemmer } from './stemmer';
+import { stemmer } from './stemmer';
 import { extractSAnim, extractASAnim2 } from './entities';
 
 describe('Entities', () => {
-    //#region tests infrastructure
-    let killStemmer: () => void;
-    let stemmer: Stemmer;
-
-    beforeAll(() => {
-        const spawned = spawnMystem();
-        stemmer = spawned.stemmer;
-        killStemmer = spawned.killStemmer;
-    });
-
-    afterAll(() => killStemmer());
-    //#endregion
-
     describe('extractASAnim2', () => {
         test('Распознает множ. число', async () => {
             const tokens = await stemmer('Вот они наши милые кони скачут по поляне');

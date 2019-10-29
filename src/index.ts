@@ -1,11 +1,10 @@
 import { random } from './utils';
 import { startServer, WebhookRequest } from './server';
 import { mainDialog } from './dialog';
-import { spawnMystem } from './stemmer';
+import { stemmer } from './stemmer';
 import { SessionData, createSessionData } from './sessionData';
 
 export function startSkillServer({ port }: { port: number }) {
-    const { stemmer, killStemmer } = spawnMystem();
     const userData: { [name: string]: SessionData } = {};
 
     startServer(
@@ -57,9 +56,7 @@ export function startSkillServer({ port }: { port: number }) {
 
             return response;
         },
-        () => {
-            killStemmer();
-        },
+        () => {},
         { port },
     );
 }

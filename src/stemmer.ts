@@ -1,5 +1,5 @@
+import { spawn } from 'child_process';
 import { Gr, Lexeme, Token } from './tokens';
-import { spawn } from './spawn';
 import { last } from './utils';
 
 //#region types
@@ -13,25 +13,38 @@ type MyStemToken = {
 type MyStemLexeme = { lex: string; gr: string };
 //#endregion
 
-export function spawnMystem(): { stemmer: Stemmer; killStemmer: () => void } {
-    // @see https://tech.yandex.ru/mystem/doc/
-    const mystem = spawn('mystem', '--format=json', '-i');
+export function stemmer(message: string): Promise<Token[]> {
+    if (!message) {
+        return Promise.resolve([]);
+    }
 
-    return {
-        async stemmer(message) {
-            const answer = await mystem.send(
-                fixSpeechRecognitionIssues(removeNonCyrillic(message)),
-            );
-            const tokens = JSON.parse(answer).map((token, position) =>
-                preprocessToken(token, position),
-            );
+    const mystem = spawn('mystem', ['--format=json', '-i']);
 
-            return removeDuplicateWords(tokens);
-        },
-        killStemmer() {
-            mystem.kill();
-        },
-    };
+    const promise = new Promise<Token[]>((resolve, reject) => {
+        mystem.stdout.on('data', data => {
+            // В ответ почему-то добавляются симовлы «[]»
+            const answer = data.toString().replace(/\[\]/gi, '');
+
+            try {
+                const tokens = JSON.parse(answer).map((token, position) =>
+                    preprocessToken(token, position),
+                );
+
+                return resolve(removeDuplicateWords(tokens));
+            } catch (e) {
+                resolve([]);
+            }
+        });
+
+        mystem.stderr.on('data', data => {
+            reject(data);
+        });
+    });
+
+    mystem.stdin.write(`${fixSpeechRecognitionIssues(removeNonCyrillic(message))}\n`);
+    mystem.stdin.end();
+
+    return promise;
 }
 
 function preprocessLexeme({ lex, gr }: MyStemLexeme): Lexeme {

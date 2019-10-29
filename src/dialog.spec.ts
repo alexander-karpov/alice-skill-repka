@@ -1,5 +1,5 @@
 import { mainDialog } from './dialog';
-import { spawnMystem, Stemmer } from './stemmer';
+import { stemmer } from './stemmer';
 import { SessionData, createSessionData } from './sessionData';
 
 describe('Main dialog', () => {
@@ -385,8 +385,6 @@ describe('Main dialog', () => {
     });
 
     //#region tests infrastructure
-    let killStemmer: () => void;
-    let stemmer: Stemmer;
     let sessionData: SessionData;
 
     async function act(command: string, random100 = 0): Promise<string> {
@@ -404,23 +402,12 @@ describe('Main dialog', () => {
     }
 
     async function buttons(command: string, random100 = 0) {
-        const {
-            buttons,
-            speech: { text },
-        } = await mainDialog(command, sessionData, { stemmer, random100 });
+        const { buttons } = await mainDialog(command, sessionData, { stemmer, random100 });
         return buttons;
     }
 
     beforeEach(() => {
         sessionData = createSessionData();
     });
-
-    beforeAll(() => {
-        const spawned = spawnMystem();
-        stemmer = spawned.stemmer;
-        killStemmer = spawned.killStemmer;
-    });
-
-    afterAll(() => killStemmer());
     //#endregion
 });
