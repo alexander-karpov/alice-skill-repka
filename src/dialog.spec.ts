@@ -352,14 +352,19 @@ describe('Main dialog', () => {
 
     test('Исправляет известные особенности распознавания речи', async () => {
         await tts('');
-        expect(await tts('Позвал сучку')).toMatch(/жучка/i);
-        expect(await tts('баку')).toMatch(/бабка/i);
-        expect(await tts('жучка')).toMatch(/жучка/i);
+        expect(await tts('позвал сучку')).toMatch(/жучка/i);
+        expect(await tts('позвал баку')).toMatch(/бабка/i);
+        expect(await tts('позвал жучка')).toMatch(/жучка/i);
     });
 
     test('Не распознаёт слово «нет» как часть персонажа', async () => {
         await tts('');
         expect(await tts('Котик нет')).toMatch(/котик за дедку/i);
+    });
+
+    test('Исправляет tts для жучки', async () => {
+        await tts('');
+        expect(await tts('Жучка')).toMatch(/ж\+учка/i);
     });
 
     test('Кнопки с уже выбранными персонажами не должны приходить повторно', async () => {

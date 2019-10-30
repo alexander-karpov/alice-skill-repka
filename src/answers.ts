@@ -80,8 +80,12 @@ export function formatStory(chars: readonly Character[]): Speech {
         const em = emoji[nom(sub)] || emoji[norm(sub)];
         const emojiPart = em ? ` ${em} ` : ' ';
 
-        text.push(`${nom(sub)}${emojiPart}за ${acc(obj)}`);
-        tts.push(`${nom(sub)} за ${acc(obj)}`);
+        text.push(`${nom(sub)}${emojiPart} за ${acc(obj)}`);
+        tts.push(
+            `${sub.tts ? sub.tts.nominative : nom(sub)} за ${
+                obj.tts ? obj.tts.nominative : acc(obj)
+            }`,
+        );
     }
 
     text.reverse();

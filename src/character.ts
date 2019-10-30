@@ -12,6 +12,7 @@ export enum Gender {
 
 export type Character = {
     subject: Word;
+    tts?: Word;
     gender: Gender;
     // Нормальная форма главного слова.
     // Помогает при определении, кто это.

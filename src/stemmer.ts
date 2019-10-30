@@ -52,9 +52,8 @@ export function stemmer(message: string): Promise<Token[]> {
     });
 
     const cyrillic = removeNonCyrillic(message);
-    const fixed = fixSpeechRecognitionIssues(cyrillic);
 
-    mystem.stdin.write(`${fixed}\n`);
+    mystem.stdin.write(`${cyrillic}\n`);
     mystem.stdin.end();
 
     return promise;
@@ -109,8 +108,4 @@ function removeDuplicateWords(tokens: Token[]): Token[] {
  */
 function removeNonCyrillic(message: string) {
     return message.replace(/[^а-яА-ЯёЁ ]+/g, '');
-}
-
-function fixSpeechRecognitionIssues(message: string) {
-    return message.replace(/сучк/gi, 'жучк');
 }

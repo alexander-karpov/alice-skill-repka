@@ -318,7 +318,7 @@ function extractBabka(tokens: Token[]): [Character, number] | undefined {
  * @param tokens
  */
 function extractJuchka(tokens: Token[]): [Character, number] | undefined {
-    if (tokens.some(t => t.text === 'жучка')) {
+    if (tokens.some(t => t.text.startsWith('жучк') || t.text.startsWith('сучк'))) {
         return [
             {
                 normal: 'жучка',
@@ -327,8 +327,12 @@ function extractJuchka(tokens: Token[]): [Character, number] | undefined {
                     nominative: 'жучка',
                     accusative: 'жучку',
                 },
+                tts: {
+                    nominative: 'ж+учка',
+                    accusative: 'ж+учку',
+                },
             },
-            0,
+            Number.MAX_SAFE_INTEGER,
         ];
     }
 
@@ -346,7 +350,7 @@ function extractChipollino(tokens: Token[]): [Character, number] | undefined {
                     accusative: 'чиполлино',
                 },
             },
-            0,
+            Number.MAX_SAFE_INTEGER,
         ];
     }
 
