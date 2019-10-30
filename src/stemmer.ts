@@ -14,7 +14,7 @@ type MyStemToken = {
 type MyStemLexeme = { lex: string; gr: string };
 //#endregion
 
-const stemmerCache = new LRU<string, Token[]>({ max: 512 });
+const stemmerCache = new LRU<string, Token[]>({ max: 1024 });
 
 export async function stemmer(message: string): Promise<Token[]> {
     const cached = stemmerCache.get(message);

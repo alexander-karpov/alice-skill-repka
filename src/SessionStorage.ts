@@ -1,8 +1,12 @@
 import { WebhookRequest } from './server';
 import { Session } from './Session';
+import * as LRU from 'lru-cache';
 
 export class SessionStorage {
-    private readonly sessions: { [sessionId: string]: Session } = {};
+    private readonly sessions: LRU<string, Session> = new LRU<string, Session>({
+        // Один день
+        maxAge: 1000 * 60 * 60 * 24,
+    });
 
     private constructor() {}
 
@@ -11,22 +15,22 @@ export class SessionStorage {
     }
 
     $ensureSession(request: WebhookRequest): Session {
-        const sessionId = request.session.user_id;
-        const isNewSession = request.session.new;
-        const existsSession = this.sessions[sessionId];
+        const sessionId = request.session.session_id;
+        const existsSession = this.sessions.get(sessionId);
 
-        if (!isNewSession && existsSession) {
+        if (existsSession) {
             return existsSession;
         }
 
         const newSession = Session.create();
-        this.sessions[sessionId] = newSession;
+        this.sessions.set(sessionId, newSession);
+        this.sessions.prune();
 
         return newSession;
     }
 
     $updateSession(request: WebhookRequest, session: Session) {
-        const sessionId = request.session.user_id;
-        this.sessions[sessionId] = session;
+        const sessionId = request.session.session_id;
+        this.sessions.set(sessionId, session);
     }
 }
