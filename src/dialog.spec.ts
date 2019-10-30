@@ -357,9 +357,9 @@ describe('Main dialog', () => {
         expect(await tts('жучка')).toMatch(/жучка/i);
     });
 
-    test('Распознаёт какашку (популярный персонаж)', async () => {
+    test('Не распознаёт слово «нет» как часть персонажа', async () => {
         await tts('');
-        expect(await tts('Жучка')).toMatch(/жучка/i);
+        expect(await tts('Котик нет')).toMatch(/котик за дедку/i);
     });
 
     test('Кнопки с уже выбранными персонажами не должны приходить повторно', async () => {

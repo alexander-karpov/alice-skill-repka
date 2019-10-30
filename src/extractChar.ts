@@ -5,13 +5,15 @@ import { extractSAnim, extractSAnimSInan, extractASAnim2 } from './entities';
 import { multiplyArrays } from './utils/multiplyArrays';
 
 export function extractChar(tokens: Token[]): Character | undefined {
+    const fixdedTokens = fixTokens(tokens);
+
     const indexedChars = [
-        extractAttrChar(tokens),
-        extractSS(tokens),
-        extractJuchka(tokens),
-        extractBabka(tokens),
-        extractAnimChar(tokens),
-        extractChipollino(tokens),
+        extractAttrChar(fixdedTokens),
+        extractSS(fixdedTokens),
+        extractJuchka(fixdedTokens),
+        extractBabka(fixdedTokens),
+        extractAnimChar(fixdedTokens),
+        extractChipollino(fixdedTokens),
     ].filter(Boolean) as [Character, number][];
 
     const [last] = indexedChars.sort((a, b) => b[1] - a[1]);
@@ -372,4 +374,13 @@ export function extractInanimate(tokens: Token[]): Character | undefined {
     }
 
     return undefined;
+}
+
+/**
+ * Перед распознаванием нужно удалить
+ * «вредные» слова.
+ */
+function fixTokens(tokens: Token[]): Token[] {
+    // «Нет» распознаётся как неод.существительное
+    return tokens.filter(t => t.text !== 'нет');
 }
