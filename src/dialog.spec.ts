@@ -367,6 +367,11 @@ describe('Main dialog', () => {
         expect(await tts('Жучка')).toMatch(/ж\+учка/i);
     });
 
+    test.skip('Распознаёт самого большого животного в мире', async () => {
+        await tts('');
+        expect(await tts('позвал самого большого животного в мире')).toMatch(/большое животное/i);
+    });
+
     test('Кнопки с уже выбранными персонажами не должны приходить повторно', async () => {
         const shown: { [button: string]: boolean } = {};
 

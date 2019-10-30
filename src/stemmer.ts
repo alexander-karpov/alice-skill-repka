@@ -1,4 +1,5 @@
 import { spawn } from 'child_process';
+import * as LRU from 'lru-cache';
 import { Gr, Lexeme, Token } from './tokens';
 import { last } from './utils';
 
@@ -13,7 +14,22 @@ type MyStemToken = {
 type MyStemLexeme = { lex: string; gr: string };
 //#endregion
 
-export function stemmer(message: string): Promise<Token[]> {
+const stemmerCache = new LRU<string, Token[]>({ max: 512 });
+
+export async function stemmer(message: string): Promise<Token[]> {
+    const cached = stemmerCache.get(message);
+
+    if (cached) {
+        return cached;
+    }
+
+    const tokens = await stemmerImpl(message);
+    stemmerCache.set(message, tokens);
+
+    return tokens;
+}
+
+function stemmerImpl(message: string): Promise<Token[]> {
     if (!message) {
         return Promise.resolve([]);
     }
