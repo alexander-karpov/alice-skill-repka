@@ -12,8 +12,7 @@
     "test": "jest",
     "test:start": "npm run test -- --watch",
     "precommit": "pretty-quick --staged",
-    "start": "node ./index.js",
-    "prestart": "npm i --prod"
+    "container:start": "npm i --prod && node ./index.js"
   },
   "devDependencies": {
     "@types/jest": "23.3.14",
