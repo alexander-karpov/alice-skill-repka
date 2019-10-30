@@ -363,7 +363,7 @@ describe('Main dialog', () => {
     });
 
     test('Кнопки с уже выбранными персонажами не должны приходить повторно', async () => {
-        const shown = {};
+        const shown: { [button: string]: boolean } = {};
 
         // Первые три вызова кнопки не приходят
         expect(await buttons('')).toEqual([]);

@@ -15,7 +15,10 @@ export function findKnownChar(char: Character) {
     return Object.values(knownChars).find(c => c.trigger(char));
 }
 
-export function chooseKnownCharButtons(allChars: readonly Character[], random100): string[] {
+export function chooseKnownCharButtons(
+    allChars: readonly Character[],
+    random100: number,
+): string[] {
     const notCalledKnownChars = Object.values(knownChars)
         .filter(c => c !== knownChars.mouse)
         .filter(c => c !== knownChars.zombie)

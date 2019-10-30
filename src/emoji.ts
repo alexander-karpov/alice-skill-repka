@@ -1,4 +1,4 @@
-export const emoji = {
+export const emoji: { [alias: string]: string } = {
     путин: '🤵',
     сосед: '👴🏻',
     робот: '🤖',

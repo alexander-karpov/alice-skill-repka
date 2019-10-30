@@ -210,8 +210,8 @@ function ANomMaleToFamela(lexeme: Lexeme) {
     }
 
     const nom = lexeme.text;
-    const endsWith = end => nom.endsWith(end);
-    const changeTwo = end => `${nom.substring(0, nom.length - 2)}${end}`;
+    const endsWith = (end: string) => nom.endsWith(end);
+    const changeTwo = (end: string) => `${nom.substring(0, nom.length - 2)}${end}`;
 
     if (endsWith('ую')) {
         return changeTwo('ая');

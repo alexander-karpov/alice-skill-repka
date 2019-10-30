@@ -1,6 +1,6 @@
 import { Character, isCharMale, isCharFamela, isCharUnisex } from './character';
 import { Session } from './Session';
-import { sample, last, upperFirst } from './utils';
+import { sample, upperFirst } from './utils';
 import { createSpeech, Speech, speak, tts } from './speech';
 import { emoji } from './emoji';
 
@@ -139,7 +139,7 @@ export const chars = {
             `и ${clung} в ${acc(previousChar)}.`,
         );
     },
-    dog(dog: Character, _prev, random100: number) {
+    dog(dog: Character, _prev: Character, random100: number) {
         const come = comeRunningCapitalized(dog);
         const soundNumber = sample([3, 5], random100);
 
@@ -148,7 +148,7 @@ export const chars = {
             `${come} ${nom(dog)} - <speaker audio="alice-sounds-animals-dog-${soundNumber}.opus">.`,
         );
     },
-    owl(owl: Character, _prev, random100: number) {
+    owl(owl: Character, _prev: Character, random100: number) {
         const come = flownCapitalized(owl);
         const soundNumber = sample([1, 2], random100);
 
@@ -209,7 +209,7 @@ export const chars = {
             `${come} ${nom(cow)} - <speaker audio="alice-sounds-animals-cow-2.opus">.`,
         );
     },
-    horse(horse: Character, _prev, random100: number) {
+    horse(horse: Character, _prev: Character, random100: number) {
         const come = riddenCapitalized(horse);
         const soundNumber = (random100 % 2) + 1;
 

@@ -47,7 +47,7 @@ export function tts(parts: TemplateStringsArray, ...inserts: string[]): Speech {
     };
 }
 
-function fixSpeceBeforeComma(text) {
+function fixSpeceBeforeComma(text: string) {
     return text
         .replace(' ,', ',')
         .replace(' .', '.')

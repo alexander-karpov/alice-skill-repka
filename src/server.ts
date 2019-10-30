@@ -55,7 +55,7 @@ export type WebhookResponse = {
 };
 //#endregion
 
-export function startServer(handleRequest: RequestHandler, { port }) {
+export function startServer(handleRequest: RequestHandler, { port }: { port: number }) {
     const server = http.createServer((request, response) => {
         if (request.method !== 'POST') {
             response.writeHead(200);
@@ -84,7 +84,7 @@ export function startServer(handleRequest: RequestHandler, { port }) {
         });
     });
 
-    server.listen(port, err => {
+    server.listen(port, (err: Error) => {
         if (err) {
             return console.log('Ошибка при старте сервера', err);
         }
