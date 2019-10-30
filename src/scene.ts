@@ -37,9 +37,9 @@ type SceneResult = {
 const DEDKA = createChar('дедка', 'дедку', 'дедка', Gender.Male);
 
 export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult } = {
-    [Scene.Intro]({ random100 }) {
+    [Scene.Intro]() {
         return {
-            speech: answers.intro(random100),
+            speech: answers.intro(),
             chars: [DEDKA],
             next: Scene.Repka,
         };
