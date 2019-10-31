@@ -1,9 +1,42 @@
 import { Character, Word, Gender } from './character';
 import { findSeq } from './utils/seq';
-import { Lexeme, Gr, Token, isLexemeGrsAccept, isLexemeAccept, isTokenAccept } from './tokens';
+import { Lexeme, Gr, Token, isLexemeAccept, isTokenAccept } from './tokens';
 import { multiplyArrays } from './utils/multiplyArrays';
-import { last } from './utils';
 import { Predicate } from './core';
+
+// #region Gr patterns
+const S = (l: Lexeme) => isLexemeAccept(l, [Gr.S]);
+const Acc = (l: Lexeme) => isLexemeAccept(l, [Gr.Acc]);
+const Nom = (l: Lexeme) => isLexemeAccept(l, [Gr.Nom]);
+const Anim = (l: Lexeme) => isLexemeAccept(l, [Gr.anim]);
+const Single = (l: Lexeme) => isLexemeAccept(l, [Gr.single]);
+const Persn = (l: Lexeme) => isLexemeAccept(l, [Gr.persn]);
+const Famn = (l: Lexeme) => isLexemeAccept(l, [Gr.famn]);
+const Male = (l: Lexeme) => isLexemeAccept(l, [Gr.Male]);
+const Famela = (l: Lexeme) => isLexemeAccept(l, [Gr.Famela]);
+const Unisex = (l: Lexeme) => isLexemeAccept(l, [Gr.Unisex]);
+const NotTokenA = (l: Lexeme) => !isTokenAccept(l, [Gr.A]);
+const NotName = (l: Lexeme) => !isLexemeAccept(l, [Gr.persn]) && !isLexemeAccept(l, [Gr.famn]);
+
+function x(...ps: Predicate<Lexeme>[]): Predicate<Lexeme> {
+    return (l: Lexeme) => ps.every(p => p(l));
+}
+
+const subjectPatterns: Predicate<Lexeme>[][] = [
+    [x(Persn, Acc, Male), x(Famn, Acc)],
+    [x(Persn, Acc, Famela, Single), x(Famn, Acc)],
+    [x(Persn, Acc, Unisex), x(Famn, Acc)],
+    [x(S, Anim, Single, Acc, NotTokenA), x(S, Acc)],
+    [x(S, Anim, Single, Acc, NotTokenA, NotName)],
+    [x(Persn, Nom, Male), x(Famn, Nom)],
+    [x(Persn, Nom, Famela), x(Famn, Nom)],
+    [x(Persn, Nom, Unisex), x(Famn, Nom)],
+    [x(S, Anim, Single, Nom, NotTokenA), x(S, Nom, NotTokenA)],
+    [x(S, Anim, Single, Nom, NotTokenA)],
+    [x(S, Anim, Single)],
+    [x(S, Anim)],
+];
+// #endregion
 
 export function extractChar(tokens: Token[]): Character | undefined {
     const fixdedTokens = fixTokens(tokens);
@@ -14,62 +47,30 @@ export function extractChar(tokens: Token[]): Character | undefined {
     }
 
     const predicates = extractPredicates(subject, fixdedTokens);
-    const subjectLast = last(subject) as Lexeme;
+    const subjectFirst = subject[0] as Lexeme;
 
     const word: Word = {
         nominative: predicates
-            .map(p => AToCnsistent(p, subjectLast).nominative)
+            .map(p => AToCnsistent(p, subjectFirst).nominative)
             .concat(subject.map(s => s.lex))
             .join(' '),
         accusative: predicates
-            .map(p => AToCnsistent(p, subjectLast).accusative)
-            .concat(subject.map(SToAcc))
+            .map(p => AToCnsistent(p, subjectFirst).accusative)
+            .concat(subject.map(l => SToAccCnsistent(l, subjectFirst)))
             .join(' '),
     };
 
     return {
         subject: word,
         normal: subject[0].lex,
-        gender: extractGender(subjectLast),
+        gender: extractGender(subjectFirst),
     };
 }
 
 export function extractSubject(tokens: Token[]): Lexeme[] | undefined {
     const production = multiplyArrays(...tokens.map(t => t.lexemes));
-    const S = (l: Lexeme) => isLexemeAccept(l, [Gr.S]);
-    const Acc = (l: Lexeme) => isLexemeAccept(l, [Gr.Acc]);
-    const Nom = (l: Lexeme) => isLexemeAccept(l, [Gr.Nom]);
-    const Anim = (l: Lexeme) => isLexemeAccept(l, [Gr.anim]);
-    const Single = (l: Lexeme) => isLexemeAccept(l, [Gr.single]);
-    const Persn = (l: Lexeme) => isLexemeAccept(l, [Gr.persn]);
-    const Famn = (l: Lexeme) => isLexemeAccept(l, [Gr.famn]);
-    const TokenA = (l: Lexeme) => isTokenAccept(l, [Gr.A]);
 
-    const FamnAcc = (l: Lexeme) => Famn(l) && Acc(l);
-    const FamnNom = (l: Lexeme) => Famn(l) && Nom(l);
-    const PersnAcc = (l: Lexeme) => Persn(l) && Acc(l);
-    const PersnNom = (l: Lexeme) => Persn(l) && Nom(l);
-    const SAcc = (l: Lexeme) => S(l) && Acc(l);
-    const SAccNotTokenA = (l: Lexeme) => SAcc(l) && !TokenA(l);
-    const SAnim = (l: Lexeme) => S(l) && Anim(l);
-    const SAnimSingle = (l: Lexeme) => SAnim(l) && Single(l);
-    const SAnimSingleAccNotTokenA = (l: Lexeme) => SAnimSingle(l) && Acc(l) && !TokenA(l);
-    const SAnimSingleNomNotTokenA = (l: Lexeme) => SAnimSingle(l) && Nom(l) && !TokenA(l);
-    const SNom = (l: Lexeme) => S(l) && Nom(l);
-    const SNomNotTokenA = (l: Lexeme) => SNom(l) && !TokenA(l);
-
-    const patters: Predicate<Lexeme>[][] = [
-        [SAnimSingleAccNotTokenA, SAccNotTokenA],
-        [PersnAcc, FamnAcc],
-        [SAnimSingleAccNotTokenA],
-        [SAnimSingleNomNotTokenA, SNomNotTokenA],
-        [PersnNom, FamnNom],
-        [SAnimSingleNomNotTokenA],
-        [SAnimSingle],
-        [SAnim],
-    ];
-
-    for (let pattern of patters) {
+    for (let pattern of subjectPatterns) {
         for (let sentence of production) {
             const matches = findSeq(sentence, pattern);
 
@@ -201,11 +202,11 @@ function AToAccMale(lex: string) {
     return lex;
 }
 
-function SToAcc(lexeme: Lexeme): string {
-    const isFamela = isLexemeAccept(lexeme, [Gr.Famela]);
-    const isMale = isLexemeAccept(lexeme, [Gr.Male]);
+function SToAccCnsistent(lexeme: Lexeme, consistentWith: Lexeme): string {
+    const isFamela = isLexemeAccept(consistentWith, [Gr.Famela]);
+    const isMale = isLexemeAccept(consistentWith, [Gr.Male]);
+    const isNeuter = isLexemeAccept(consistentWith, [Gr.Neuter]);
     const isA = isLexemeAccept(lexeme, [Gr.A]);
-    const isNeuter = isLexemeAccept(lexeme, [Gr.Neuter]);
 
     // Чудище -> чудище
     if (isNeuter) {

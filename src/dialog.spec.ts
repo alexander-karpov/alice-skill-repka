@@ -150,7 +150,7 @@ describe('Main dialog', () => {
         expect(await act('сашу')).toMatch('Кого позвал саша');
     });
 
-    test.skip('Принимает имя-фамилию', async () => {
+    test('Принимает имя-фамилию', async () => {
         await act('');
         expect(await act('александра карпова')).toMatch(/Александр Карпов за дедку,/i);
         expect(await act('ирина карпова')).toMatch(/Ирина Карпова за Александра Карпова,/i);
@@ -325,9 +325,9 @@ describe('Main dialog', () => {
         expect(await act('меня')).toMatch(/кто вы/i);
     });
 
-    test.skip('Принимает За зайцем (регрессия)', async () => {
+    test('Принимает За зайцем (регрессия)', async () => {
         await act('');
-        expect(await act('за зайцем')).toMatch(/заяц за дедку/i);
+        expect(await tts('за зайцем')).toMatch(/заяц за дедку/i);
     });
 
     test('История заканчивается когда становится очень длинной', async () => {
