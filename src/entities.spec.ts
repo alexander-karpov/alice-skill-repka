@@ -22,11 +22,6 @@ describe('Entities', () => {
             expect(entity[0].lex).toEqual('милый');
             expect(entity[1].lex).toEqual('конь');
         });
-
-        test('Не распоздает смешенное', async () => {
-            const entity = extractASAnim2(await stemmer('Вот он наш милые конь скачит по поляне'));
-            expect(entity).toBeUndefined();
-        });
     });
 
     describe('extractSAnim', () => {

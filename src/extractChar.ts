@@ -33,6 +33,25 @@ function lexemeToWord(lexeme: Lexeme): Word {
     };
 }
 
+function lexemesToWord(subject: Lexeme, predicate: Lexeme): Word {
+    const saccusative = subject.gr.includes(Gr.S) ? SNomToAcc(subject) : ANomToAcc(subject);
+    const snominative =
+        subject.gr.includes(Gr.Famela) && subject.gr.includes(Gr.A)
+            ? ANomMaleToFamela(subject)
+            : subject.lex;
+
+    const paccusative = predicate.gr.includes(Gr.S) ? SNomToAcc(predicate) : ANomToAcc(predicate);
+    const pnominative =
+        subject.gr.includes(Gr.Famela) && predicate.gr.includes(Gr.A)
+            ? ANomMaleToFamela(predicate)
+            : predicate.lex;
+
+    return {
+        nominative: pnominative + ' ' + snominative,
+        accusative: paccusative + ' ' + saccusative,
+    };
+}
+
 function extractGender(lexeme: Lexeme): Gender {
     if (lexeme.gr.includes(Gr.Male)) {
         return Gender.Male;
@@ -219,6 +238,14 @@ function ANomMaleToFamela(lexeme: Lexeme) {
         return changeTwo('ая');
     }
 
+    if (endsWith('ые')) {
+        return changeTwo('ая');
+    }
+
+    if (endsWith('ие')) {
+        return changeTwo('яя');
+    }
+
     if (endsWith('юю')) {
         return changeTwo('яя');
     }
@@ -235,15 +262,12 @@ function extractAttrChar(tokens: Token[]): [Character, number] | undefined {
 
     if (!char) return undefined;
 
-    const [adj, noun] = char.map(l => lexemeToWord(l));
+    const [adj, noun] = char;
 
     return [
         {
-            subject: {
-                nominative: `${adj.nominative} ${noun.nominative}`,
-                accusative: `${adj.accusative} ${noun.accusative}`,
-            },
-            normal: noun.nominative,
+            subject: lexemesToWord(noun, adj),
+            normal: noun.lex,
             gender: extractGender(char[1]),
         },
         char[1].position,

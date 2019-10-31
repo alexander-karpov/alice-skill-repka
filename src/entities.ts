@@ -22,6 +22,17 @@ export function extractASAnim2(tokens: Token[]): [Lexeme, Lexeme] | undefined {
         }
     }
 
+    const A = (l: Lexeme) => isLexemeAccept(l, [Gr.A]);
+    const S = (l: Lexeme) => isLexemeAccept(l, [Gr.S]);
+
+    for (let sentence of production) {
+        const matches = findSeq(sentence, [A, S]);
+
+        if (matches && matches[0] && matches[1]) {
+            return [matches[0], matches[1]];
+        }
+    }
+
     return undefined;
 }
 
