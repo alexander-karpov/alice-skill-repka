@@ -1,7 +1,5 @@
 import { Character, Word, Gender } from './character';
-import { findSeq } from './utils/seq';
-import { Lexeme, Gr, Token, isLexemeAccept, isTokenAccept } from './tokens';
-import { multiplyArrays } from './utils/multiplyArrays';
+import { Lexeme, Gr, Token, isLexemeAccept, isTokenAccept, findLexemes } from './tokens';
 import { Predicate } from './core';
 
 // #region Gr patterns
@@ -23,16 +21,21 @@ function x(...ps: Predicate<Lexeme>[]): Predicate<Lexeme> {
 }
 
 const subjectPatterns: Predicate<Lexeme>[][] = [
+    // Имена вин.
     [x(Persn, Acc, Male), x(Famn, Acc)],
     [x(Persn, Acc, Famela, Single), x(Famn, Acc)],
     [x(Persn, Acc, Unisex), x(Famn, Acc)],
+    // Вин.
     [x(S, Anim, Single, Acc, NotTokenA), x(S, Acc)],
     [x(S, Anim, Single, Acc, NotTokenA, NotName)],
+    // Имена имен.
     [x(Persn, Nom, Male), x(Famn, Nom)],
     [x(Persn, Nom, Famela), x(Famn, Nom)],
     [x(Persn, Nom, Unisex), x(Famn, Nom)],
-    [x(S, Anim, Single, Nom, NotTokenA), x(S, Nom, NotTokenA)],
-    [x(S, Anim, Single, Nom, NotTokenA)],
+    // Имен.
+    [x(S, Anim, Nom, NotTokenA), x(S, Nom, NotTokenA)],
+    [x(S, Anim, Nom, NotTokenA)],
+    // Что угодно
     [x(S, Anim, Single)],
     [x(S, Anim)],
 ];
@@ -68,15 +71,11 @@ export function extractChar(tokens: Token[]): Character | undefined {
 }
 
 export function extractSubject(tokens: Token[]): Lexeme[] | undefined {
-    const production = multiplyArrays(...tokens.map(t => t.lexemes));
-
     for (let pattern of subjectPatterns) {
-        for (let sentence of production) {
-            const matches = findSeq(sentence, pattern);
+        const matches = findLexemes(tokens, pattern);
 
-            if (matches) {
-                return matches;
-            }
+        if (matches) {
+            return matches;
         }
     }
 
@@ -336,27 +335,23 @@ function extractGender(lexeme: Lexeme): Gender {
 }
 
 export function extractInanimate(tokens: Token[]): Character | undefined {
-    const production = multiplyArrays(...tokens.map(t => t.lexemes));
-
     const SInanAcc = (l: Lexeme) => isLexemeAccept(l, [Gr.inan, Gr.S, Gr.Acc]);
     const SInanNom = (l: Lexeme) => isLexemeAccept(l, [Gr.inan, Gr.S, Gr.Nom]);
 
-    for (let sentence of production) {
-        const found = findSeq(sentence, [SInanAcc]) || findSeq(sentence, [SInanNom]);
+    const found = findLexemes(tokens, [SInanAcc]) || findLexemes(tokens, [SInanNom]);
 
-        if (found) {
-            const [char] = found;
-            const isFamela = isLexemeAccept(char, [Gr.Famela]);
+    if (found) {
+        const [char] = found;
+        const isFamela = isLexemeAccept(char, [Gr.Famela]);
 
-            return {
-                subject: {
-                    nominative: char.lex,
-                    accusative: isFamela ? SToAccFamela(char.lex) : char.lex,
-                },
-                normal: char.lex,
-                gender: extractGender(char),
-            };
-        }
+        return {
+            subject: {
+                nominative: char.lex,
+                accusative: isFamela ? SToAccFamela(char.lex) : char.lex,
+            },
+            normal: char.lex,
+            gender: extractGender(char),
+        };
     }
 
     return undefined;
@@ -368,5 +363,13 @@ export function extractInanimate(tokens: Token[]): Character | undefined {
  */
 function fixTokens(tokens: Token[]): Token[] {
     // «Нет» распознаётся как неод.существительное
-    return tokens.filter(t => t.text !== 'нет');
+    const withouutNo = tokens.filter(t => t.text !== 'нет');
+
+    // Отбросить маловероятные слова
+    // const moreLikely = withouutNo.map(t => ({
+    //     text: t.text,
+    //     lexemes: t.lexemes.filter(l => l.weight > 0.1),
+    // }));
+
+    return withouutNo;
 }
