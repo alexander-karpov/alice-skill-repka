@@ -1,5 +1,12 @@
 //#region types
-export type Lexeme = { text: string; lex: string; gr: Gr[]; grs: Gr[][]; position: number };
+export type Lexeme = {
+    text: string;
+    lex: string;
+    gr: Gr[];
+    tokenGrs: Gr[][];
+    grs: Gr[][];
+    position: number;
+};
 export type Token = { lexemes: Lexeme[]; text: string };
 
 export enum Gr {
@@ -124,4 +131,7 @@ export function isLexemeAccept(lexeme: Lexeme, grs: Gr[]): boolean {
 
 export function isLexemeGrsAccept(lexeme: Lexeme, grs: Gr[]): boolean {
     return grs.every(gr => lexeme.grs.some(lgr => lgr.includes(gr)));
+}
+export function isTokenAccept(lexeme: Lexeme, grs: Gr[]): boolean {
+    return grs.every(gr => lexeme.tokenGrs.some(lgr => lgr.includes(gr)));
 }

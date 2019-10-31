@@ -80,6 +80,7 @@ function preprocessLexeme({ lex, gr }: MyStemLexeme): Lexeme {
         lex,
         gr: gr.split(/=|,/) as Gr[],
         grs: [],
+        tokenGrs: [],
         text: '',
         position: 0,
     };
@@ -90,6 +91,7 @@ function preprocessToken({ analysis = [], text }: MyStemToken, position: number)
 
     lexemes.forEach(l => {
         l.grs = getGrsWithSameLex(l.lex, lexemes);
+        l.tokenGrs = lexemes.map(l => l.gr);
         l.text = text;
         l.position = position;
     });
