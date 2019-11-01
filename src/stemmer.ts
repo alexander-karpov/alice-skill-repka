@@ -1,7 +1,6 @@
 import { spawn } from 'child_process';
 import * as LRU from 'lru-cache';
 import { Gr, Lexeme, Token } from './tokens';
-import { last } from './utils';
 
 //#region types
 export type Stemmer = (message: string) => Promise<Token[]>;
@@ -21,14 +20,16 @@ type MyStemLexeme = {
 const stemmerCache = new LRU<string, Token[]>({ max: 1024 });
 
 export async function stemmer(message: string): Promise<Token[]> {
-    const cached = stemmerCache.get(message);
+    const fixedMessage = fixVoiceRecognitionDefects(message);
+
+    const cached = stemmerCache.get(fixedMessage);
 
     if (cached) {
         return cached;
     }
 
-    const tokens = await stemmerImpl(message);
-    stemmerCache.set(message, tokens);
+    const tokens = await stemmerImpl(fixedMessage);
+    stemmerCache.set(fixedMessage, tokens);
 
     return tokens;
 }
@@ -62,9 +63,8 @@ function stemmerImpl(message: string): Promise<Token[]> {
                 const json = outDate.toString().replace(/\[\]/gi, '');
                 const parsed = JSON.parse(json);
                 const tokens = parsed.map(preprocessToken);
-                const deduplicated = removeDuplicateWords(tokens);
 
-                resolve(deduplicated);
+                resolve(tokens);
             } catch (e) {
                 resolve([]);
             }
@@ -105,21 +105,13 @@ function getGrsWithSameLex(lex: string, lexemes: Lexeme[]) {
     return lexemes.filter(l => l.lex === lex).map(l => l.gr);
 }
 
-/**
- * Удаляет из предложения повторяющиеся слова. Они иногда бывают.
- */
-function removeDuplicateWords(tokens: Token[]): Token[] {
-    const deduplicated: Token[] = [];
-
-    for (let token of tokens) {
-        const prev = last(deduplicated);
-
-        if (!prev || prev.text !== token.text) {
-            deduplicated.push(token);
-        }
-    }
-
-    return deduplicated;
+function fixVoiceRecognitionDefects(message: string) {
+    // Дети случайно зовут сучку вместо жучки
+    // Баку вместо баки
+    return message
+        .replace('сучк', 'жучк')
+        .replace(/^баку/, 'бабку')
+        .replace(/\sбаку/, 'бабку');
 }
 
 /**

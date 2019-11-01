@@ -1,13 +1,14 @@
 import { Character, Word, Gender } from './character';
 import { Lexeme, Gr, Token, isLexemeAccept, isTokenAccept, findLexemes } from './tokens';
 import { Predicate } from './core';
+import { last } from './utils';
 
 /**
  * Mystem возвращает бесконтекстную вероятность леммы.
  * Используем её для отсечения совсем невероятных,
  * но мешающих распознаванию вариантов.
  */
-const LEXEME_PROBABILITY_BARRIER = 0.00001;
+const LEXEME_PROBABILITY_BARRIER = 0.0001;
 
 // #region Gr patterns
 const S = (l: Lexeme) => isLexemeAccept(l, [Gr.S]);
@@ -72,6 +73,7 @@ export function extractChar(tokens: Token[]): Character | undefined {
 
     return {
         subject: word,
+        tts: fixTts(word),
         normal: subject[0].lex,
         gender: extractGender(subjectFirst),
     };
@@ -342,10 +344,12 @@ function extractGender(lexeme: Lexeme): Gender {
 }
 
 export function extractInanimate(tokens: Token[]): Character | undefined {
+    const fixdedTokens = fixTokens(tokens);
+
     const SInanAcc = (l: Lexeme) => isLexemeAccept(l, [Gr.inan, Gr.S, Gr.Acc]);
     const SInanNom = (l: Lexeme) => isLexemeAccept(l, [Gr.inan, Gr.S, Gr.Nom]);
 
-    const found = findLexemes(tokens, [SInanAcc]) || findLexemes(tokens, [SInanNom]);
+    const found = findLexemes(fixdedTokens, [SInanAcc]) || findLexemes(fixdedTokens, [SInanNom]);
 
     if (found) {
         const [char] = found;
@@ -378,5 +382,43 @@ function fixTokens(tokens: Token[]): Token[] {
         lexemes: t.lexemes.filter(l => l.weight > LEXEME_PROBABILITY_BARRIER),
     }));
 
-    return moreLikely;
+    // «Жучка» распознаётся как «жучок»
+    const fixedJuchra = moreLikely.map(t => {
+        if (t.text === 'жучка') {
+            return {
+                text: t.text,
+                lexemes: t.lexemes.filter(l => l.lex !== 'жучок'),
+            };
+        }
+
+        return t;
+    });
+
+    // Удаляет повторения
+    const deduplicated: Token[] = [];
+
+    for (let token of fixedJuchra) {
+        const prev = last(deduplicated);
+
+        if (!prev || prev.text !== token.text) {
+            deduplicated.push(token);
+        }
+    }
+
+    return deduplicated;
+}
+
+/**
+ * Исправляет произношение для некоторых персонажей
+ * @param char
+ */
+function fixTts(word: Word): Word {
+    if (word.nominative === 'жучка') {
+        return {
+            nominative: 'ж+учка',
+            accusative: 'ж+учку',
+        };
+    }
+
+    return word;
 }

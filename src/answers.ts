@@ -81,11 +81,7 @@ export function formatStory(chars: readonly Character[]): Speech {
         const emojiPart = em ? ` ${em} ` : ' ';
 
         text.push(`${nom(sub)}${emojiPart} за ${acc(obj)}`);
-        tts.push(
-            `${sub.tts ? sub.tts.nominative : nom(sub)} за ${
-                obj.tts ? obj.tts.nominative : acc(obj)
-            }`,
-        );
+        tts.push(`${nomTts(sub)} за ${accTts(obj)}`);
     }
 
     text.reverse();
@@ -147,10 +143,12 @@ export const chars = {
         const come = comeRunningCapitalized(dog);
         const soundNumber = sample([3, 5], random100);
 
-        return createSpeech(
+        return speak([
             `${come} ${nom(dog)}.`,
-            `${come} ${nom(dog)} - <speaker audio="alice-sounds-animals-dog-${soundNumber}.opus">.`,
-        );
+            `${come} ${nomTts(
+                dog,
+            )} - <speaker audio="alice-sounds-animals-dog-${soundNumber}.opus">.`,
+        ]);
     },
     owl(owl: Character, _prev: Character, random100: number) {
         const come = flownCapitalized(owl);
@@ -302,8 +300,16 @@ export function nom(char: Character) {
     return char.subject.nominative;
 }
 
+export function nomTts(char: Character) {
+    return char.tts ? char.tts.nominative : char.subject.nominative;
+}
+
 export function acc(char: Character) {
     return char.subject.accusative;
+}
+
+export function accTts(char: Character) {
+    return char.tts ? char.tts.accusative : char.subject.accusative;
 }
 
 export function norm(char: Character) {
