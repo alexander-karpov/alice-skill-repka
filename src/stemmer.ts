@@ -11,7 +11,11 @@ type MyStemToken = {
     text: string;
 };
 
-type MyStemLexeme = { lex: string; gr: string };
+type MyStemLexeme = {
+    lex: string;
+    gr: string;
+    wt: number;
+};
 //#endregion
 
 const stemmerCache = new LRU<string, Token[]>({ max: 1024 });
@@ -34,7 +38,7 @@ function stemmerImpl(message: string): Promise<Token[]> {
         return Promise.resolve([]);
     }
 
-    const mystem = spawn('mystem', ['--format=json', '-i']);
+    const mystem = spawn('mystem', ['--format=json', '--weight', '-i']);
 
     const promise = new Promise<Token[]>((resolve, reject) => {
         let outDate: Buffer | undefined;
@@ -75,13 +79,13 @@ function stemmerImpl(message: string): Promise<Token[]> {
     return promise;
 }
 
-function preprocessLexeme({ lex, gr }: MyStemLexeme): Lexeme {
+function preprocessLexeme({ lex, gr, wt }: MyStemLexeme): Lexeme {
     return {
         lex,
         gr: gr.split(/=|,/) as Gr[],
+        weight: wt,
         grs: [],
         tokenGrs: [],
-        text: '',
         position: 0,
     };
 }
@@ -92,7 +96,6 @@ function preprocessToken({ analysis = [], text }: MyStemToken, position: number)
     lexemes.forEach(l => {
         l.grs = getGrsWithSameLex(l.lex, lexemes);
         l.tokenGrs = lexemes.map(l => l.gr);
-        l.text = text;
         l.position = position;
     });
     return { lexemes, text };

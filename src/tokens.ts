@@ -2,8 +2,8 @@ import { Predicate } from './core';
 
 //#region types
 export type Lexeme = {
-    text: string;
     lex: string;
+    weight: number;
     gr: Gr[];
     tokenGrs: Gr[][];
     grs: Gr[][];

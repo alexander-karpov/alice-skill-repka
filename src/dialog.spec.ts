@@ -399,7 +399,7 @@ describe('Main dialog', () => {
     });
 
     describe('Запросы пользователей', () => {
-        test.skip('жили были дед да баба…', async () => {
+        test('жили были дед да баба…', async () => {
             await act('');
             expect(
                 await tts(

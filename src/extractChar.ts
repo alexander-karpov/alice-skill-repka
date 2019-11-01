@@ -2,6 +2,13 @@ import { Character, Word, Gender } from './character';
 import { Lexeme, Gr, Token, isLexemeAccept, isTokenAccept, findLexemes } from './tokens';
 import { Predicate } from './core';
 
+/**
+ * Mystem возвращает бесконтекстную вероятность леммы.
+ * Используем её для отсечения совсем невероятных,
+ * но мешающих распознаванию вариантов.
+ */
+const LEXEME_PROBABILITY_BARRIER = 0.00001;
+
 // #region Gr patterns
 const S = (l: Lexeme) => isLexemeAccept(l, [Gr.S]);
 const Acc = (l: Lexeme) => isLexemeAccept(l, [Gr.Acc]);
@@ -365,11 +372,11 @@ function fixTokens(tokens: Token[]): Token[] {
     // «Нет» распознаётся как неод.существительное
     const withouutNo = tokens.filter(t => t.text !== 'нет');
 
-    // Отбросить маловероятные слова
-    // const moreLikely = withouutNo.map(t => ({
-    //     text: t.text,
-    //     lexemes: t.lexemes.filter(l => l.weight > 0.1),
-    // }));
+    // Отбросить маловероятные (вообще невероятные) слова
+    const moreLikely = withouutNo.map(t => ({
+        text: t.text,
+        lexemes: t.lexemes.filter(l => l.weight > LEXEME_PROBABILITY_BARRIER),
+    }));
 
-    return withouutNo;
+    return moreLikely;
 }
