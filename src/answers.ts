@@ -112,6 +112,17 @@ export const chars = {
         const come = comeCapitalized(char);
         return speak(`${come} ${nom(char)}.`);
     },
+    grandfather(char: Character, previousChar: Character, random100: number) {
+        const come = comeCapitalized(char);
+        const soundNumber = sample([1, 2], random100);
+
+        return speak([
+            `${come} ${nom(char)}.`,
+            `${come} ${nom(
+                char,
+            )} - <speaker audio="alice-sounds-human-sneeze-${soundNumber}.opus">.`,
+        ]);
+    },
     mouse(mouse: Character) {
         const come = comeRunningCapitalized(mouse);
 

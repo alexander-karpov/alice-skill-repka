@@ -139,4 +139,10 @@ const knownChars = {
         answer: answers.chars.zombie,
         image: '',
     } as KnownChar,
+    grandfather: {
+        button: '👴 Дедушка',
+        trigger: intents.grandfather,
+        answer: answers.chars.grandfather,
+        image: '',
+    } as KnownChar,
 };

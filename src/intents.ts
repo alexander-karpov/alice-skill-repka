@@ -5,6 +5,10 @@ export function granny(char: Character) {
     return equals(char, 'бабка', 'бабушка', 'баба');
 }
 
+export function grandfather(char: Character) {
+    return startsWith(char, 'дед');
+}
+
 export function cat(char: Character) {
     return startsWith(char, 'кош', 'кот', 'киск', 'мурк');
 }
