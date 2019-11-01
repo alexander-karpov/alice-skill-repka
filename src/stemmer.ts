@@ -106,14 +106,14 @@ function getGrsWithSameLex(lex: string, lexemes: Lexeme[]) {
 }
 
 function fixVoiceRecognitionDefects(message: string) {
-    // Дети случайно зовут сучку вместо жучки
+    // Дети случайно зовут сучку или ручку вместо жучки
     // Баку вместо баки
     return message
-        .replace('сучк', 'жучк')
-        .replace('детка', 'дедку')
-        .replace('детку', 'дедку')
+        .replace(/^[с|р]учк/, 'жучк')
+        .replace(/\s[с|р]учк/, ' жучк')
+        .replace(/детк[а|у]/, 'дедку')
         .replace(/^баку/, 'бабку')
-        .replace(/\sбаку/, 'бабку');
+        .replace(/\sбаку/, ' бабку');
 }
 
 /**
