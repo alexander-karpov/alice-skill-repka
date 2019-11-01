@@ -110,6 +110,7 @@ function fixVoiceRecognitionDefects(message: string) {
     // Баку вместо баки
     return message
         .replace('сучк', 'жучк')
+        .replace('детк', 'дедк')
         .replace(/^баку/, 'бабку')
         .replace(/\sбаку/, 'бабку');
 }
