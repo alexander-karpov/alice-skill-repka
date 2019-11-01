@@ -194,9 +194,18 @@ export const chars = {
             `${come} ${nom(char)} - <speaker audio="alice-music-violin-c-1.opus">.`,
         );
     },
-    bear(char: Character) {
+    bear(char: Character, prev: Character, random100: number) {
         const come = comeCapitalized(char);
-        return createSpeech(`${come} ${nom(char)}.`);
+
+        const sound = sample(
+            [
+                '<speaker audio="dialogs-upload/d72eedce-c6f5-412b-8ed7-93cdccd9b716/e29520bc-c2e2-40e5-9b7a-bc805fe89b1e.opus">',
+                '<speaker audio="dialogs-upload/d72eedce-c6f5-412b-8ed7-93cdccd9b716/baef2695-35fd-471b-b40f-7c34f7eeec31.opus">',
+            ],
+            random100,
+        );
+
+        return speak([`${come} ${nom(char)}.`, `${come} ${nom(char)} - ${sound}.`]);
     },
     crow(crow: Character) {
         const come = flownCapitalized(crow);
