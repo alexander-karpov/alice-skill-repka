@@ -352,6 +352,12 @@ describe('Main dialog', () => {
         );
     });
 
+    test('Не распознаёт «пришла» как пришлая', async () => {
+        await act('');
+
+        expect(await act('пришла бабушка')).toMatch(/^Пришла бабушка/i);
+    });
+
     test('Кнопки с уже выбранными персонажами не должны приходить повторно', async () => {
         const shown: { [button: string]: boolean } = {};
 

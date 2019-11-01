@@ -405,7 +405,16 @@ function fixTokens(tokens: Token[]): Token[] {
         }
     }
 
-    return deduplicated;
+    /**
+     * Удаляем краткие формы.
+     * Чтобы слово «пришла» не распознавалось как «пришлая»
+     */
+    const noBriefForm = deduplicated.map(t => ({
+        text: t.text,
+        lexemes: t.lexemes.filter(l => !isLexemeAccept(l, [Gr.brev])),
+    }));
+
+    return noBriefForm;
 }
 
 /**

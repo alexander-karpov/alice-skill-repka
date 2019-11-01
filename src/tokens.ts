@@ -124,6 +124,8 @@ export enum Gr {
     obsol = 'устар',
     /** фамилия */
     famn = 'фам',
+    /** краткая форма */
+    brev = 'кр',
 }
 //#endregion
 
