@@ -20,16 +20,14 @@ type MyStemLexeme = {
 const stemmerCache = new LRU<string, Token[]>({ max: 1024 });
 
 export async function stemmer(message: string): Promise<Token[]> {
-    const fixedMessage = fixVoiceRecognitionDefects(message);
-
-    const cached = stemmerCache.get(fixedMessage);
+    const cached = stemmerCache.get(message);
 
     if (cached) {
         return cached;
     }
 
-    const tokens = await stemmerImpl(fixedMessage);
-    stemmerCache.set(fixedMessage, tokens);
+    const tokens = await stemmerImpl(message);
+    stemmerCache.set(message, tokens);
 
     return tokens;
 }
@@ -72,8 +70,9 @@ function stemmerImpl(message: string): Promise<Token[]> {
     });
 
     const cyrillic = removeNonCyrillic(message);
+    const nluFixed = fixVoiceRecognitionDefects(cyrillic);
 
-    mystem.stdin.write(`${cyrillic}\n`);
+    mystem.stdin.write(`${nluFixed}\n`);
     mystem.stdin.end();
 
     return promise;
@@ -108,11 +107,12 @@ function getGrsWithSameLex(lex: string, lexemes: Lexeme[]) {
 function fixVoiceRecognitionDefects(message: string) {
     // Дети случайно зовут сучку или ручку вместо жучки
     // Баку вместо баки
-    return message
-        .replace(/^[с|р]учк/, 'жучк')
+    // Пробел вначале добавляем, чтобы не распознавать отдельно
+    // начало текста. Симлов границы слова для кирилицы не работает.
+    return ` ${message}`
         .replace(/\s[с|р]учк/, ' жучк')
-        .replace(/детк[а|у]/, 'дедку')
-        .replace(/^баку/, 'бабку')
+        .replace(/\sдетк[а|у]/, ' дедку')
+        .replace(/\sночк[а|у]/, ' дочка')
         .replace(/\sбаку/, ' бабку');
 }
 
