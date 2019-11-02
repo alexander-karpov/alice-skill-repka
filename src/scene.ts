@@ -90,6 +90,7 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
                 chars: [DEDKA],
                 next: Scene.Repka,
                 endSession: true,
+                buttons: [reactionButton],
             };
         }
 
@@ -152,12 +153,10 @@ function knownCharButtons(chars: readonly Character[], random100: number): Scene
 }
 
 function storyEndButtons(): SceneButton[] {
-    return [
-        { text: 'Да' },
-        { text: 'Нет' },
-        {
-            text: '❤️ Поставить оценку',
-            url: 'https://dialogs.yandex.ru/store/skills/916a8380-skazka-pro-repku',
-        },
-    ];
+    return [{ text: 'Да' }, { text: 'Нет' }, reactionButton];
 }
+
+const reactionButton = {
+    text: '❤️ Поставить оценку',
+    url: 'https://dialogs.yandex.ru/store/skills/916a8380-skazka-pro-repku',
+};

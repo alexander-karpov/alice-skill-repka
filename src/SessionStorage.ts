@@ -4,8 +4,8 @@ import * as LRU from 'lru-cache';
 
 export class SessionStorage {
     private readonly sessions: LRU<string, Session> = new LRU<string, Session>({
-        // Один день
-        maxAge: 1000 * 60 * 60 * 24,
+        // Один час
+        maxAge: 1000 * 60 * 60,
     });
 
     private constructor() {}
