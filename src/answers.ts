@@ -123,6 +123,12 @@ export const chars = {
             )} - <speaker audio="alice-sounds-human-sneeze-${soundNumber}.opus">.`,
         ]);
     },
+    alice() {
+        return speak([
+            `Запустилась Алиса.`,
+            `Запустилась Алиса - <speaker audio="dialogs-upload/d72eedce-c6f5-412b-8ed7-93cdccd9b716/8331f8db-0b01-4fcc-8530-ba8c1c676643.opus">.`,
+        ]);
+    },
     mouse(mouse: Character) {
         const come = comeRunningCapitalized(mouse);
 

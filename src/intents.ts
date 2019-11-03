@@ -9,6 +9,10 @@ export function grandfather(char: Character) {
     return startsWith(char, 'дед');
 }
 
+export function alice(char: Character) {
+    return equals(char, 'алиса');
+}
+
 export function cat(char: Character) {
     return startsWith(char, 'кош', 'кот', 'киск', 'мурк');
 }

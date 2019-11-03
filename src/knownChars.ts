@@ -127,11 +127,11 @@ const knownChars = {
         answer: answers.chars.fish,
         image: '',
     } as KnownChar,
-    girm: {
+    girl: {
         button: '👧 Внучку',
         trigger: intents.girl,
         answer: answers.chars.girl,
-        image: '',
+        image: '965417/04042969d5ad6db34bc3',
     } as KnownChar,
     zombie: {
         button: '🧟‍ Зомби',
@@ -140,9 +140,15 @@ const knownChars = {
         image: '',
     } as KnownChar,
     grandfather: {
-        button: '👴 Дедушка',
+        button: '👴 Дедушку',
         trigger: intents.grandfather,
         answer: answers.chars.grandfather,
         image: '',
+    } as KnownChar,
+    alice: {
+        button: '📱 Алису',
+        trigger: intents.alice,
+        answer: answers.chars.alice,
+        image: '1030494/941a763ac0fcc18e2be8',
     } as KnownChar,
 };
