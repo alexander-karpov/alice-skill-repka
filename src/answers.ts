@@ -126,7 +126,7 @@ export const chars = {
     alice() {
         return speak([
             `Запустилась Алиса.`,
-            `Запустилась Алиса - <speaker audio="dialogs-upload/d72eedce-c6f5-412b-8ed7-93cdccd9b716/8331f8db-0b01-4fcc-8530-ba8c1c676643.opus">.`,
+            `Запустилась Алиса <speaker audio="dialogs-upload/d72eedce-c6f5-412b-8ed7-93cdccd9b716/c4f36867-9885-439b-b215-bb5a87852710.opus">.`,
         ]);
     },
     mouse(mouse: Character) {
