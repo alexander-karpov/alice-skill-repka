@@ -124,10 +124,11 @@ export const chars = {
         ]);
     },
     alice() {
-        return speak([
-            `Запустилась Алиса.`,
-            `Запустилась Алиса <speaker audio="dialogs-upload/d72eedce-c6f5-412b-8ed7-93cdccd9b716/c4f36867-9885-439b-b215-bb5a87852710.opus">.`,
-        ]);
+        return speak([`Запустилась Алиса.`, `Запустилась Алиса.`]);
+    },
+
+    harryPotter() {
+        return speak([`Акцио, репка!`, `+Акцо, репка!  - - - `]);
     },
     mouse(mouse: Character) {
         const come = comeRunningCapitalized(mouse);

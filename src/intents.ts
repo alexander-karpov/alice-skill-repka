@@ -13,6 +13,10 @@ export function alice(char: Character) {
     return equals(char, 'алиса');
 }
 
+export function harryPotter(char: Character) {
+    return char.subject.nominative.toLocaleLowerCase() === 'гарри поттер';
+}
+
 export function cat(char: Character) {
     return startsWith(char, 'кош', 'кот', 'киск', 'мурк');
 }
@@ -101,16 +105,13 @@ export function wantsRepeat(tokens: Token[]) {
 }
 
 export function notWantRepeat(tokens: Token[]) {
-    function eq<T>(value: T) {
-        return (x: T) => (x === value ? x : undefined);
-    }
-
     const text = tokens.map(t => t.text);
 
     return Boolean(
         text.includes('достаточно') ||
             text.includes('хватит') ||
             text.includes('нет') ||
+            text.includes('пока') ||
             text.join(' ').includes('не надо'),
     );
 }

@@ -22,6 +22,8 @@ export function chooseKnownCharButtons(
     const notCalledKnownChars = Object.values(knownChars)
         .filter(c => c !== knownChars.mouse)
         .filter(c => c !== knownChars.zombie)
+        .filter(c => c !== knownChars.alice)
+        .filter(c => c !== knownChars.harryPotter)
         .filter(known => !allChars.some(known.trigger));
 
     if (notCalledKnownChars.length === 0) {
@@ -150,5 +152,11 @@ const knownChars = {
         trigger: intents.alice,
         answer: answers.chars.alice,
         image: '1030494/941a763ac0fcc18e2be8',
+    } as KnownChar,
+    harryPotter: {
+        button: '🧙‍♂️ Гарри Поттер',
+        trigger: intents.harryPotter,
+        answer: answers.chars.harryPotter,
+        image: '',
     } as KnownChar,
 };
