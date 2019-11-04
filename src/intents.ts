@@ -1,4 +1,4 @@
-import { Token } from './tokens';
+import { Token, isTokenInclude } from './tokens';
 import { Character } from './character';
 
 export function granny(char: Character) {
@@ -88,10 +88,16 @@ export function help(tokens: Token[]) {
 }
 
 export function wantsRepeat(tokens: Token[]) {
-    const text = tokens.map(t => t.text);
-    return text.some(t =>
-        ['да', 'давай', 'давайте', 'продолжай', 'ладно', 'хочу', 'заново', 'хотим'].includes(t),
-    );
+    return isIncludeAny(tokens, [
+        'да',
+        'давать',
+        'продолжать',
+        'ладно',
+        'хотеть',
+        'заново',
+        'снова',
+        'сначала',
+    ]);
 }
 
 export function notWantRepeat(tokens: Token[]) {
@@ -114,4 +120,8 @@ function startsWith(char: Character, ...aliases: string[]) {
 }
 function equals(char: Character, ...alias: string[]) {
     return alias.some(alias => char.normal === alias);
+}
+
+function isIncludeAny(ts: Token[], cases: string[]) {
+    return ts.some(t => cases.some(c => isTokenInclude(t, c)));
 }

@@ -130,6 +130,9 @@ describe('Main dialog', () => {
 
         expect(await act('мышку')).toMatch('вытянули репку');
         expect(await act('да пожалуйста')).toMatch('Посадил дед репку');
+
+        expect(await act('мышку')).toMatch('вытянули репку');
+        expect(await act('сначала')).toMatch('Посадил дед репку');
     });
 
     test('Отказ от продолжения словом Не надо', async () => {
