@@ -140,7 +140,7 @@ export function isTokenAccept(lexeme: Lexeme, grs: Gr[]): boolean {
     return grs.every(gr => lexeme.tokenGrs.some(lgr => lgr.includes(gr)));
 }
 
-export function isTokenInclude(token: Token, lex: string) {
+export function isTokenIncludesLex(token: Token, lex: string) {
     return token.lexemes.some(l => l.lex === lex);
 }
 

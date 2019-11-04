@@ -1,4 +1,4 @@
-import { Token, isTokenInclude } from './tokens';
+import { Token, isTokenIncludesLex } from './tokens';
 import { Character } from './character';
 
 export function granny(char: Character) {
@@ -92,7 +92,7 @@ export function help(tokens: Token[]) {
 }
 
 export function wantsRepeat(tokens: Token[]) {
-    return isIncludeAny(tokens, [
+    return isIncludeAnyLex(tokens, [
         'да',
         'давать',
         'продолжать',
@@ -111,9 +111,14 @@ export function notWantRepeat(tokens: Token[]) {
         text.includes('достаточно') ||
             text.includes('хватит') ||
             text.includes('нет') ||
+            text.includes('конец') ||
             text.includes('пока') ||
             text.join(' ').includes('не надо'),
     );
+}
+
+export function you(tokens: Token[]) {
+    return tokens.length === 1 && isTokenIncludesLex(tokens[0], 'ты');
 }
 
 function startsWith(char: Character, ...aliases: string[]) {
@@ -123,6 +128,6 @@ function equals(char: Character, ...alias: string[]) {
     return alias.some(alias => char.normal === alias);
 }
 
-function isIncludeAny(ts: Token[], cases: string[]) {
-    return ts.some(t => cases.some(c => isTokenInclude(t, c)));
+function isIncludeAnyLex(ts: Token[], cases: string[]) {
+    return ts.some(t => cases.some(c => isTokenIncludesLex(t, c)));
 }

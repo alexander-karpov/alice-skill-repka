@@ -47,16 +47,24 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
     [Scene.Repka]({ tokens, chars, random100 }) {
         const currentChar = last(chars) as Character;
         const nextChar = extractChar(tokens);
-        const inanimate = extractInanimate(tokens);
-
-        if (!nextChar && inanimate) {
-            return {
-                speech: answers.inanimateCalled(inanimate, currentChar),
-                buttons: knownCharButtons(chars, random100),
-            };
-        }
 
         if (!nextChar) {
+            const inanimate = extractInanimate(tokens);
+
+            if (inanimate) {
+                return {
+                    speech: answers.inanimateCalled(inanimate, currentChar),
+                    buttons: knownCharButtons(chars, random100),
+                };
+            }
+
+            if (intents.you(tokens)) {
+                return {
+                    speech: answers.you(currentChar),
+                    buttons: knownCharButtons(chars, random100),
+                };
+            }
+
             return {
                 speech: answers.wrongCommand(currentChar),
                 buttons: knownCharButtons(chars, random100),
