@@ -17,6 +17,17 @@ export function startSkillServer({ port }: { port: number }) {
 
     startServer(
         async request => {
+            if (request.request.command === 'ping') {
+                return {
+                    response: {
+                        text: 'pong',
+                        end_session: true,
+                    },
+                    session: request.session,
+                    version: request.version,
+                };
+            }
+
             const random100 = random(100);
             const time = new Date().getTime();
             const session = sessions.$ensureSession(time, request);
