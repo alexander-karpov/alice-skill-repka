@@ -4,6 +4,7 @@ import { Speech, speak } from './speech';
 import * as intents from './intents';
 import { SceneButton, scenes } from './scene';
 import { whoCalled2 } from './answers';
+import { EventsCollector } from './EventsCollector';
 
 //#region types
 export type DialogDependencies = {
@@ -17,12 +18,14 @@ export type DialogResult = {
     buttons: SceneButton[];
     endSession: boolean;
     session: Session;
+    events: EventsCollector;
 };
 //#endregion
 
 export async function mainDialog(
     command: string,
     session: Session,
+    events: EventsCollector,
     { stemmer, random100 }: DialogDependencies,
 ): Promise<DialogResult> {
     const tokens = await stemmer(command.toLowerCase());
@@ -39,6 +42,7 @@ export async function mainDialog(
             endSession: false,
             buttons: [],
             session,
+            events,
         };
     }
 
@@ -46,6 +50,7 @@ export async function mainDialog(
         chars: session.currentCharacters,
         tokens,
         random100,
+        events,
     });
 
     return {
@@ -54,5 +59,6 @@ export async function mainDialog(
         imageId: res.imageId,
         buttons: res.buttons || [],
         session: session.assign(res.next, res.chars),
+        events: res.events,
     };
 }

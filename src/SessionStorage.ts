@@ -14,7 +14,7 @@ export class SessionStorage {
         return new SessionStorage();
     }
 
-    $ensureSession(request: WebhookRequest): Session {
+    $ensureSession(time: number, request: WebhookRequest): Session {
         const sessionId = request.session.session_id;
         const existsSession = this.sessions.get(sessionId);
 
@@ -22,7 +22,7 @@ export class SessionStorage {
             return existsSession;
         }
 
-        const newSession = Session.create();
+        const newSession = Session.create(time);
         this.sessions.set(sessionId, newSession);
         this.sessions.prune();
 

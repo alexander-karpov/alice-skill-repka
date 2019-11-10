@@ -6,14 +6,15 @@ export class Session {
     private constructor(
         private readonly scene: Scene,
         private readonly chars: readonly Character[],
+        public readonly createdOn: number,
     ) {}
 
-    static create() {
-        return new Session(Scene.Intro, []);
+    static create(time: number) {
+        return new Session(Scene.Intro, [], time);
     }
 
     assign(scene?: Scene, chars?: readonly Character[]) {
-        return new Session(scene || this.scene, chars || this.chars);
+        return new Session(scene || this.scene, chars || this.chars, this.createdOn);
     }
 
     get currentScene(): Scene {

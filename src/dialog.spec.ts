@@ -1,6 +1,8 @@
 import { mainDialog } from './dialog';
 import { stemmer } from './stemmer';
 import { Session } from './Session';
+import { EventsCollector } from './EventsCollector';
+import { Event } from './Event';
 
 describe('Main dialog', () => {
     test('Классическая сказка: начало', async () => {
@@ -202,7 +204,10 @@ describe('Main dialog', () => {
         const {
             speech: { text },
             endSession,
-        } = await mainDialog('нет спасибо', session, { stemmer, random100: 0 });
+        } = await mainDialog('нет спасибо', session, new MockEventsCollector(), {
+            stemmer,
+            random100: 0,
+        });
 
         expect(text).toMatch('конец');
         expect(endSession).toEqual(true);
@@ -502,7 +507,7 @@ describe('Main dialog', () => {
         const {
             speech: { text },
             session: nextSession,
-        } = await mainDialog(command, session, { stemmer, random100 });
+        } = await mainDialog(command, session, new MockEventsCollector(), { stemmer, random100 });
         session = nextSession;
         return text;
     }
@@ -511,22 +516,35 @@ describe('Main dialog', () => {
         const {
             speech: { tts },
             session: nextSession,
-        } = await mainDialog(command, session, { stemmer, random100 });
+        } = await mainDialog(command, session, new MockEventsCollector(), { stemmer, random100 });
         session = nextSession;
         return tts;
     }
 
     async function buttons(command: string, random100 = 0) {
-        const { buttons, session: nextSession } = await mainDialog(command, session, {
-            stemmer,
-            random100,
-        });
+        const { buttons, session: nextSession } = await mainDialog(
+            command,
+            session,
+            new MockEventsCollector(),
+            {
+                stemmer,
+                random100,
+            },
+        );
         session = nextSession;
         return buttons;
     }
 
     beforeEach(() => {
-        session = Session.create();
+        session = Session.create(0);
     });
+
+    class MockEventsCollector implements EventsCollector {
+        events: readonly Event[] = [];
+
+        withNewGame(): EventsCollector {
+            return this;
+        }
+    }
     //#endregion
 });

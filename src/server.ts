@@ -90,6 +90,7 @@ export function startServer(handleRequest: RequestHandler, { port }: { port: num
         }
 
         console.log(`Alice Repka server is listening on ${port}`);
+        console.log(`NODE_ENV ${process.env.NODE_ENV}`);
     });
 
     server.on('close', () => {

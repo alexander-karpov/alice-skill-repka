@@ -7,6 +7,7 @@ import { Character, createChar, Gender } from './character';
 import { findKnownChar, chooseKnownCharButtons, KnownChar } from './knownChars';
 import { extractChar, extractInanimate } from './extractChar';
 import { cutText } from './utils';
+import { EventsCollector } from './EventsCollector';
 
 export enum Scene {
     Intro = 'Intro',
@@ -23,10 +24,12 @@ type SceneDependencies = {
     random100: number;
     tokens: Token[];
     chars: readonly Character[];
+    events: EventsCollector;
 };
 
 type SceneResult = {
     speech: Speech;
+    events: EventsCollector;
     chars?: readonly Character[];
     next?: Scene;
     endSession?: boolean;
@@ -37,14 +40,15 @@ type SceneResult = {
 const DEDKA = createChar('дедка', 'дедку', 'дедка', Gender.Male);
 
 export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult } = {
-    [Scene.Intro]() {
+    [Scene.Intro]({ events }) {
         return {
             speech: answers.intro(),
             chars: [DEDKA],
             next: Scene.Repka,
+            events: events.withNewGame(),
         };
     },
-    [Scene.Repka]({ tokens, chars, random100 }) {
+    [Scene.Repka]({ tokens, chars, events, random100 }) {
         const currentChar = last(chars) as Character;
         const nextChar = extractChar(tokens);
 
@@ -55,6 +59,7 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
                 return {
                     speech: answers.inanimateCalled(inanimate, currentChar),
                     buttons: knownCharButtons(chars, random100),
+                    events,
                 };
             }
 
@@ -62,12 +67,14 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
                 return {
                     speech: answers.you(currentChar),
                     buttons: knownCharButtons(chars, random100),
+                    events,
                 };
             }
 
             return {
                 speech: answers.wrongCommand(currentChar),
                 buttons: knownCharButtons(chars, random100),
+                events,
             };
         }
 
@@ -89,9 +96,10 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
             imageId: image,
             chars: chars.concat(nextChar),
             next,
+            events,
         };
     },
-    [Scene.RepeatOffer]({ tokens }) {
+    [Scene.RepeatOffer]({ tokens, events }) {
         if (intents.notWantRepeat(tokens)) {
             return {
                 speech: answers.endOfStory(),
@@ -99,6 +107,7 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
                 next: Scene.Repka,
                 endSession: true,
                 buttons: [reactionButton],
+                events,
             };
         }
 
@@ -107,10 +116,11 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
                 speech: answers.storyBegin(),
                 chars: [DEDKA],
                 next: Scene.Repka,
+                events,
             };
         }
 
-        return { speech: answers.yesOrNoExpected(), buttons: storyEndButtons() };
+        return { speech: answers.yesOrNoExpected(), buttons: storyEndButtons(), events };
     },
 };
 
