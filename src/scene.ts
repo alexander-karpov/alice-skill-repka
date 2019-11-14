@@ -12,7 +12,7 @@ import { EventsCollector } from './EventsCollector';
 export enum Scene {
     Intro = 'Intro',
     Repka = 'Repka',
-    RepeatOffer = 'RepeatOffer',
+    RepeatOffer = 'RepeatOffer'
 }
 
 export type SceneButton = {
@@ -45,7 +45,7 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
             speech: answers.intro(),
             chars: [DEDKA],
             next: Scene.Repka,
-            events: events.withNewGame(),
+            events: events.withNewGame()
         };
     },
     [Scene.Repka]({ tokens, chars, events, random100 }) {
@@ -59,7 +59,7 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
                 return {
                     speech: answers.inanimateCalled(inanimate, currentChar),
                     buttons: knownCharButtons(chars, random100),
-                    events,
+                    events: events.withThing(inanimate.subject.nominative)
                 };
             }
 
@@ -67,14 +67,14 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
                 return {
                     speech: answers.you(currentChar),
                     buttons: knownCharButtons(chars, random100),
-                    events,
+                    events
                 };
             }
 
             return {
                 speech: answers.wrongCommand(currentChar),
                 buttons: knownCharButtons(chars, random100),
-                events,
+                events
             };
         }
 
@@ -96,7 +96,7 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
             imageId: image,
             chars: chars.concat(nextChar),
             next,
-            events,
+            events: events.withCharacter(nextChar.subject.nominative)
         };
     },
     [Scene.RepeatOffer]({ tokens, events }) {
@@ -107,7 +107,7 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
                 next: Scene.Repka,
                 endSession: true,
                 buttons: [reactionButton],
-                events,
+                events
             };
         }
 
@@ -116,19 +116,19 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
                 speech: answers.storyBegin(),
                 chars: [DEDKA],
                 next: Scene.Repka,
-                events,
+                events
             };
         }
 
         return { speech: answers.yesOrNoExpected(), buttons: storyEndButtons(), events };
-    },
+    }
 };
 
 function makeRepkaTale(
     chars: readonly Character[],
     char: Character,
     knownChar: KnownChar | undefined,
-    random100: number,
+    random100: number
 ) {
     const allChars = chars.concat(char);
     const previousChar = last(chars) as Character;
@@ -148,11 +148,7 @@ function isTaleEnd(tale: Speech, nextChar: Character) {
     return isLastMouse || isTaleTooLong;
 }
 
-function makeButtons(
-    chars: readonly Character[],
-    isEnd: boolean,
-    random100: number,
-): SceneButton[] {
+function makeButtons(chars: readonly Character[], isEnd: boolean, random100: number): SceneButton[] {
     // Дадим ребенку сначала понять, что можно
     // самому придумывать персонажей.
     if (chars.length < 4) {
@@ -176,5 +172,5 @@ function storyEndButtons(): SceneButton[] {
 
 const reactionButton = {
     text: '❤️ Поставить оценку',
-    url: 'https://dialogs.yandex.ru/store/skills/916a8380-skazka-pro-repku',
+    url: 'https://dialogs.yandex.ru/store/skills/916a8380-skazka-pro-repku'
 };

@@ -3,7 +3,7 @@ import { startServer } from './server';
 import { mainDialog } from './dialog';
 import { stemmer } from './stemmer';
 import { SessionStorage } from './SessionStorage';
-import { RequestEventsCollector } from './RequestEventsCollector';
+import { EventsCollector } from './EventsCollector';
 import { AmplitudeAnalytics } from './AmplitudeAnalytics';
 import { ConsoleAnalytics } from './ConsoleAnalytics';
 import { Analytics } from './Analytics';
@@ -21,21 +21,21 @@ export function startSkillServer({ port }: { port: number }) {
                 return {
                     response: {
                         text: 'pong',
-                        end_session: true,
+                        end_session: true
                     },
                     session: request.session,
-                    version: request.version,
+                    version: request.version
                 };
             }
 
             const random100 = random(100);
             const time = new Date().getTime();
             const session = sessions.$ensureSession(time, request);
-            const events = RequestEventsCollector.create(time, request, session);
+            const events = EventsCollector.create(time, request, session);
 
             const answer = await mainDialog(request.request.command, session, events, {
                 stemmer,
-                random100,
+                random100
             });
 
             sessions.$updateSession(request, answer.session);
@@ -44,7 +44,7 @@ export function startSkillServer({ port }: { port: number }) {
                 ? {
                       type: 'BigImage',
                       image_id: answer.imageId,
-                      description: answer.speech.text,
+                      description: answer.speech.text
                   }
                 : undefined;
 
@@ -53,7 +53,7 @@ export function startSkillServer({ port }: { port: number }) {
                       return {
                           title: b.text,
                           url: b.url,
-                          hide: true,
+                          hide: true
                       };
                   })
                 : undefined;
@@ -64,17 +64,17 @@ export function startSkillServer({ port }: { port: number }) {
                     tts: answer.speech.tts,
                     card,
                     buttons,
-                    end_session: answer.endSession,
+                    end_session: answer.endSession
                 },
                 session: request.session,
-                version: request.version,
+                version: request.version
             };
 
             analytics.sendEvents(answer.events);
 
             return response;
         },
-        { port },
+        { port }
     );
 }
 

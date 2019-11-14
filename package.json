@@ -10,7 +10,7 @@
   "scripts": {
     "build": "rm -rf ./dist && tsc && cp package.json ./dist",
     "test": "jest",
-    "test:start": "npm run test -- --watch",
+    "test:watch": "npm run test -- --watch",
     "precommit": "pretty-quick --staged",
     "container:start": "npm i --prod && node ./index.js"
   },
