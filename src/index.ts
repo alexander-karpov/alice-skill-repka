@@ -17,7 +17,10 @@ export function startSkillServer({ port }: { port: number }) {
 
     startServer(
         async request => {
-            if (request.request.command === 'ping') {
+            if (
+                request.request.command.includes('ping') ||
+                request.request.original_utterance.includes('ping')
+            ) {
                 return {
                     response: {
                         text: 'pong',
