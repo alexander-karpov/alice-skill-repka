@@ -1,4 +1,4 @@
-import { Character } from './character';
+import { Character } from './Character';
 import { Scene } from './scene';
 import { last } from './utils';
 

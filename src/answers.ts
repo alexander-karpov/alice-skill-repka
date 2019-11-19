@@ -1,5 +1,4 @@
-import { Character, isCharMale, isCharFamela, isCharUnisex } from './character';
-import { Session } from './Session';
+import { Character } from './Character';
 import { sample, upperFirst } from './utils';
 import { createSpeech, Speech, speak, tts } from './speech';
 import { emoji } from './emoji';
@@ -23,18 +22,8 @@ export function intro(): Speech {
     );
 }
 
-export function whoCalled(session: Session) {
-    const char = session.findLastCharacter();
-
-    if (char) {
-        return `Кого ${called(char)} ${nom(char)}?`;
-    }
-
-    return '';
-}
-
 export function whoCalled2(char: Character) {
-    return `Кого ${called(char)} ${nom(char)}?`;
+    return `Кого ${called(char)} ${char.nominative}?`;
 }
 
 export function yesOrNoExpected(): Speech {
@@ -57,13 +46,13 @@ export function wrongCommand(char: Character) {
 }
 
 export function inanimateCalled(inanimate: Character, previousChar: Character) {
-    const zval = byGender(previousChar, 'звал', 'звала', 'звало');
+    const zval = previousChar.byGender('звал', 'звала', 'звало');
 
     return speak(
-        `Долго ${zval} ${nom(previousChar)} ${acc(inanimate)} —`,
+        `Долго ${zval} ${previousChar.nominative} ${inanimate.accusative} —`,
         speak([
-            byGender(previousChar, 'не дозвался.', 'не дозвалась.', 'не дозвалось.'),
-            byGender(previousChar, ' - не дозв+ался.', ' - не дозвал+ась.', ' - не дозвал+ось.'),
+            previousChar.byGender('не дозвался.', 'не дозвалась.', 'не дозвалось.'),
+            previousChar.byGender(' - не дозв+ался.', ' - не дозвал+ась.', ' - не дозвал+ось.'),
         ]),
         'Давайте позовем другого персонажа.',
         whoCalled2(previousChar),
@@ -74,7 +63,7 @@ export function inanimateCalled(inanimate: Character, previousChar: Character) {
  * Ответ на «Ты», «Тебя».
  */
 export function you(previousChar: Character) {
-    const zval = byGender(previousChar, 'звал', 'звала', 'звало');
+    const zval = previousChar.byGender('звал', 'звала', 'звало');
 
     return speak(
         ['Я там была, мёд 🍯 пила.\n', 'Я там была - мёд пила.'],
@@ -93,11 +82,11 @@ export function formatStory(chars: readonly Character[]): Speech {
     for (let i = 0; i < chars.length - 1; i++) {
         const sub = chars[i + 1];
         const obj = chars[i];
-        const em = emoji[nom(sub)] || emoji[norm(sub)];
+        const em = emoji[sub.nominative] || sub.byNormal(emoji);
         const emojiPart = em ? ` ${em} ` : ' ';
 
-        text.push(`${nom(sub)}${emojiPart} за ${acc(obj)}`);
-        tts.push(`${nomTts(sub)} за ${accTts(obj)}`);
+        text.push(`${sub.nominative}${emojiPart} за ${obj.accusative}`);
+        tts.push(`${sub.nominativeTts} за ${obj.accusativeTts}`);
     }
 
     text.reverse();
@@ -126,17 +115,15 @@ export function failure(char: Character) {
 export const chars = {
     granny(char: Character) {
         const come = comeCapitalized(char);
-        return speak(`${come} ${nom(char)}.`);
+        return speak(`${come} ${char.nominative}.`);
     },
     grandfather(char: Character, previousChar: Character, random100: number) {
         const come = comeCapitalized(char);
         const soundNumber = sample([1, 2], random100);
 
         return speak([
-            `${come} ${nom(char)}.`,
-            `${come} ${nom(
-                char,
-            )} - <speaker audio="alice-sounds-human-sneeze-${soundNumber}.opus">.`,
+            `${come} ${char.nominative}.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-human-sneeze-${soundNumber}.opus">.`,
         ]);
     },
     alice() {
@@ -146,75 +133,75 @@ export const chars = {
     harryPotter() {
         return speak([`Акцио, репка!`, `+Акцо, репка!  - - - `]);
     },
-    mouse(mouse: Character) {
-        const come = comeRunningCapitalized(mouse);
+    mouse(char: Character) {
+        const come = comeRunningCapitalized(char);
 
         return speak([
-            `${come} ${nom(mouse)}.`,
-            `${come} ${nom(mouse)} - <speaker audio="alice-music-violin-b-1.opus">.`,
+            `${come} ${char.nominative}.`,
+            `${come} ${char.nominative} - <speaker audio="alice-music-violin-b-1.opus">.`,
         ]);
     },
     cat(char: Character, previousChar: Character, random100: number) {
-        const useSOftMeow = isCharFamela(char) || nom(char).includes('котен');
-        const soundNumber = sample(useSOftMeow ? [3, 4] : [1, 2], random100);
+        const famelaMeow = [3, 4];
+        const maleMeow = char.nominative.includes('котен') ? famelaMeow : [1, 2];
+
+        const soundNumber = sample(char.byGender(maleMeow, famelaMeow, maleMeow), random100);
         const meow = speak([
             '- мяу -',
             `<speaker audio="alice-sounds-animals-cat-${soundNumber}.opus">`,
         ]);
 
-        const clung = byGender(char, 'вцепился', 'вцепилась', 'вцепилось');
-        const name = nom(char);
+        const clung = char.byGender('вцепился', 'вцепилась', 'вцепилось');
+        const name = char.nominative;
         const description = name === 'мурка' ? 'кошка ' : '';
 
         return speak(
-            byGender(char, 'Прибежал', 'Прибежала', 'Прибежало'),
+            char.byGender('Прибежал', 'Прибежала', 'Прибежало'),
             `${description}${name}`,
             meow,
-            `и ${clung} в ${acc(previousChar)}.`,
+            `и ${clung} в ${previousChar.accusative}.`,
         );
     },
-    dog(dog: Character, _prev: Character, random100: number) {
-        const come = comeRunningCapitalized(dog);
+    dog(char: Character, _prev: Character, random100: number) {
+        const come = comeRunningCapitalized(char);
         const soundNumber = sample([3, 5], random100);
 
         return speak([
-            `${come} ${nom(dog)}.`,
-            `${come} ${nomTts(
-                dog,
-            )} - <speaker audio="alice-sounds-animals-dog-${soundNumber}.opus">.`,
+            `${come} ${char.nominative}.`,
+            `${come} ${char.nominativeTts} - <speaker audio="alice-sounds-animals-dog-${soundNumber}.opus">.`,
         ]);
     },
-    owl(owl: Character, _prev: Character, random100: number) {
-        const come = flownCapitalized(owl);
+    owl(char: Character, _prev: Character, random100: number) {
+        const come = flownCapitalized(char);
         const soundNumber = sample([1, 2], random100);
 
         return createSpeech(
-            `${come} ${nom(owl)}.`,
-            `${come} ${nom(owl)} - <speaker audio="alice-sounds-animals-owl-${soundNumber}.opus">.`,
+            `${come} ${char.nominative}.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-owl-${soundNumber}.opus">.`,
         );
     },
-    rooster(rooster: Character) {
-        const come = flownCapitalized(rooster);
+    rooster(char: Character) {
+        const come = flownCapitalized(char);
 
         return createSpeech(
-            `${come} ${nom(rooster)}.`,
-            `${come} ${nom(rooster)} - <speaker audio="alice-sounds-animals-rooster-1.opus">.`,
+            `${come} ${char.nominative}.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-rooster-1.opus">.`,
         );
     },
-    wolf(wolf: Character) {
-        const come = comeRunningCapitalized(wolf);
+    wolf(char: Character) {
+        const come = comeRunningCapitalized(char);
 
         return createSpeech(
-            `${come} ${nom(wolf)}.`,
-            `${come} ${nom(wolf)} - <speaker audio="alice-sounds-animals-wolf-1.opus">.`,
+            `${come} ${char.nominative}.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-wolf-1.opus">.`,
         );
     },
     fox(char: Character) {
         const come = comeRunningCapitalized(char);
 
         return createSpeech(
-            `${come} ${nom(char)}.`,
-            `${come} ${nom(char)} - <speaker audio="alice-music-violin-c-1.opus">.`,
+            `${come} ${char.nominative}.`,
+            `${come} ${char.nominative} - <speaker audio="alice-music-violin-c-1.opus">.`,
         );
     },
     bear(char: Character, prev: Character, random100: number) {
@@ -228,57 +215,55 @@ export const chars = {
             random100,
         );
 
-        return speak([`${come} ${nom(char)}.`, `${come} ${nom(char)} - ${sound}.`]);
+        return speak([`${come} ${char.nominative}.`, `${come} ${char.nominative} - ${sound}.`]);
     },
-    crow(crow: Character) {
-        const come = flownCapitalized(crow);
+    crow(char: Character) {
+        const come = flownCapitalized(char);
 
         return createSpeech(
-            `${come} ${nom(crow)}.`,
-            `${come} ${nom(crow)} - <speaker audio="alice-sounds-animals-crow-1.opus">.`,
+            `${come} ${char.nominative}.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-crow-1.opus">.`,
         );
     },
-    lion(lion: Character) {
-        const come = comeCapitalized(lion);
+    lion(char: Character) {
+        const come = comeCapitalized(char);
 
         return createSpeech(
-            `${come} ${nom(lion)}.`,
-            `${come} ${nom(lion)} - <speaker audio="alice-sounds-animals-lion-1.opus">.`,
+            `${come} ${char.nominative}.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-lion-1.opus">.`,
         );
     },
-    cow(cow: Character) {
-        const come = comeCapitalized(cow);
+    cow(char: Character) {
+        const come = comeCapitalized(char);
 
         return createSpeech(
-            `${come} ${nom(cow)}.`,
-            `${come} ${nom(cow)} - <speaker audio="alice-sounds-animals-cow-2.opus">.`,
+            `${come} ${char.nominative}.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-cow-2.opus">.`,
         );
     },
-    horse(horse: Character, _prev: Character, random100: number) {
-        const come = riddenCapitalized(horse);
+    horse(char: Character, _prev: Character, random100: number) {
+        const come = riddenCapitalized(char);
         const soundNumber = (random100 % 2) + 1;
 
         return createSpeech(
-            `${come} ${nom(horse)}.`,
-            `${come} ${nom(
-                horse,
-            )} - <speaker audio="alice-sounds-animals-horse-${soundNumber}.opus">.`,
+            `${come} ${char.nominative}.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-horse-${soundNumber}.opus">.`,
         );
     },
-    chicken(chicken: Character) {
-        const come = comeRunningCapitalized(chicken);
+    chicken(char: Character) {
+        const come = comeRunningCapitalized(char);
 
         return createSpeech(
-            `${come} ${nom(chicken)}.`,
-            `${come} ${nom(chicken)} - <speaker audio="alice-sounds-animals-chicken-1.opus">.`,
+            `${come} ${char.nominative}.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-chicken-1.opus">.`,
         );
     },
-    frog(frog: Character) {
-        const come = riddenCapitalized(frog);
+    frog(char: Character) {
+        const come = riddenCapitalized(char);
 
         return createSpeech(
-            `${come} ${nom(frog)}.`,
-            `${come} ${nom(frog)} - <speaker audio="alice-sounds-animals-frog-1.opus">.`,
+            `${come} ${char.nominative}.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-frog-1.opus">.`,
         );
     },
     elephant(char: Character, _previousChar: Character, random100: number): Speech {
@@ -286,21 +271,21 @@ export const chars = {
         const n = sample([1, 2], random100);
 
         return createSpeech(
-            `${come} ${nom(char)}.`,
-            `${come} ${nom(char)} - <speaker audio="alice-sounds-animals-elephant-${n}.opus">.`,
+            `${come} ${char.nominative}.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-elephant-${n}.opus">.`,
         );
     },
     fish(char: Character, previousChar: Character) {
-        const nemu = byGender(previousChar, 'нему', 'ней', 'нему');
-        const poshel = byGender(previousChar, 'Пошёл', 'Пошла', 'Пошло');
-        const stalOn = byGender(previousChar, 'стал он', 'стала она', 'стало оно');
+        const nemu = previousChar.byGender('нему', 'ней', 'нему');
+        const poshel = previousChar.byGender('Пошёл', 'Пошла', 'Пошло');
+        const stalOn = previousChar.byGender('стал он', 'стала она', 'стало оно');
 
         return speak(
-            `${poshel} ${nom(previousChar)} к синему морю;`,
+            `${poshel} ${previousChar.nominative} к синему морю;`,
             createSpeech('', '<speaker audio="alice-sounds-nature-sea-1.opus"> - - '),
-            `${stalOn} кликать ${acc(char)}, приплыла к ${nemu} рыбка, спросила:`,
-            `«Чего тебе надобно ${nom(previousChar)}?»`,
-            `Ей с поклоном ${nom(previousChar)} отвечает:`,
+            `${stalOn} кликать ${char.accusative}, приплыла к ${nemu} рыбка, спросила:`,
+            `«Чего тебе надобно ${previousChar.nominative}?»`,
+            `Ей с поклоном ${previousChar.nominative} отвечает:`,
             `«Смилуйся, государыня рыбка, помоги вытянуть репку.»`,
         );
     },
@@ -308,8 +293,8 @@ export const chars = {
         const come = comeRunningCapitalized(char);
 
         return createSpeech(
-            `${come} ${nom(char)}.`,
-            `${come} ${nom(char)} - <speaker audio="alice-sounds-human-laugh-5.opus">.`,
+            `${come} ${char.nominative}.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-human-laugh-5.opus">.`,
         );
     },
 
@@ -317,60 +302,28 @@ export const chars = {
         const come = comeRunningCapitalized(char);
 
         return createSpeech(
-            `Пришло страшное ${nom(char)} и схватило ${acc(previousChar)}.`,
-            `Пришло страшное ${nom(
-                char,
-            )} - <speaker audio="alice-sounds-human-walking-dead-2.opus"> - и схватило ${acc(
-                previousChar,
-            )}.`,
+            `Пришло страшное ${char.nominative} и схватило ${previousChar.accusative}.`,
+            `Пришло страшное ${char.nominative} - <speaker audio="alice-sounds-human-walking-dead-2.opus"> - и схватило ${previousChar.accusative}.`,
         );
     },
 };
 
 function called(char: Character) {
-    return byGender(char, 'позвал', 'позвала', 'позвало');
-}
-
-function byGender<T>(char: Character, male: T, famela: T, other: T) {
-    if (isCharMale(char) || isCharUnisex(char)) {
-        return male;
-    }
-
-    return isCharFamela(char) ? famela : other;
-}
-
-export function nom(char: Character) {
-    return char.subject.nominative;
-}
-
-export function nomTts(char: Character) {
-    return char.tts ? char.tts.nominative : char.subject.nominative;
-}
-
-export function acc(char: Character) {
-    return char.subject.accusative;
-}
-
-export function accTts(char: Character) {
-    return char.tts ? char.tts.accusative : char.subject.accusative;
-}
-
-export function norm(char: Character) {
-    return char.normal;
+    return char.byGender('позвал', 'позвала', 'позвало');
 }
 
 function comeRunningCapitalized(char: Character) {
-    return byGender(char, 'Прибежал', 'Прибежала', 'Прибежало');
+    return char.byGender('Прибежал', 'Прибежала', 'Прибежало');
 }
 
 function comeCapitalized(char: Character) {
-    return byGender(char, 'Пришёл', 'Пришла', 'Пришло');
+    return char.byGender('Пришёл', 'Пришла', 'Пришло');
 }
 
 function riddenCapitalized(char: Character) {
-    return byGender(char, 'Прискакал', 'Прискакала', 'Прискакало');
+    return char.byGender('Прискакал', 'Прискакала', 'Прискакало');
 }
 
 function flownCapitalized(char: Character) {
-    return byGender(char, 'Прилетел', 'Прилетела', 'Прилетело');
+    return char.byGender('Прилетел', 'Прилетела', 'Прилетело');
 }

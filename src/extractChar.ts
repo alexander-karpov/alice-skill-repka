@@ -1,7 +1,9 @@
-import { Character, Word, Gender } from './character';
+import { Character } from './Character';
 import { Lexeme, Gr, Token, isLexemeAccept, isTokenAccept, findLexemes } from './tokens';
 import { Predicate } from './core';
 import { last } from './utils';
+import { Gender } from './Gender';
+import { Word } from './Word';
 
 /**
  * Mystem возвращает бесконтекстную вероятность леммы.
@@ -71,12 +73,7 @@ export function extractChar(tokens: Token[]): Character | undefined {
             .join(' '),
     };
 
-    return {
-        subject: word,
-        tts: fixTts(word),
-        normal: subject[0].lex,
-        gender: extractGender(subjectFirst),
-    };
+    return Character.create(word, extractGender(subjectFirst), subject[0].lex, fixTts(word));
 }
 
 export function extractSubject(tokens: Token[]): Lexeme[] | undefined {
@@ -355,14 +352,14 @@ export function extractInanimate(tokens: Token[]): Character | undefined {
         const [char] = found;
         const isFamela = isLexemeAccept(char, [Gr.Famela]);
 
-        return {
-            subject: {
+        return Character.create(
+            {
                 nominative: char.lex,
                 accusative: isFamela ? SToAccFamela(char.lex) : char.lex,
             },
-            normal: char.lex,
-            gender: extractGender(char),
-        };
+            extractGender(char),
+            char.lex,
+        );
     }
 
     return undefined;
