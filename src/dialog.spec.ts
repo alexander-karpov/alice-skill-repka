@@ -1,10 +1,13 @@
 import { mainDialog, DialogResult } from './dialog';
-import { stemmer } from './stemmer';
+import { Stemmer } from './Stemmer';
 import { Session } from './Session';
 import { Event } from './Event';
 import { EventsCollector } from './EventsCollector';
 import { WebhookRequest } from './server';
 import { SceneButton } from './scene';
+import { CachingStemmer } from './CachingStemmer';
+import { MystemStemmer } from './MystemStemmer';
+import { DumpingStemmer } from './DumpingStemmer';
 
 describe('Main dialog', () => {
     test('Классическая сказка: начало', async () => {
@@ -412,21 +415,21 @@ describe('Main dialog', () => {
             expect(await events('котик')).toContainEqual(
                 expect.objectContaining({
                     event_type: 'Call Character',
-                    event_properties: { name: 'котик' }
+                    event_properties: { name: 'котик' },
                 })
             );
 
             expect(await events('Олега')).toContainEqual(
                 expect.objectContaining({
                     event_type: 'Call Character',
-                    event_properties: { name: 'олег' }
+                    event_properties: { name: 'олег' },
                 })
             );
 
             expect(await events('кукуруку')).toContainEqual(
                 expect.objectContaining({
                     event_type: 'Call Character',
-                    event_properties: { name: 'кукурук' }
+                    event_properties: { name: 'кукурук' },
                 })
             );
         });
@@ -437,7 +440,7 @@ describe('Main dialog', () => {
             expect(await events('лопату')).toContainEqual(
                 expect.objectContaining({
                     event_type: 'Call Thing',
-                    event_properties: { name: 'лопата' }
+                    event_properties: { name: 'лопата' },
                 })
             );
         });
@@ -545,11 +548,12 @@ describe('Main dialog', () => {
     let sessionMock: Session;
     let requestMock: WebhookRequest;
     let eventsMock: EventsCollector;
+    let stemmer: Stemmer = new DumpingStemmer(new MystemStemmer());
 
     async function act(command: string, random100 = 0): Promise<DialogResult> {
         const dialogResult = await mainDialog(command, sessionMock, eventsMock, {
             stemmer,
-            random100
+            random100,
         });
 
         sessionMock = dialogResult.session;
@@ -582,26 +586,26 @@ describe('Main dialog', () => {
                 client_id: 'ru.yandex.searchplugin/7.16 (none none; android 4.4.2)',
 
                 locale: 'ru-RU',
-                timezone: 'UTC'
+                timezone: 'UTC',
             },
             request: {
                 command: 'котик',
                 nlu: {
-                    tokens: ['котик']
+                    tokens: ['котик'],
                 },
                 original_utterance: 'котик',
                 markup: {
-                    dangerous_context: false
-                }
+                    dangerous_context: false,
+                },
             },
             session: {
                 message_id: 1,
                 new: true,
                 session_id: 'cf8ad214-d7482f07-a55c37a4-89ca72b0',
                 skill_id: 'd72eedce-c6f5-412b-8ed7-93cdccd9b716',
-                user_id: '62E12D32F4A76F3201DBE52C8D4F39065CB80D3DC23BC5233AEB808A54441BA4'
+                user_id: '62E12D32F4A76F3201DBE52C8D4F39065CB80D3DC23BC5233AEB808A54441BA4',
             },
-            version: '1.0'
+            version: '1.0',
         };
 
         eventsMock = EventsCollector.create(0, requestMock, sessionMock);

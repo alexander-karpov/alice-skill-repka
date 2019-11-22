@@ -1,4 +1,4 @@
-import { Stemmer } from './stemmer';
+import { Stemmer } from './Stemmer';
 import { Session } from './Session';
 import { Speech, speak } from './speech';
 import * as intents from './intents';
@@ -26,9 +26,9 @@ export async function mainDialog(
     command: string,
     session: Session,
     events: EventsCollector,
-    { stemmer, random100 }: DialogDependencies,
+    { stemmer, random100 }: DialogDependencies
 ): Promise<DialogResult> {
-    const tokens = await stemmer(command.toLowerCase());
+    const tokens = await stemmer.analyze(command.toLowerCase());
 
     const char = session.findLastCharacter();
 
@@ -37,7 +37,7 @@ export async function mainDialog(
             speech: speak(
                 'В этой игре мы вместе сочиним сказку про репку.',
                 'Называйте персонажей и слушайте получившуюся историю.',
-                char ? whoCalled2(char) : '',
+                char ? whoCalled2(char) : ''
             ),
             endSession: false,
             buttons: [],
