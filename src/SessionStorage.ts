@@ -22,7 +22,7 @@ export class SessionStorage {
             return existsSession;
         }
 
-        const newSession = Session.create(time);
+        const newSession = Session.start(time);
         this.sessions.set(sessionId, newSession);
         this.sessions.prune();
 

@@ -2,12 +2,13 @@ import { random } from './utils';
 import { startServer } from './server';
 import { mainDialog } from './dialog';
 import { SessionStorage } from './SessionStorage';
-import { EventsCollector } from './EventsCollector';
+import { EventsBatch } from './EventsBatch';
 import { AmplitudeAnalytics } from './AmplitudeAnalytics';
 import { ConsoleAnalytics } from './ConsoleAnalytics';
 import { Analytics } from './Analytics';
 import { CachingStemmer } from './CachingStemmer';
 import { MystemStemmer } from './MystemStemmer';
+import { Experiments } from './Experiments';
 
 export function startSkillServer({ port }: { port: number }) {
     const sessions = SessionStorage.create();
@@ -35,7 +36,8 @@ export function startSkillServer({ port }: { port: number }) {
             const random100 = random(100);
             const time = new Date().getTime();
             const session = sessions.$ensureSession(time, request);
-            const events = EventsCollector.create(time, request, session);
+            const experiments = new Experiments().forUser(request.session.user_id);
+            const events = new EventsBatch(time, request, session, experiments);
 
             const answer = await mainDialog(request.request.command, session, events, {
                 stemmer: new CachingStemmer(new MystemStemmer()),

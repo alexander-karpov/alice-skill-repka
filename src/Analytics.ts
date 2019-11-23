@@ -1,8 +1,8 @@
-import { EventsCollector } from './EventsCollector';
+import { EventsBatch } from './EventsBatch';
 
 /**
  * Абстрактный отправлятор аналитики/счетчиков
  */
-export type Analytics = {
-    sendEvents(events: EventsCollector): void;
-};
+export interface Analytics {
+    sendEvents(events: EventsBatch): void;
+}

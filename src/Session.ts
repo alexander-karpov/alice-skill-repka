@@ -6,15 +6,11 @@ export class Session {
     private constructor(
         private readonly scene: Scene,
         private readonly chars: readonly Character[],
-        public readonly createdOn: number,
+        readonly createdOn: number
     ) {}
 
-    static create(time: number) {
+    static start(time: number) {
         return new Session(Scene.Intro, [], time);
-    }
-
-    assign(scene?: Scene, chars?: readonly Character[]) {
-        return new Session(scene || this.scene, chars || this.chars, this.createdOn);
     }
 
     get currentScene(): Scene {
@@ -23,6 +19,10 @@ export class Session {
 
     get currentCharacters(): readonly Character[] {
         return this.chars;
+    }
+
+    assign(scene?: Scene, chars?: readonly Character[]) {
+        return new Session(scene || this.scene, chars || this.chars, this.createdOn);
     }
 
     findLastCharacter(): Character | undefined {

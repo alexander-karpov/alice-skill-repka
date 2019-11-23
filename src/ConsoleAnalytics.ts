@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { EventsCollector } from './EventsCollector';
+import { EventsBatch } from './EventsBatch';
 import { Analytics } from './Analytics';
 
 /**
@@ -10,7 +10,7 @@ export class ConsoleAnalytics implements Analytics {
         return new ConsoleAnalytics();
     }
 
-    sendEvents(events: EventsCollector) {
+    sendEvents(events: EventsBatch) {
         if (events.events.length) {
             console.log(...events.events.map(e => e.toString()));
         }

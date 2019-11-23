@@ -2,12 +2,12 @@ import { mainDialog, DialogResult } from './dialog';
 import { Stemmer } from './Stemmer';
 import { Session } from './Session';
 import { Event } from './Event';
-import { EventsCollector } from './EventsCollector';
+import { EventsBatch } from './EventsBatch';
 import { WebhookRequest } from './server';
 import { SceneButton } from './scene';
-import { CachingStemmer } from './CachingStemmer';
 import { MystemStemmer } from './MystemStemmer';
 import { DumpingStemmer } from './DumpingStemmer';
+import { Experiments } from './Experiments';
 
 describe('Main dialog', () => {
     test('Классическая сказка: начало', async () => {
@@ -444,6 +444,30 @@ describe('Main dialog', () => {
                 })
             );
         });
+
+        test('Experiment Cities', async () => {
+            eventsMock = new EventsBatch(
+                0,
+                requestMock,
+                sessionMock,
+                new Experiments().forUser('100000000')
+            );
+
+            expect(await events('')).toContainEqual(
+                expect.objectContaining({ user_properties: { Experiments: ['cities'] } })
+            );
+
+            eventsMock = new EventsBatch(
+                0,
+                requestMock,
+                sessionMock,
+                new Experiments().forUser('F00000000')
+            );
+
+            expect(await events('котика')).toContainEqual(
+                expect.objectContaining({ user_properties: { Experiments: [] } })
+            );
+        });
     });
 
     describe('Запросы пользователей', () => {
@@ -547,7 +571,7 @@ describe('Main dialog', () => {
     //#region tests infrastructure
     let sessionMock: Session;
     let requestMock: WebhookRequest;
-    let eventsMock: EventsCollector;
+    let eventsMock: EventsBatch;
     let stemmer: Stemmer = new DumpingStemmer(new MystemStemmer());
 
     async function act(command: string, random100 = 0): Promise<DialogResult> {
@@ -579,8 +603,6 @@ describe('Main dialog', () => {
     }
 
     beforeEach(() => {
-        sessionMock = Session.create(0);
-
         requestMock = {
             meta: {
                 client_id: 'ru.yandex.searchplugin/7.16 (none none; android 4.4.2)',
@@ -608,7 +630,14 @@ describe('Main dialog', () => {
             version: '1.0',
         };
 
-        eventsMock = EventsCollector.create(0, requestMock, sessionMock);
+        sessionMock = Session.start(0);
+
+        eventsMock = new EventsBatch(
+            0,
+            requestMock,
+            sessionMock,
+            new Experiments().forUser(requestMock.session.user_id)
+        );
     });
     //#endregion
 });

@@ -12,14 +12,16 @@ export class Event {
     private readonly region: string;
     private readonly session_id: number;
     private readonly insert_id: string;
-    private readonly event_properties: Readonly<Record<string, string>>;
+    private readonly event_properties: Readonly<Record<string, string | string[]>>;
+    private readonly user_properties: Readonly<Record<string, string | string[]>>;
 
     constructor(
         eventType: string,
         time: number,
         request: WebhookRequest,
         session: Session,
-        eventProps: Readonly<Record<string, string>>,
+        eventProps: Readonly<Record<string, string | string[]>>,
+        userProps: Readonly<Record<string, string | string[]>>
     ) {
         this.event_type = eventType;
         this.time = time;
@@ -27,6 +29,7 @@ export class Event {
         this.region = request.meta.timezone;
         this.insert_id = `${eventType}${request.session.session_id}${request.session.message_id}`;
         this.event_properties = eventProps;
+        this.user_properties = userProps;
         this.session_id = session.createdOn;
     }
 

@@ -7,7 +7,7 @@ import { Character } from './Character';
 import { findKnownChar, chooseKnownCharButtons, KnownChar } from './knownChars';
 import { extractChar, extractInanimate } from './extractChar';
 import { cutText } from './utils';
-import { EventsCollector } from './EventsCollector';
+import { EventsBatch } from './EventsBatch';
 import { Gender } from './Gender';
 
 export enum Scene {
@@ -25,12 +25,12 @@ type SceneDependencies = {
     random100: number;
     tokens: Token[];
     chars: readonly Character[];
-    events: EventsCollector;
+    events: EventsBatch;
 };
 
 type SceneResult = {
     speech: Speech;
-    events: EventsCollector;
+    events: EventsBatch;
     chars?: readonly Character[];
     next?: Scene;
     endSession?: boolean;
@@ -129,7 +129,7 @@ function makeRepkaTale(
     chars: readonly Character[],
     char: Character,
     knownChar: KnownChar | undefined,
-    random100: number,
+    random100: number
 ) {
     const allChars = chars.concat(char);
     const previousChar = last(chars) as Character;
@@ -152,7 +152,7 @@ function isTaleEnd(tale: Speech, nextChar: Character) {
 function makeButtons(
     chars: readonly Character[],
     isEnd: boolean,
-    random100: number,
+    random100: number
 ): SceneButton[] {
     // Дадим ребенку сначала понять, что можно
     // самому придумывать персонажей.

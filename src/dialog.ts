@@ -4,7 +4,7 @@ import { Speech, speak } from './speech';
 import * as intents from './intents';
 import { SceneButton, scenes } from './scene';
 import { whoCalled2 } from './answers';
-import { EventsCollector } from './EventsCollector';
+import { EventsBatch } from './EventsBatch';
 
 //#region types
 export type DialogDependencies = {
@@ -18,14 +18,14 @@ export type DialogResult = {
     buttons: SceneButton[];
     endSession: boolean;
     session: Session;
-    events: EventsCollector;
+    events: EventsBatch;
 };
 //#endregion
 
 export async function mainDialog(
     command: string,
     session: Session,
-    events: EventsCollector,
+    events: EventsBatch,
     { stemmer, random100 }: DialogDependencies
 ): Promise<DialogResult> {
     const tokens = await stemmer.analyze(command.toLowerCase());

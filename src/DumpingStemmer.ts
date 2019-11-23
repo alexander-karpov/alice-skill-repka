@@ -5,7 +5,7 @@ import * as crypto from 'crypto';
 import { Token } from './tokens';
 
 /**
- * Добавляет сохранение на файловую систему
+ * Добавляет кэширование на файловую систему
  */
 export class DumpingStemmer implements Stemmer {
     constructor(private readonly stemmer: Stemmer) {}

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { EventsCollector } from './EventsCollector';
+import { EventsBatch } from './EventsBatch';
 import { Analytics } from './Analytics';
 
 /**
@@ -12,7 +12,7 @@ export class AmplitudeAnalytics implements Analytics {
         return new AmplitudeAnalytics(apiKey);
     }
 
-    sendEvents(events: EventsCollector) {
+    sendEvents(events: EventsBatch) {
         axios
             .post('https://api.amplitude.com/2/httpapi', {
                 api_key: this.apiKey,
