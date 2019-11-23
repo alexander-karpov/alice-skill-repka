@@ -8,7 +8,7 @@ export type AnswerBuilder = (char: Character, previousChar: Character, random100
 export function storyBegin(): Speech {
     return speak(
         'Посадил дед репку.',
-        'Выросла репка большая-пребольшая. Стал дед репку из земли тянуть. Тянет-потянет, вытянуть не может. Кого позвал дедка?',
+        'Выросла репка большая-пребольшая. Стал дед репку из земли тянуть. Тянет-потянет, вытянуть не может. Кого позвал дедка?'
     );
 }
 
@@ -18,7 +18,7 @@ export function intro(): Speech {
         tts`Хотите ${'- -'} вместе ${'-'} сочинить сказку?${' - - '}`,
         tts`Вы слышали ${'-'} как посадил дед репку?${' - - '}`,
         tts`А кто помогал её тянуть? ${'- -'} Давайте придумаем вместе.${' - - - '}`,
-        storyBegin(),
+        storyBegin()
     );
 }
 
@@ -29,7 +29,7 @@ export function whoCalled2(char: Character) {
 export function yesOrNoExpected(): Speech {
     return speak(
         ['Сейчас я ожидаю в ответ "Да" или "Нет".', 'сейчас я ожидаю в ответ - - да - - или  нет.'],
-        'Хотите продолжить игру?',
+        'Хотите продолжить игру?'
     );
 }
 
@@ -41,7 +41,7 @@ export function wrongCommand(char: Character) {
     return speak(
         `Это не похоже на персонажа.`,
         tts`Для подсказки скажите ${'-'} "Помощь".`,
-        whoCalled2(char),
+        whoCalled2(char)
     );
 }
 
@@ -55,7 +55,7 @@ export function inanimateCalled(inanimate: Character, previousChar: Character) {
             previousChar.byGender(' - не дозв+ался.', ' - не дозвал+ась.', ' - не дозвал+ось.'),
         ]),
         'Давайте позовем другого персонажа.',
-        whoCalled2(previousChar),
+        whoCalled2(previousChar)
     );
 }
 
@@ -66,13 +66,13 @@ export function you(previousChar: Character) {
     const zval = previousChar.byGender('звал', 'звала', 'звало');
 
     return speak(
-        ['Я там была, мёд 🍯 пила.\n', 'Я там была - мёд пила.'],
-        ['В земле росла ботва 🌱 зелёная.\n', 'В земле росла - ботва зелёная.'],
-        ['Под ней сидела мышь 🐭 учёная.\n', 'Под ней сидела мышь - учёная.'],
-        ['Свои мне сказки 📚 говорила.\n\n', 'Свои мне сказки говорила.'],
-
+        ['Я там была, мёд пила.\n', 'Я там была - мёд пила.'],
+        ['В земле росла ботва зелёная.\n', 'В земле росла - ботва зелёная.'],
+        ['Под ней сидела мышь учёная.\n', 'Под ней сидела мышь - учёная.'],
+        ['Свои мне сказки говорила.\n\n', 'Свои мне сказки говорила.'],
+        '🍯 🌱 🐭 📚',
         'Давайте позовем другого персонажа.',
-        whoCalled2(previousChar),
+        whoCalled2(previousChar)
     );
 }
 export function formatStory(chars: readonly Character[]): Speech {
@@ -94,7 +94,7 @@ export function formatStory(chars: readonly Character[]): Speech {
 
     return speak(
         [upperFirst(text.join(', ')), tts.join(' - ')],
-        [`, дедка 👴 за репку.`, ' - дедка за репку.'],
+        [`, дедка 👴 за репку.`, ' - дедка за репку.']
     );
 }
 
@@ -104,7 +104,7 @@ export function success() {
             'Тянут-потянут 🎉 вытянули репку!',
             'Тянут-потянут <speaker audio="alice-sounds-human-kids-1.opus"> - вытянули репку!',
         ],
-        'Какая интересная сказка! Хотите продолжить игру?',
+        'Какая интересная сказка! Хотите продолжить игру?'
     );
 }
 
@@ -159,7 +159,7 @@ export const chars = {
             char.byGender('Прибежал', 'Прибежала', 'Прибежало'),
             `${description}${name}`,
             meow,
-            `и ${clung} в ${previousChar.accusative}.`,
+            `и ${clung} в ${previousChar.accusative}.`
         );
     },
     dog(char: Character, _prev: Character, random100: number) {
@@ -177,7 +177,7 @@ export const chars = {
 
         return createSpeech(
             `${come} ${char.nominative}.`,
-            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-owl-${soundNumber}.opus">.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-owl-${soundNumber}.opus">.`
         );
     },
     rooster(char: Character) {
@@ -185,7 +185,7 @@ export const chars = {
 
         return createSpeech(
             `${come} ${char.nominative}.`,
-            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-rooster-1.opus">.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-rooster-1.opus">.`
         );
     },
     wolf(char: Character) {
@@ -193,7 +193,7 @@ export const chars = {
 
         return createSpeech(
             `${come} ${char.nominative}.`,
-            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-wolf-1.opus">.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-wolf-1.opus">.`
         );
     },
     fox(char: Character) {
@@ -201,7 +201,7 @@ export const chars = {
 
         return createSpeech(
             `${come} ${char.nominative}.`,
-            `${come} ${char.nominative} - <speaker audio="alice-music-violin-c-1.opus">.`,
+            `${come} ${char.nominative} - <speaker audio="alice-music-violin-c-1.opus">.`
         );
     },
     bear(char: Character, prev: Character, random100: number) {
@@ -212,7 +212,7 @@ export const chars = {
                 '<speaker audio="dialogs-upload/d72eedce-c6f5-412b-8ed7-93cdccd9b716/e29520bc-c2e2-40e5-9b7a-bc805fe89b1e.opus">',
                 '<speaker audio="dialogs-upload/d72eedce-c6f5-412b-8ed7-93cdccd9b716/baef2695-35fd-471b-b40f-7c34f7eeec31.opus">',
             ],
-            random100,
+            random100
         );
 
         return speak([`${come} ${char.nominative}.`, `${come} ${char.nominative} - ${sound}.`]);
@@ -222,7 +222,7 @@ export const chars = {
 
         return createSpeech(
             `${come} ${char.nominative}.`,
-            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-crow-1.opus">.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-crow-1.opus">.`
         );
     },
     lion(char: Character) {
@@ -230,7 +230,7 @@ export const chars = {
 
         return createSpeech(
             `${come} ${char.nominative}.`,
-            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-lion-1.opus">.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-lion-1.opus">.`
         );
     },
     cow(char: Character) {
@@ -238,7 +238,7 @@ export const chars = {
 
         return createSpeech(
             `${come} ${char.nominative}.`,
-            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-cow-2.opus">.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-cow-2.opus">.`
         );
     },
     horse(char: Character, _prev: Character, random100: number) {
@@ -247,7 +247,7 @@ export const chars = {
 
         return createSpeech(
             `${come} ${char.nominative}.`,
-            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-horse-${soundNumber}.opus">.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-horse-${soundNumber}.opus">.`
         );
     },
     chicken(char: Character) {
@@ -255,7 +255,7 @@ export const chars = {
 
         return createSpeech(
             `${come} ${char.nominative}.`,
-            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-chicken-1.opus">.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-chicken-1.opus">.`
         );
     },
     frog(char: Character) {
@@ -263,7 +263,7 @@ export const chars = {
 
         return createSpeech(
             `${come} ${char.nominative}.`,
-            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-frog-1.opus">.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-frog-1.opus">.`
         );
     },
     elephant(char: Character, _previousChar: Character, random100: number): Speech {
@@ -272,7 +272,7 @@ export const chars = {
 
         return createSpeech(
             `${come} ${char.nominative}.`,
-            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-elephant-${n}.opus">.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-elephant-${n}.opus">.`
         );
     },
     fish(char: Character, previousChar: Character) {
@@ -286,7 +286,7 @@ export const chars = {
             `${stalOn} кликать ${char.accusative}, приплыла к ${nemu} рыбка, спросила:`,
             `«Чего тебе надобно ${previousChar.nominative}?»`,
             `Ей с поклоном ${previousChar.nominative} отвечает:`,
-            `«Смилуйся, государыня рыбка, помоги вытянуть репку.»`,
+            `«Смилуйся, государыня рыбка, помоги вытянуть репку.»`
         );
     },
     girl(char: Character) {
@@ -294,7 +294,7 @@ export const chars = {
 
         return createSpeech(
             `${come} ${char.nominative}.`,
-            `${come} ${char.nominative} - <speaker audio="alice-sounds-human-laugh-5.opus">.`,
+            `${come} ${char.nominative} - <speaker audio="alice-sounds-human-laugh-5.opus">.`
         );
     },
 
@@ -303,7 +303,7 @@ export const chars = {
 
         return createSpeech(
             `Пришло страшное ${char.nominative} и схватило ${previousChar.accusative}.`,
-            `Пришло страшное ${char.nominative} - <speaker audio="alice-sounds-human-walking-dead-2.opus"> - и схватило ${previousChar.accusative}.`,
+            `Пришло страшное ${char.nominative} - <speaker audio="alice-sounds-human-walking-dead-2.opus"> - и схватило ${previousChar.accusative}.`
         );
     },
 };
