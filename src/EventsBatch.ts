@@ -1,7 +1,7 @@
 import { WebhookRequest } from './server';
 import { Event } from './Event';
 import { Session } from './Session';
-import { Experiments } from './Experiments';
+import { EventProps } from './EventProps';
 
 /**
  * Накапливает в себе события разных типов
@@ -16,23 +16,33 @@ export class EventsBatch {
         readonly events: readonly Event[] = []
     ) {}
 
-    withNewGame(): EventsBatch {
-        return this.withEvent('New Game', {});
+    addNewGame(): EventsBatch {
+        return this.addEvent({ eventType: 'New Game', eventProps: {} });
     }
 
-    withCharacter(name: string): EventsBatch {
-        return this.withEvent('Call Character', { name });
+    addwin(eventProps: { charsCount: number }): EventsBatch {
+        return this.addEvent({ eventType: 'Win', eventProps });
     }
 
-    withThing(name: string): EventsBatch {
-        return this.withEvent('Call Thing', { name });
+    addCharacter(name: string): EventsBatch {
+        return this.addEvent({ eventType: 'Call Character', eventProps: { name } });
     }
 
-    private withEvent(
-        eventType: string,
-        eventProps: Readonly<Record<string, string | string[]>>,
-        userProps: Readonly<Record<string, string | string[]>> = { Experiments: this.experiments }
-    ): EventsBatch {
+    addThing(name: string): EventsBatch {
+        return this.addEvent({ eventType: 'Call Thing', eventProps: { name } });
+    }
+
+    private addEvent({
+        eventType,
+        eventProps,
+        userProps = {
+            Experiments: this.experiments,
+        },
+    }: {
+        eventType: string;
+        eventProps: EventProps;
+        userProps?: EventProps;
+    }): EventsBatch {
         if (!userProps.Experiments) {
             throw new Error('Забыл добавить Experiments в userProps');
         }

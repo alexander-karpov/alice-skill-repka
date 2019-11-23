@@ -409,6 +409,14 @@ describe('Main dialog', () => {
             );
         });
 
+        test('Win', async () => {
+            await act('');
+
+            expect(await events('мышку')).toContainEqual(
+                expect.objectContaining({ event_type: 'Win' })
+            );
+        });
+
         test('Call Character', async () => {
             await act('котик');
 

@@ -46,7 +46,7 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
             speech: answers.intro(),
             chars: [DEDKA],
             next: Scene.Repka,
-            events: events.withNewGame(),
+            events: events.addNewGame(),
         };
     },
     [Scene.Repka]({ tokens, chars, events, random100 }) {
@@ -60,7 +60,7 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
                 return {
                     speech: answers.inanimateCalled(inanimate, currentChar),
                     buttons: knownCharButtons(chars, random100),
-                    events: events.withThing(inanimate.nominative),
+                    events: events.addThing(inanimate.nominative),
                 };
             }
 
@@ -91,13 +91,18 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
             : speak([cutText(taleWithEnd.text, 1023), cutText(taleWithEnd.tts, 1023)]);
         const next = isEnd ? Scene.RepeatOffer : Scene.Repka;
 
+        const eventsWithChar = events.addCharacter(nextChar.nominative);
+        const eventsWithWith = isEnd
+            ? eventsWithChar.addwin({ charsCount: chars.length })
+            : eventsWithChar;
+
         return {
             speech: cutTale,
             buttons,
             imageId: image,
             chars: chars.concat(nextChar),
             next,
-            events: events.withCharacter(nextChar.nominative),
+            events: eventsWithWith,
         };
     },
     [Scene.RepeatOffer]({ tokens, events }) {

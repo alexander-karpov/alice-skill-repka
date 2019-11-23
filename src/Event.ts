@@ -1,5 +1,6 @@
 import { WebhookRequest } from './server';
 import { Session } from './Session';
+import { EventProps } from './EventProps';
 
 /**
  * Событие аналитики, счетчик
@@ -12,16 +13,16 @@ export class Event {
     private readonly region: string;
     private readonly session_id: number;
     private readonly insert_id: string;
-    private readonly event_properties: Readonly<Record<string, string | string[]>>;
-    private readonly user_properties: Readonly<Record<string, string | string[]>>;
+    private readonly event_properties: EventProps;
+    private readonly user_properties: EventProps;
 
     constructor(
         eventType: string,
         time: number,
         request: WebhookRequest,
         session: Session,
-        eventProps: Readonly<Record<string, string | string[]>>,
-        userProps: Readonly<Record<string, string | string[]>>
+        eventProps: EventProps,
+        userProps: EventProps
     ) {
         this.event_type = eventType;
         this.time = time;
