@@ -64,14 +64,6 @@ export const scenes: { [name in Scene]: (deps: SceneDependencies) => SceneResult
                 };
             }
 
-            if (intents.you(tokens)) {
-                return {
-                    speech: answers.you(currentChar),
-                    buttons: knownCharButtons(chars, random100),
-                    events,
-                };
-            }
-
             return {
                 speech: answers.wrongCommand(currentChar),
                 buttons: knownCharButtons(chars, random100),

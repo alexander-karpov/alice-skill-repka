@@ -17,7 +17,7 @@ export function findKnownChar(char: Character) {
 
 export function chooseKnownCharButtons(
     allChars: readonly Character[],
-    random100: number,
+    random100: number
 ): string[] {
     const notCalledKnownChars = Object.values(knownChars)
         .filter(c => c !== knownChars.mouse)

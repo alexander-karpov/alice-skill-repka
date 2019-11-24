@@ -113,12 +113,8 @@ export function notWantRepeat(tokens: Token[]) {
             text.includes('нет') ||
             text.includes('конец') ||
             text.includes('пока') ||
-            text.join(' ').includes('не надо'),
+            text.join(' ').includes('не надо')
     );
-}
-
-export function you(tokens: Token[]) {
-    return tokens.length === 1 && isTokenIncludesLex(tokens[0], 'ты');
 }
 
 function isIncludeAnyLex(ts: Token[], cases: string[]) {
