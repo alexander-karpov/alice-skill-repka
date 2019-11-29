@@ -46,7 +46,7 @@ export async function mainDialog(
         };
     }
 
-    const res = session.scenario[session.currentScene]({
+    const res = session.scenario.current({
         chars: session.currentCharacters,
         tokens,
         random100,
@@ -58,7 +58,7 @@ export async function mainDialog(
         endSession: !!res.endSession,
         imageId: res.imageId,
         buttons: res.buttons || [],
-        session: session.assign(res.next, res.chars),
+        session: session.assign(res.scenario, res.chars),
         events: res.events,
     };
 }

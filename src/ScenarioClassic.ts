@@ -9,21 +9,24 @@ import { last, cutText } from './utils';
 import { speak, Speech } from './speech';
 import { SceneButton } from './SceneButton';
 import { extractChar, extractInanimate } from './extractChar';
+import { Scene } from './Scene';
 
-export class ScenarioClassic implements Scenario {
+export class ScenarioClassic extends Scenario {
     private reactionButton = {
         text: '❤️ Поставить оценку',
         url: 'https://dialogs.yandex.ru/store/skills/916a8380-skazka-pro-repku',
     };
 
-    constructor() {}
+    create(scene: Scene): Scenario {
+        return new ScenarioClassic(scene);
+    }
 
     intro({ events }: SceneParams): SceneResult {
         return {
             speech: answers.intro(),
             chars: [Character.dedka],
-            next: 'repka',
             events: events.addNewGame(),
+            scenario: this.create('repka'),
         };
     }
 
@@ -39,6 +42,7 @@ export class ScenarioClassic implements Scenario {
                     speech: answers.inanimateCalled(inanimate, currentChar),
                     buttons: this.knownCharButtons(chars, random100),
                     events: events.addThing(inanimate.nominative),
+                    scenario: this,
                 };
             }
 
@@ -46,6 +50,7 @@ export class ScenarioClassic implements Scenario {
                 speech: answers.wrongCommand(currentChar),
                 buttons: this.knownCharButtons(chars, random100),
                 events,
+                scenario: this,
             };
         }
 
@@ -59,7 +64,7 @@ export class ScenarioClassic implements Scenario {
         const cutTale = image
             ? speak([cutText(taleWithEnd.text, 254), cutText(taleWithEnd.tts, 1023)])
             : speak([cutText(taleWithEnd.text, 1023), cutText(taleWithEnd.tts, 1023)]);
-        const next = isEnd ? 'repeatOffer' : 'repka';
+        const scene = isEnd ? 'repeatOffer' : 'repka';
 
         const eventsWithChar = events.addCharacter(nextChar.nominative);
         const eventsWithWith = isEnd
@@ -71,8 +76,8 @@ export class ScenarioClassic implements Scenario {
             buttons,
             imageId: image,
             chars: chars.concat(nextChar),
-            next,
             events: eventsWithWith,
+            scenario: this.create(scene),
         };
     }
 
@@ -81,10 +86,10 @@ export class ScenarioClassic implements Scenario {
             return {
                 speech: answers.endOfStory(),
                 chars: [Character.dedka],
-                next: 'repka',
                 endSession: true,
                 buttons: [this.reactionButton],
                 events,
+                scenario: this.create('repka'),
             };
         }
 
@@ -92,12 +97,17 @@ export class ScenarioClassic implements Scenario {
             return {
                 speech: answers.storyBegin(),
                 chars: [Character.dedka],
-                next: 'repka',
                 events,
+                scenario: this.create('repka'),
             };
         }
 
-        return { speech: answers.yesOrNoExpected(), buttons: this.storyEndButtons(), events };
+        return {
+            speech: answers.yesOrNoExpected(),
+            buttons: this.storyEndButtons(),
+            events,
+            scenario: this,
+        };
     }
 
     private makeRepkaTale(
