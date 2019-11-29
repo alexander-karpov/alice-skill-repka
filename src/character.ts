@@ -6,6 +6,12 @@ export class Character {
         return new Character(subject, gender, normal, tts);
     }
 
+    static dedka = Character.create(
+        { nominative: 'дедка', accusative: 'дедку' },
+        Gender.Male,
+        'дедка'
+    );
+
     get nominative(): string {
         return this.subject.nominative;
     }

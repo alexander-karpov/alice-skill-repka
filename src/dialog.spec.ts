@@ -4,7 +4,7 @@ import { Session } from './Session';
 import { Event } from './Event';
 import { EventsBatch } from './EventsBatch';
 import { WebhookRequest } from './server';
-import { SceneButton } from './scene';
+import { SceneButton } from './SceneButton';
 import { MystemStemmer } from './MystemStemmer';
 import { DumpingStemmer } from './DumpingStemmer';
 import { Experiments } from './Experiments';

@@ -2,7 +2,7 @@ import { Stemmer } from './Stemmer';
 import { Session } from './Session';
 import { Speech, speak } from './speech';
 import * as intents from './intents';
-import { SceneButton, scenes } from './scene';
+import { SceneButton } from './SceneButton';
 import { whoCalled2 } from './answers';
 import { EventsBatch } from './EventsBatch';
 
@@ -46,7 +46,7 @@ export async function mainDialog(
         };
     }
 
-    const res = scenes[session.currentScene]({
+    const res = session.scenario[session.currentScene]({
         chars: session.currentCharacters,
         tokens,
         random100,
