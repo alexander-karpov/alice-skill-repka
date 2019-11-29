@@ -447,6 +447,17 @@ describe('Main dialog', () => {
             );
         });
 
+        test('Unrecognized', async () => {
+            await act('котик');
+
+            expect(await events('что где когда')).toContainEqual(
+                expect.objectContaining({
+                    event_type: 'Unrecognized',
+                    event_properties: { command: 'что где когда' },
+                })
+            );
+        });
+
         test('Experiment Cities', async () => {
             eventsMock = new EventsBatch(
                 0,

@@ -32,6 +32,10 @@ export class EventsBatch {
         return this.addEvent({ eventType: 'Call Thing', eventProps: { name } });
     }
 
+    addUnrecognized(command: string): EventsBatch {
+        return this.addEvent({ eventType: 'Unrecognized', eventProps: { command } });
+    }
+
     private addEvent({
         eventType,
         eventProps,

@@ -30,7 +30,7 @@ export class ScenarioClassic extends Scenario {
         };
     }
 
-    repka({ chars, tokens, random100, events }: SceneParams): SceneResult {
+    repka({ chars, tokens, random100, events, command }: SceneParams): SceneResult {
         const currentChar = last(chars) as Character;
         const nextChar = extractChar(tokens);
 
@@ -49,7 +49,7 @@ export class ScenarioClassic extends Scenario {
             return {
                 speech: answers.wrongCommand(currentChar),
                 buttons: this.knownCharButtons(chars, random100),
-                events,
+                events: events.addUnrecognized(command),
                 scenario: this,
             };
         }

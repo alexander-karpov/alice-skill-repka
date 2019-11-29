@@ -48,6 +48,7 @@ export async function mainDialog(
 
     const res = session.scenario.current({
         chars: session.currentCharacters,
+        command,
         tokens,
         random100,
         events,
