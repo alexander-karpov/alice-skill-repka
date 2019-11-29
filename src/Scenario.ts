@@ -7,7 +7,7 @@ type ScenesImplementation = {
 };
 
 export abstract class Scenario implements ScenesImplementation {
-    constructor(private readonly currentScene: Scene) {}
+    constructor(private readonly currentScene: Scene = 'intro') {}
 
     abstract intro(params: SceneParams): SceneResult;
 

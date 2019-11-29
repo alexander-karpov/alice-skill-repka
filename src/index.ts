@@ -8,10 +8,13 @@ import { ConsoleAnalytics } from './ConsoleAnalytics';
 import { Analytics } from './Analytics';
 import { CachingStemmer } from './CachingStemmer';
 import { MystemStemmer } from './MystemStemmer';
-import { Experiments } from './Experiments';
+import { ExperimentsResolver } from './ExperimentsResolver';
+import { ScenarioResolver } from './ScenarioResolver';
 
 export function startSkillServer({ port }: { port: number }) {
-    const sessions = SessionStorage.create();
+    const experimentsResolver = new ExperimentsResolver();
+    const sessions = new SessionStorage(new ScenarioResolver(), experimentsResolver);
+
     const AMPLITUDE_REPKA_API_KEY = process.env.AMPLITUDE_REPKA_API_KEY;
     const analytics: Analytics = AMPLITUDE_REPKA_API_KEY
         ? AmplitudeAnalytics.create(AMPLITUDE_REPKA_API_KEY)
@@ -36,7 +39,7 @@ export function startSkillServer({ port }: { port: number }) {
             const random100 = random(100);
             const time = new Date().getTime();
             const session = sessions.$ensureSession(time, request);
-            const experiments = new Experiments().forUser(request.session.user_id);
+            const experiments = experimentsResolver.resolve(request.session.user_id);
             const events = new EventsBatch(time, request, session, experiments);
 
             const answer = await mainDialog(request.request.command, session, events, {

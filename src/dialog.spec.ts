@@ -7,7 +7,9 @@ import { WebhookRequest } from './server';
 import { SceneButton } from './SceneButton';
 import { MystemStemmer } from './MystemStemmer';
 import { DumpingStemmer } from './DumpingStemmer';
-import { Experiments } from './Experiments';
+import { ExperimentsResolver } from './ExperimentsResolver';
+import { ScenarioClassic } from './ScenarioClassic';
+import { ScenarioThings } from './ScenarioThings';
 
 describe('Main dialog', () => {
     test('Классическая сказка: начало', async () => {
@@ -458,12 +460,23 @@ describe('Main dialog', () => {
             );
         });
 
-        test('Experiment Cities', async () => {
+        test('Experiments', async () => {
             eventsMock = new EventsBatch(
                 0,
                 requestMock,
                 sessionMock,
-                new Experiments().forUser('100000000')
+                new ExperimentsResolver().resolve('FFFFFFFF')
+            );
+
+            expect(await events('котика')).toContainEqual(
+                expect.objectContaining({ user_properties: { Experiments: [] } })
+            );
+
+            eventsMock = new EventsBatch(
+                0,
+                requestMock,
+                sessionMock,
+                new ExperimentsResolver().resolve('1FFFFFFF')
             );
 
             expect(await events('')).toContainEqual(
@@ -474,12 +487,25 @@ describe('Main dialog', () => {
                 0,
                 requestMock,
                 sessionMock,
-                new Experiments().forUser('F00000000')
+                new ExperimentsResolver().resolve('F1FFFFFFF')
             );
 
-            expect(await events('котика')).toContainEqual(
-                expect.objectContaining({ user_properties: { Experiments: [] } })
+            expect(await events('')).toContainEqual(
+                expect.objectContaining({ user_properties: { Experiments: ['things'] } })
             );
+        });
+    });
+
+    describe('Эксперименты', () => {
+        test('things', async () => {
+            sessionMock = new Session([], new ScenarioThings(), 0);
+
+            await text('');
+            expect(await tts('котик')).toMatch('котик за дедку');
+            expect(await tts('утюг')).toMatch('утюг за котика');
+            expect(await tts('сапог')).toMatch('сапог за утюг');
+            expect(await tts('вилка')).toMatch('вилка за сапог');
+            expect(await tts('ложка')).toMatch('ложка за вилку');
         });
     });
 
@@ -643,13 +669,13 @@ describe('Main dialog', () => {
             version: '1.0',
         };
 
-        sessionMock = Session.start(0);
+        sessionMock = new Session([], new ScenarioClassic(), 0);
 
         eventsMock = new EventsBatch(
             0,
             requestMock,
             sessionMock,
-            new Experiments().forUser(requestMock.session.user_id)
+            new ExperimentsResolver().resolve(requestMock.session.user_id)
         );
     });
     //#endregion

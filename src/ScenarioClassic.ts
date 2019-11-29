@@ -10,6 +10,7 @@ import { speak, Speech } from './speech';
 import { SceneButton } from './SceneButton';
 import { extractChar, extractInanimate } from './extractChar';
 import { Scene } from './Scene';
+import { Token } from './tokens';
 
 export class ScenarioClassic extends Scenario {
     private reactionButton = {
@@ -32,10 +33,10 @@ export class ScenarioClassic extends Scenario {
 
     repka({ chars, tokens, random100, events, command }: SceneParams): SceneResult {
         const currentChar = last(chars) as Character;
-        const nextChar = extractChar(tokens);
+        const nextChar = this.recognizeCharacter(tokens);
 
         if (!nextChar) {
-            const inanimate = extractInanimate(tokens);
+            const inanimate = this.recognizeThing(tokens);
 
             if (inanimate) {
                 return {
@@ -108,6 +109,14 @@ export class ScenarioClassic extends Scenario {
             events,
             scenario: this,
         };
+    }
+
+    protected recognizeCharacter(tokens: Token[]): Character | undefined {
+        return extractChar(tokens);
+    }
+
+    protected recognizeThing(tokens: Token[]): Character | undefined {
+        return extractInanimate(tokens);
     }
 
     private makeRepkaTale(
