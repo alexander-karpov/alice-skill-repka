@@ -5,6 +5,8 @@ import * as intents from './intents';
 import { SceneButton } from './SceneButton';
 import { whoCalled2 } from './answers';
 import { EventsBatch } from './EventsBatch';
+import { ScenarioCities } from './ScenarioCities';
+import { Character } from './Character';
 
 //#region types
 export type DialogDependencies = {
@@ -31,6 +33,16 @@ export async function mainDialog(
     const tokens = await stemmer.analyze(command.toLowerCase());
 
     const char = session.findLastCharacter();
+
+    if (command === 'exp cities') {
+        return {
+            speech: speak('Включаю эксперимент Города. Сейчас игра начнётся заново.'),
+            endSession: false,
+            buttons: [],
+            session: session.assign(new ScenarioCities('intro'), [Character.dedka]),
+            events: events,
+        };
+    }
 
     if (intents.help(tokens)) {
         return {
