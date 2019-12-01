@@ -40,8 +40,20 @@ export class Character {
         return this.type === CharacterType.Thing;
     }
 
+    get firstLetter(): string {
+        const letter = this.normal.charAt(0).toLowerCase();
+        const letter2 = letter.replace('й', 'и');
+
+        return letter2;
+    }
+
     get lastLetter(): string {
-        return this.normal.charAt(this.normal.length - 1).toLowerCase();
+        const letter = this.normal.charAt(this.normal.length - 1).toLowerCase();
+        const letter2 =
+            letter === 'ь' ? this.normal.charAt(this.normal.length - 2).toLowerCase() : letter;
+        const letter3 = letter2.replace('й', 'и');
+
+        return letter3;
     }
 
     byGender<T>(male: T, famela: T, other: T) {

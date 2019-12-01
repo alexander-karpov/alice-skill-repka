@@ -2,7 +2,7 @@ import { Character } from './Character';
 import { sample, upperFirst } from './utils';
 import { createSpeech, Speech, speak, tts } from './speech';
 import { emoji } from './emoji';
-import { alphabetFirstLetter, alphabetLastLetter } from './alphabet';
+import { alphabetLetter } from './alphabet';
 
 export type AnswerBuilder = (char: Character, previousChar: Character, random100: number) => Speech;
 
@@ -60,9 +60,9 @@ export function citiesWrongChar(char: Character, previous: Character) {
     return speak(
         `${upperFirst(char.normal)} не подойдёт. ${upperFirst(heSheIt(char))} начинается на`,
         ['букву', 'букву -'],
-        alphabetFirstLetter(char),
+        alphabetLetter(char.firstLetter),
         tts`,${'-'} а ${previous.normal} заканчивается на букву ${'-'}`,
-        alphabetLastLetter(previous),
+        alphabetLetter(previous.lastLetter),
         `.`,
         whoCalled2(previous),
         startsWithLetter(previous)
@@ -121,7 +121,7 @@ export function cantPull(char: Character) {
 }
 
 export function startsWithLetter(previous: Character) {
-    return speak(tts`На букву ${'- -'}`, alphabetLastLetter(previous), ['.', '.']);
+    return speak(tts`На букву ${'- -'}`, alphabetLetter(previous.lastLetter), ['.', '.']);
 }
 
 export const chars = {

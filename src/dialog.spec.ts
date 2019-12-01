@@ -10,6 +10,7 @@ import { DumpingStemmer } from './DumpingStemmer';
 import { ExperimentsResolver } from './ExperimentsResolver';
 import { ScenarioClassic } from './ScenarioClassic';
 import { ScenarioThings } from './ScenarioThings';
+import { ScenarioCities } from './ScenarioCities';
 
 describe('Main dialog', () => {
     test('Классическая сказка: начало', async () => {
@@ -497,7 +498,7 @@ describe('Main dialog', () => {
     });
 
     describe('Эксперименты', () => {
-        test('things', async () => {
+        test('Things', async () => {
             sessionMock = new Session([], new ScenarioThings(), 0);
 
             await text('');
@@ -506,6 +507,20 @@ describe('Main dialog', () => {
             expect(await tts('сапог')).toMatch('сапог за утюг');
             expect(await tts('вилка')).toMatch('вилка за сапог');
             expect(await tts('ложка')).toMatch('ложка за вилку');
+        });
+
+        test('Cities', async () => {
+            sessionMock = new Session([], new ScenarioCities(), 0);
+
+            await text('');
+            expect(await tts('арап')).toMatch('арап за дедку');
+            expect(await tts('петя')).toMatch('петя за арапа');
+            expect(await tts('як')).toMatch('як за петю');
+            expect(await tts('капрал')).toMatch('капрал за яка');
+            expect(await tts('лось')).toMatch('лось за капрала');
+            expect(await tts('слон')).toMatch('слон за лося');
+
+            expect(await tts('котика')).toMatch(/котик не подойдёт/i);
         });
     });
 

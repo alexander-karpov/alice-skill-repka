@@ -32,17 +32,8 @@ const alphabet: { [l: string]: string | undefined } = {
     я: 'я',
 };
 
-export function alphabeLetter(letter: string): Speech {
-    const fixed = letter === 'й' ? 'и' : letter;
-    const alphabetLetter = alphabet[fixed] || fixed;
+export function alphabetLetter(letter: string): Speech {
+    const alphabetLetter = alphabet[letter] || letter;
 
-    return speak([`«${fixed.toUpperCase()}»`, alphabetLetter]);
-}
-
-export function alphabetFirstLetter(char: Character): Speech {
-    return alphabeLetter(char.normal.charAt(0).toLocaleLowerCase());
-}
-
-export function alphabetLastLetter(char: Character): Speech {
-    return alphabeLetter(char.normal.charAt(char.normal.length - 1).toLocaleLowerCase());
+    return speak([`«${letter.toUpperCase()}»`, alphabetLetter]);
 }

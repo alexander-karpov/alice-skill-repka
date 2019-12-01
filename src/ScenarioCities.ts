@@ -38,13 +38,7 @@ export class ScenarioCities extends ScenarioClassic {
 
         const previous = last(params.chars) as Character;
 
-        const lastLetter = previous.normal.charAt(previous.normal.length - 1);
-        const mustStartsWith = lastLetter === 'й' ? 'и' : lastLetter;
-
-        const firstLetter = char.normal.charAt(0);
-        const startsWith = firstLetter === 'й' ? 'и' : firstLetter;
-
-        if (mustStartsWith !== startsWith) {
+        if (char.firstLetter !== previous.lastLetter) {
             return {
                 speech: answers.citiesWrongChar(char, previous),
                 events: params.events.addThing(char.nominative),

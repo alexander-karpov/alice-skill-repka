@@ -327,6 +327,11 @@ function SToAccMale(lex: string) {
         return changeTwo('ьва');
     }
 
+    // Петя -> петю
+    if (endsWith('я')) {
+        return changeOne('ю');
+    }
+
     // Человек -> человека, кролик -> кролика.
     return add('а');
 }
