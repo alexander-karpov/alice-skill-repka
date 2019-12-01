@@ -476,22 +476,22 @@ describe('Main dialog', () => {
                 0,
                 requestMock,
                 sessionMock,
-                new ExperimentsResolver().resolve('1FFFFFFF')
+                new ExperimentsResolver().resolve('0FFFFFFF')
             );
 
             expect(await events('')).toContainEqual(
-                expect.objectContaining({ user_properties: { Experiments: ['cities'] } })
+                expect.objectContaining({ user_properties: { Experiments: ['Cities'] } })
             );
 
             eventsMock = new EventsBatch(
                 0,
                 requestMock,
                 sessionMock,
-                new ExperimentsResolver().resolve('F1FFFFFFF')
+                new ExperimentsResolver().resolve('4FFFFFFFF')
             );
 
             expect(await events('')).toContainEqual(
-                expect.objectContaining({ user_properties: { Experiments: ['things'] } })
+                expect.objectContaining({ user_properties: { Experiments: ['Things'] } })
             );
         });
     });

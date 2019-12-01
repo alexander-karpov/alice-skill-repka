@@ -4,6 +4,7 @@ import { Predicate } from './core';
 import { last } from './utils';
 import { Gender } from './Gender';
 import { Word } from './Word';
+import { CharacterType } from './CharacterType';
 
 /**
  * Mystem возвращает бесконтекстную вероятность леммы.
@@ -51,7 +52,7 @@ const subjectPatterns: Predicate<Lexeme>[][] = [
 ];
 // #endregion
 
-export function extractChar(tokens: Token[]): Character | undefined {
+export function extractСreature(tokens: Token[]): Character | undefined {
     const fixdedTokens = fixTokens(tokens);
     const subject = extractSubject(fixdedTokens);
 
@@ -73,7 +74,13 @@ export function extractChar(tokens: Token[]): Character | undefined {
             .join(' '),
     };
 
-    return Character.create(word, extractGender(subjectFirst), subject[0].lex, fixTts(word));
+    return new Character(
+        CharacterType.Сreature,
+        word,
+        extractGender(subjectFirst),
+        subject[0].lex,
+        fixTts(word)
+    );
 }
 
 export function extractSubject(tokens: Token[]): Lexeme[] | undefined {
@@ -340,7 +347,7 @@ function extractGender(lexeme: Lexeme): Gender {
     return Gender.Neuter;
 }
 
-export function extractInanimate(tokens: Token[]): Character | undefined {
+export function extractThing(tokens: Token[]): Character | undefined {
     const fixdedTokens = fixTokens(tokens);
 
     const SInanAcc = (l: Lexeme) => isLexemeAccept(l, [Gr.inan, Gr.S, Gr.Acc]);
@@ -352,13 +359,14 @@ export function extractInanimate(tokens: Token[]): Character | undefined {
         const [char] = found;
         const isFamela = isLexemeAccept(char, [Gr.Famela]);
 
-        return Character.create(
+        return new Character(
+            CharacterType.Thing,
             {
                 nominative: char.lex,
                 accusative: isFamela ? SToAccFamela(char.lex) : char.lex,
             },
             extractGender(char),
-            char.lex,
+            char.lex
         );
     }
 

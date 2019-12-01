@@ -4,7 +4,10 @@ describe('ExperimentsResolver', () => {
     test('resolve', async () => {
         const resolver = new ExperimentsResolver();
 
-        expect(resolver.resolve('1FFFF')).toEqual(['cities']);
-        expect(resolver.resolve('F1FFF')).toEqual(['things']);
+        expect(resolver.resolve('0')).toEqual(['Cities']);
+        expect(resolver.resolve('3')).toEqual(['Cities']);
+
+        expect(resolver.resolve('4')).toEqual(['Things']);
+        expect(resolver.resolve('7')).toEqual(['Things']);
     });
 });

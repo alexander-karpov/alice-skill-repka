@@ -1,1 +1,4 @@
-export type ExpFlag = 'cities' | 'things';
+export enum ExpFlag {
+    Cities = 'Cities',
+    Things = 'Things',
+}

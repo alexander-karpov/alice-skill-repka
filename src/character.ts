@@ -1,12 +1,20 @@
 import { Gender } from './Gender';
 import { Word } from './Word';
+import { CharacterType } from './CharacterType';
 
 export class Character {
-    static create(subject: Word, gender: Gender, normal: string, tts?: Word): Character {
-        return new Character(subject, gender, normal, tts);
-    }
+    constructor(
+        public type: CharacterType,
+        private subject: Word,
+        private gender: Gender,
+        // Нормальная форма главного слова.
+        // Помогает при определении, кто это.
+        public normal: string,
+        private tts?: Word
+    ) {}
 
-    static dedka = Character.create(
+    static dedka = new Character(
+        CharacterType.Сreature,
         { nominative: 'дедка', accusative: 'дедку' },
         Gender.Male,
         'дедка'
@@ -28,16 +36,20 @@ export class Character {
         return this.tts ? this.tts.accusative : this.subject.accusative;
     }
 
+    get isThing(): boolean {
+        return this.type === CharacterType.Thing;
+    }
+
+    get lastLetter(): string {
+        return this.normal.charAt(this.normal.length - 1).toLowerCase();
+    }
+
     byGender<T>(male: T, famela: T, other: T) {
         if (this.gender === Gender.Male || this.gender === Gender.Unisex) {
             return male;
         }
 
         return this.gender === Gender.Famela ? famela : other;
-    }
-
-    byNormal<T>(cases: Record<string, T>): T | undefined {
-        return cases[this.normal];
     }
 
     startsWith(...starts: string[]) {
@@ -47,19 +59,4 @@ export class Character {
     equals(...aliases: string[]) {
         return aliases.some(alias => this.normal === alias);
     }
-
-    private constructor(subject: Word, gender: Gender, normal: string, tts?: Word) {
-        this.subject = subject;
-        this.tts = tts;
-        this.gender = gender;
-        this.normal = normal;
-    }
-
-    private subject: Word;
-    private tts?: Word;
-    private gender: Gender;
-
-    // Нормальная форма главного слова.
-    // Помогает при определении, кто это.
-    private normal: string;
 }

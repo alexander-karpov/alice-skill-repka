@@ -4,11 +4,18 @@ import { ExpFlag } from './ExpFlag';
  * Разделяет пользователей на участников экспериментов.
  */
 export class ExperimentsResolver {
-    // ВНИМАНИЕ. Не меняй порядок экспериментов в массиве
-    private readonly experiments: readonly ExpFlag[] = ['cities', 'things'];
-
     resolve(userId: string): ExpFlag[] {
         // Id пользователя состоит из символов от 0 до F
-        return this.experiments.filter((_exp, index) => userId[index] <= '7');
+        const firstLetter = userId[0];
+
+        if (['0', '1', '2', '3'].includes(firstLetter)) {
+            return [ExpFlag.Cities];
+        }
+
+        if (['4', '5', '6', '7'].includes(firstLetter)) {
+            return [ExpFlag.Things];
+        }
+
+        return [];
     }
 }

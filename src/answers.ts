@@ -2,6 +2,7 @@ import { Character } from './Character';
 import { sample, upperFirst } from './utils';
 import { createSpeech, Speech, speak, tts } from './speech';
 import { emoji } from './emoji';
+import { alphabetFirstLetter, alphabetLastLetter } from './alphabet';
 
 export type AnswerBuilder = (char: Character, previousChar: Character, random100: number) => Speech;
 
@@ -18,6 +19,16 @@ export function intro(): Speech {
         tts`Хотите ${'- -'} вместе ${'-'} сочинить сказку?${' - - '}`,
         tts`Вы слышали ${'-'} как посадил дед репку?${' - - '}`,
         tts`А кто помогал её тянуть? ${'- -'} Давайте придумаем вместе.${' - - - '}`,
+        storyBegin()
+    );
+}
+
+export function introCities(): Speech {
+    return speak(
+        ['Привет, ребята!', 'Привет - ребята! - '],
+        tts`Хотите ${'-'} поиграть ${'-'} и сочинить ${'-'} сказку?${' - - '}`,
+        tts`В нашей сказки каждый новый герой ${'-'}  начинается на ту букву, ${'-'} на какую заканчивается предыдущий. Готовы? ${' - - - '} `,
+        ['', '<speaker audio="alice-music-harp-1.opus">'],
         storyBegin()
     );
 }
@@ -45,6 +56,19 @@ export function wrongCommand(char: Character) {
     );
 }
 
+export function citiesWrongChar(char: Character, previous: Character) {
+    return speak(
+        `${upperFirst(char.normal)} не подойдёт. ${upperFirst(heSheIt(char))} начинается на`,
+        ['букву', 'букву -'],
+        alphabetFirstLetter(char),
+        tts`,${'-'} а ${previous.normal} заканчивается на букву ${'-'}`,
+        alphabetLastLetter(previous),
+        `.`,
+        whoCalled2(previous),
+        startsWithLetter(previous)
+    );
+}
+
 export function inanimateCalled(inanimate: Character, previousChar: Character) {
     const zval = previousChar.byGender('звал', 'звала', 'звало');
 
@@ -66,7 +90,7 @@ export function formatStory(chars: readonly Character[]): Speech {
     for (let i = 0; i < chars.length - 1; i++) {
         const sub = chars[i + 1];
         const obj = chars[i];
-        const em = emoji[sub.nominative] || sub.byNormal(emoji);
+        const em = emoji[sub.nominative] || emoji[sub.normal];
         const emojiPart = em ? ` ${em} ` : ' ';
 
         text.push(`${sub.nominative}${emojiPart} за ${obj.accusative}`);
@@ -92,8 +116,12 @@ export function success() {
     );
 }
 
-export function failure(char: Character) {
+export function cantPull(char: Character) {
     return speak(`Тянут-потянут — вытянуть не могут.`, whoCalled2(char));
+}
+
+export function startsWithLetter(previous: Character) {
+    return speak(tts`На букву ${'- -'}`, alphabetLastLetter(previous), ['.', '.']);
 }
 
 export const chars = {
@@ -294,6 +322,10 @@ export const chars = {
 
 function called(char: Character) {
     return char.byGender('позвал', 'позвала', 'позвало');
+}
+
+function heSheIt(char: Character) {
+    return char.byGender('он', 'она', 'оно');
 }
 
 function comeRunningCapitalized(char: Character) {

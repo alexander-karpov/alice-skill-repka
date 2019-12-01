@@ -8,7 +8,7 @@ import { KnownChar, chooseKnownCharButtons, findKnownChar } from './knownChars';
 import { last, cutText } from './utils';
 import { speak, Speech } from './speech';
 import { SceneButton } from './SceneButton';
-import { extractChar, extractInanimate } from './extractChar';
+import { extractСreature, extractThing } from './extractChar';
 import { Scene } from './Scene';
 import { Token } from './tokens';
 
@@ -31,22 +31,12 @@ export class ScenarioClassic extends Scenario {
         };
     }
 
-    repka({ chars, tokens, random100, events, command }: SceneParams): SceneResult {
+    repka(params: SceneParams): SceneResult {
+        const { chars, tokens, random100, events, command } = params;
         const currentChar = last(chars) as Character;
         const nextChar = this.recognizeCharacter(tokens);
 
         if (!nextChar) {
-            const inanimate = this.recognizeThing(tokens);
-
-            if (inanimate) {
-                return {
-                    speech: answers.inanimateCalled(inanimate, currentChar),
-                    buttons: this.knownCharButtons(chars, random100),
-                    events: events.addThing(inanimate.nominative),
-                    scenario: this,
-                };
-            }
-
             return {
                 speech: answers.wrongCommand(currentChar),
                 buttons: this.knownCharButtons(chars, random100),
@@ -55,10 +45,16 @@ export class ScenarioClassic extends Scenario {
             };
         }
 
+        const discardCharAnswer = this.discardCharacter(nextChar, params);
+
+        if (discardCharAnswer) {
+            return discardCharAnswer;
+        }
+
         const knownChar = findKnownChar(nextChar);
         const tale = this.makeRepkaTale(chars, nextChar, knownChar, random100);
         const isEnd = this.isTaleEnd(tale, nextChar);
-        const end = isEnd ? answers.success() : answers.failure(nextChar);
+        const end = isEnd ? answers.success() : this.cantPullSpeech(nextChar);
         const taleWithEnd = speak(tale, end);
         const image = knownChar && knownChar.image;
         const buttons = this.makeButtons([...chars, nextChar], isEnd, random100);
@@ -112,11 +108,34 @@ export class ScenarioClassic extends Scenario {
     }
 
     protected recognizeCharacter(tokens: Token[]): Character | undefined {
-        return extractChar(tokens);
+        return extractСreature(tokens) || extractThing(tokens);
     }
 
-    protected recognizeThing(tokens: Token[]): Character | undefined {
-        return extractInanimate(tokens);
+    protected discardCharacter(char: Character, params: SceneParams): SceneResult | undefined {
+        const currentChar = last(params.chars) as Character;
+
+        if (char.isThing) {
+            return {
+                speech: answers.inanimateCalled(char, currentChar),
+                buttons: this.knownCharButtons(params.chars, params.random100),
+                events: params.events.addThing(char.nominative),
+                scenario: this,
+            };
+        }
+    }
+
+    /**
+     * Определяет завершающую фразу истории "Вытянуть не могут"
+     */
+    protected cantPullSpeech(char: Character): Speech {
+        return answers.cantPull(char);
+    }
+
+    /**
+     * Формирует список кнопок подсказок персонажей
+     */
+    protected knownCharButtons(chars: readonly Character[], random100: number): SceneButton[] {
+        return chooseKnownCharButtons(chars, random100).map(text => ({ text }));
     }
 
     private makeRepkaTale(
@@ -159,10 +178,6 @@ export class ScenarioClassic extends Scenario {
         }
 
         return this.knownCharButtons(chars, random100);
-    }
-
-    private knownCharButtons(chars: readonly Character[], random100: number): SceneButton[] {
-        return chooseKnownCharButtons(chars, random100).map(text => ({ text }));
     }
 
     private storyEndButtons(): SceneButton[] {
