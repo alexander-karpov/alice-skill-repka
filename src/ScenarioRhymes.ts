@@ -2,13 +2,10 @@ import { ScenarioClassic } from './ScenarioClassic';
 import { Scene } from './Scene';
 import { Scenario } from './Scenario';
 import { Character } from './Character';
-import { SceneParams } from './SceneParams';
-import { SceneResult } from './SceneResult';
-import { last, sample } from './utils';
+import { sample } from './utils';
 import * as answers from './answers';
-import { Speech, speak } from './speech';
-import { SceneButton } from './SceneButton';
-import { chooseKnownCharButtons, KnownChar } from './knownChars';
+import { speak } from './speech';
+import { KnownChar } from './knownChars';
 
 import dict = require('./nouns.json');
 
@@ -68,5 +65,5 @@ function getEnding(word: string): string {
         return '';
     }
 
-    return word.substr(accentIndex - 1);
+    return word.substr(accentIndex);
 }
