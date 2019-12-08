@@ -54,7 +54,7 @@ export class ScenarioClassic extends Scenario {
         const knownChar = findKnownChar(nextChar);
         const tale = this.makeRepkaTale(chars, nextChar, knownChar, random100);
         const isEnd = this.isTaleEnd(tale, nextChar);
-        const end = isEnd ? answers.success() : this.cantPullSpeech(nextChar);
+        const end = isEnd ? answers.success() : this.cantPullAnswer(nextChar);
         const taleWithEnd = speak(tale, end);
         const image = knownChar && knownChar.image;
         const buttons = this.makeButtons([...chars, nextChar], isEnd, random100);
@@ -127,7 +127,7 @@ export class ScenarioClassic extends Scenario {
     /**
      * Определяет завершающую фразу истории "Вытянуть не могут"
      */
-    protected cantPullSpeech(char: Character): Speech {
+    protected cantPullAnswer(char: Character): Speech {
         return answers.cantPull(char);
     }
 
@@ -138,7 +138,10 @@ export class ScenarioClassic extends Scenario {
         return chooseKnownCharButtons(chars, random100).map(text => ({ text }));
     }
 
-    private makeRepkaTale(
+    /**
+     * Текст сказки без окончания. Кто за кем.
+     */
+    protected makeRepkaTale(
         chars: readonly Character[],
         char: Character,
         knownChar: KnownChar | undefined,

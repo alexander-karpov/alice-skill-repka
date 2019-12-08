@@ -7,6 +7,9 @@ import { whoCalled2 } from './answers';
 import { EventsBatch } from './EventsBatch';
 import { ScenarioCities } from './ScenarioCities';
 import { Character } from './Character';
+import { upperFirst } from './utils';
+import { ScenarioResolver } from './ScenarioResolver';
+import { ExpFlag } from './ExpFlag';
 
 //#region types
 export type DialogDependencies = {
@@ -34,12 +37,15 @@ export async function mainDialog(
 
     const char = session.findLastCharacter();
 
-    if (command === 'exp cities') {
+    if (command.startsWith('exp ')) {
+        // @ts-ignore
+        const expFlag: ExpFlag = upperFirst(command.substr(4));
+
         return {
-            speech: speak('Включаю эксперимент Города. Сейчас игра начнётся заново.'),
+            speech: speak(`Включаю эксперимент ${expFlag}. Сейчас игра начнётся заново.`),
             endSession: false,
             buttons: [],
-            session: session.assign(new ScenarioCities('intro'), [Character.dedka]),
+            session: session.assign(new ScenarioResolver().resolve([expFlag]), [Character.dedka]),
             events: events,
         };
     }

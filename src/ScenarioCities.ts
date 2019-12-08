@@ -6,12 +6,12 @@ import { SceneParams } from './SceneParams';
 import { SceneResult } from './SceneResult';
 import { last } from './utils';
 import * as answers from './answers';
-import { Speech, speak } from './speech';
 import { SceneButton } from './SceneButton';
 import { chooseKnownCharButtons } from './knownChars';
 
 /**
- * Можно звать на помошь Вещи, неодушевленных персонажей
+ * Название каждого следующего героя должно начинаться на букву
+ * на которую заканчивается название предыдущего.
  */
 export class ScenarioCities extends ScenarioClassic {
     create(scene: Scene): Scenario {
