@@ -11,6 +11,12 @@ import { ExperimentsResolver } from './ExperimentsResolver';
 import { ScenarioClassic } from './ScenarioClassic';
 import { ScenarioThings } from './ScenarioThings';
 import { ScenarioCities } from './ScenarioCities';
+import { ScenarioRhymes } from './ScenarioRhymes';
+
+// за большой льва
+// внучок
+// Сова -> есть деньга
+// за маленькЕго котёнка
 
 describe('Main dialog', () => {
     test('Классическая сказка: начало', async () => {
@@ -521,6 +527,15 @@ describe('Main dialog', () => {
             expect(await tts('слон')).toMatch('слон за лося');
 
             expect(await tts('котика')).toMatch(/котик не подойдёт/i);
+        });
+
+        test('Rhymes', async () => {
+            sessionMock = new Session([], new ScenarioRhymes(), 0);
+
+            await text('');
+            expect(await tts('котик')).toMatch('У меня есть ботик');
+            expect(await tts('бабка')).toMatch('У меня есть лапка');
+            expect(await tts('медведь')).toMatch('кеть');
         });
     });
 

@@ -146,7 +146,7 @@ export class ScenarioClassic extends Scenario {
         char: Character,
         knownChar: KnownChar | undefined,
         random100: number
-    ) {
+    ): Speech {
         const allChars = chars.concat(char);
         const previousChar = last(chars) as Character;
         const chain = answers.formatStory(allChars);

@@ -4,10 +4,11 @@ import { Scenario } from './Scenario';
 import { Character } from './Character';
 import { sample } from './utils';
 import * as answers from './answers';
-import { speak } from './speech';
+import { speak, Speech } from './speech';
 import { KnownChar } from './knownChars';
 
-import dict = require('./nouns.json');
+import { Rhymer } from './Rhymer';
+const rhymer = new Rhymer();
 
 /**
  * Добавляет к истории рифмы типа «Я внучка. У меня есть ручка.»
@@ -25,45 +26,23 @@ export class ScenarioRhymes extends ScenarioClassic {
         char: Character,
         knownChar: KnownChar | undefined,
         random100: number
-    ) {
-        let normalWithAccent: string | undefined = undefined;
-        let rhymedPart = speak('');
+    ): Speech {
+        const chain = answers.formatStory(chars.concat(char));
+        const iAm = speak([`Я ${char.nominative}.`, `Я ${char.nominativeTts}.`]);
 
-        for (let word of dict) {
-            if (word.replace('+', '') === char.normal) {
-                normalWithAccent = word;
-            }
+        const iHelpYou = sample(
+            ['Помогу вам.', 'Буду помогать.', 'Помогу вытянуть репку.'],
+            random100
+        );
+
+        const rhyme = rhymer.findRhymes(char.normal, random100);
+
+        if (rhyme) {
+            const iHave = speak(`У меня есть ${rhyme}.`);
+
+            return speak(iAm, iHave, iHelpYou, chain);
         }
 
-        if (normalWithAccent) {
-            const ending = getEnding(normalWithAccent);
-            const rhymes = dict.filter(w => w.endsWith(ending) && w !== normalWithAccent);
-            const rhyme = sample(rhymes, random100);
-            const rhymeSpeach = speak([rhyme.replace('+', ''), rhyme]);
-
-            if (rhymes.length) {
-                const helpYou = sample(
-                    ['Помогу вам.', 'Буду помогать.', 'Помогу вытянуть репку.'],
-                    random100
-                );
-
-                rhymedPart = speak(`Я ${char.nominative}. У меня есть`, rhymeSpeach, '.', helpYou);
-            }
-        }
-
-        const allChars = chars.concat(char);
-        const chain = answers.formatStory(allChars);
-
-        return speak(rhymedPart, chain);
+        return speak(iAm, iHelpYou, chain);
     }
-}
-
-function getEnding(word: string): string {
-    const accentIndex = word.indexOf('+');
-
-    if (accentIndex === -1) {
-        return '';
-    }
-
-    return word.substr(accentIndex);
 }
