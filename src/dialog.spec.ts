@@ -500,6 +500,17 @@ describe('Main dialog', () => {
             expect(await events('')).toContainEqual(
                 expect.objectContaining({ user_properties: { Experiments: ['Things'] } })
             );
+
+            // eventsMock = new EventsBatch(
+            //     0,
+            //     requestMock,
+            //     sessionMock,
+            //     new ExperimentsResolver().resolve('8FFFFFFFF')
+            // );
+
+            // expect(await events('')).toContainEqual(
+            //     expect.objectContaining({ user_properties: { Experiments: ['Rhymes'] } })
+            // );
         });
     });
 
@@ -530,12 +541,12 @@ describe('Main dialog', () => {
         });
 
         test('Rhymes', async () => {
-            sessionMock = new Session([], new ScenarioRhymes(), 0);
+            sessionMock = new Session([], new ScenarioRhymes('intro', []), 0);
 
             await text('');
-            expect(await tts('котик')).toMatch('У меня есть ботик');
-            expect(await tts('бабка')).toMatch('У меня есть лапка');
-            expect(await tts('медведь')).toMatch('медь');
+            expect(await tts('медведь')).toMatch('У меня есть медь');
+            expect(await tts('медведь')).toMatch('У меня есть сеть');
+            expect(await tts('медведь')).toMatch('У меня есть плеть');
         });
     });
 

@@ -14,8 +14,12 @@ const rhymer = new Rhymer();
  * Добавляет к истории рифмы типа «Я внучка. У меня есть ручка.»
  */
 export class ScenarioRhymes extends ScenarioClassic {
+    constructor(currentScene: Scene, private readonly usedRhymes: string[]) {
+        super(currentScene);
+    }
+
     create(scene: Scene): Scenario {
-        return new ScenarioRhymes(scene);
+        return new ScenarioRhymes(scene, this.usedRhymes);
     }
 
     /**
@@ -35,10 +39,12 @@ export class ScenarioRhymes extends ScenarioClassic {
             random100
         );
 
-        const rhyme = rhymer.findRhymes(char.normal, random100);
+        const rhymes = rhymer.findRhymes(char.normal).filter(r => !this.usedRhymes.includes(r));
 
-        if (rhyme) {
+        if (rhymes.length) {
+            const rhyme = sample(rhymes, random100);
             const iHave = speak(`У меня есть ${rhyme}.`);
+            this.usedRhymes.push(rhyme);
 
             return speak(iAm, iHave, iHelpYou, chain);
         }

@@ -3,20 +3,19 @@ import { binarySearch } from './binarySearch';
 import rhymes = require('./rhymes.json');
 //@ts-ignore
 import еndings = require('./endings.json');
-import { sample } from './utils';
 
 export class Rhymer {
     /**
      * Возвращает случайную рифму для слова
      */
-    findRhymes(word: string, random: number): string | undefined {
+    findRhymes(word: string): string[] {
         const еndingRecord = binarySearch(еndings, record => {
             const key = record.slice(0, record.indexOf(','));
             return word === key ? 0 : key > word ? 1 : -1;
         });
 
         if (!еndingRecord) {
-            return undefined;
+            return [];
         }
 
         const еnding = еndingRecord.slice(еndingRecord.indexOf(',') + 1);
@@ -27,7 +26,7 @@ export class Rhymer {
         });
 
         if (!rhymesRecord) {
-            return undefined;
+            return [];
         }
 
         const rs = rhymesRecord.split(',');
@@ -39,6 +38,6 @@ export class Rhymer {
             rs.splice(rs.indexOf(word), 1);
         }
 
-        return sample(rs, random);
+        return rs;
     }
 }
