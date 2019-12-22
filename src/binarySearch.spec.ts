@@ -11,7 +11,6 @@ describe('binarySearch', () => {
             return еnding === key ? 0 : key > еnding ? 1 : -1;
         });
 
-        expect(rhymes.find(r => r.startsWith(еnding))).toMatch("`эт',кеть,медь,сеть");
-        expect(item).toMatch("`эт',кеть,медь,сеть");
+        expect(item).toMatch("`эт',медь,сеть,плеть,снедь,треть,мечеть");
     });
 });

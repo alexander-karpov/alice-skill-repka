@@ -11,6 +11,7 @@ const path = require('path');
         'print-anim': printAnimCommand,
         'build-endings': buildEndingsCommand,
         'build-rhymes': buildRhymesCommand,
+        'print-inan-homonyms': buildInanHomonymsCommand,
     };
 
     const commandName = process.argv[2];
@@ -203,12 +204,19 @@ async function buildRhymesCommand() {
     const index = {};
     const result = [];
 
+    const geo = await readTxt('./data/geo.txt');
+
     await readLines('./data/inan.phon', line => {
         const [word, phon] = line.split('\t');
         const key = getPhonEnding(phon);
+        const normWord = normalizeWord(word);
+
+        if (geo.includes(normWord)) {
+            return;
+        }
 
         index[key] = index[key] || [];
-        index[key].push(normalizeWord(word));
+        index[key].push(normWord);
     });
 
     for (const key of Object.keys(index)) {
@@ -218,6 +226,18 @@ async function buildRhymesCommand() {
     result.sort(dictSortCompare);
 
     writeJson('./src/rhymes.json', result);
+}
+
+async function buildInanHomonymsCommand() {
+    const dehomonymy = readJsom('./data/dehomonymy.json');
+
+    await readLines('./data/inan.phon', line => {
+        const [word, phon] = line.split('\t');
+
+        if (word.split('`').length > 2 && !dehomonymy[word]) {
+            console.log(`"${word}":"${phon}",`);
+        }
+    });
 }
 
 /**
@@ -247,13 +267,28 @@ function readJsom(filename) {
 }
 
 /**
+ * Читает текстовый файл в массив строк
+ * @param {String} filename Пуль к файлу
+ * @return {String[]}
+ */
+async function readTxt(filename) {
+    const lines = [];
+
+    await readLines(filename, line => {
+        lines.push(line);
+    });
+
+    return lines;
+}
+
+/**
  * Сохраняет объект в json-файл
  * @param {String} filename Пуль к файлу
  * @param {Щиоусе} object Сохраняемый в файл объект
  * @return {Object}
  */
 function writeJson(filename, object) {
-    fs.writeFileSync(path.resolve(filename), JSON.stringify(object));
+    fs.writeFileSync(path.resolve(filename), JSON.stringify(object, null, 2));
 }
 
 /**

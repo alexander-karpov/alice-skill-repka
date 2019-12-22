@@ -535,7 +535,7 @@ describe('Main dialog', () => {
             await text('');
             expect(await tts('котик')).toMatch('У меня есть ботик');
             expect(await tts('бабка')).toMatch('У меня есть лапка');
-            expect(await tts('медведь')).toMatch('кеть');
+            expect(await tts('медведь')).toMatch('медь');
         });
     });
 
