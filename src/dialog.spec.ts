@@ -501,16 +501,16 @@ describe('Main dialog', () => {
                 expect.objectContaining({ user_properties: { Experiments: ['Things'] } })
             );
 
-            // eventsMock = new EventsBatch(
-            //     0,
-            //     requestMock,
-            //     sessionMock,
-            //     new ExperimentsResolver().resolve('8FFFFFFFF')
-            // );
+            eventsMock = new EventsBatch(
+                0,
+                requestMock,
+                sessionMock,
+                new ExperimentsResolver().resolve('8FFFFFFFF')
+            );
 
-            // expect(await events('')).toContainEqual(
-            //     expect.objectContaining({ user_properties: { Experiments: ['Rhymes'] } })
-            // );
+            expect(await events('')).toContainEqual(
+                expect.objectContaining({ user_properties: { Experiments: ['Rhymes'] } })
+            );
         });
     });
 

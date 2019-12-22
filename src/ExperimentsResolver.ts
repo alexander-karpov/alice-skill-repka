@@ -16,9 +16,9 @@ export class ExperimentsResolver {
             return [ExpFlag.Things];
         }
 
-        // if (['8', '9', 'а', 'b'].includes(firstLetter)) {
-        //     return [ExpFlag.Rhymes];
-        // }
+        if (['8', '9', 'а', 'b'].includes(firstLetter)) {
+            return [ExpFlag.Rhymes];
+        }
 
         return [];
     }

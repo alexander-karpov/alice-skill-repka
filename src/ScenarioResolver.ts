@@ -16,7 +16,7 @@ export class ScenarioResolver {
         }
 
         if (exps.includes(ExpFlag.Rhymes)) {
-            return new ScenarioRhymes();
+            return new ScenarioRhymes('intro', []);
         }
 
         return new ScenarioClassic();
