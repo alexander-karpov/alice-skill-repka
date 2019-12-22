@@ -35,7 +35,9 @@ export class Rhymer {
         rs.shift();
 
         // Удаляем само рифмуемое слово из вариантов
-        rs.splice(rs.indexOf(word), 1);
+        if (rs.includes(word)) {
+            rs.splice(rs.indexOf(word), 1);
+        }
 
         return sample(rs, random);
     }

@@ -12,5 +12,6 @@ describe('Rhymer', () => {
         expect(dict.findRhymes('котик', 5)).toMatch('блокнотик');
 
         expect(dict.findRhymes('медведь', 0)).toMatch('кеть');
+        expect(dict.findRhymes('чудовище', 0)).toMatch('сокровище');
     });
 });
