@@ -426,21 +426,21 @@ describe('Main dialog', () => {
             expect(await events('котик')).toContainEqual(
                 expect.objectContaining({
                     event_type: 'Call Character',
-                    event_properties: { name: 'котик' },
+                    event_properties: { $command: 'котик', name: 'котик' },
                 })
             );
 
             expect(await events('Олега')).toContainEqual(
                 expect.objectContaining({
                     event_type: 'Call Character',
-                    event_properties: { name: 'олег' },
+                    event_properties: { $command: 'Олега', name: 'олег' },
                 })
             );
 
             expect(await events('кукуруку')).toContainEqual(
                 expect.objectContaining({
                     event_type: 'Call Character',
-                    event_properties: { name: 'кукурук' },
+                    event_properties: { $command: 'кукуруку', name: 'кукурук' },
                 })
             );
         });
@@ -451,7 +451,7 @@ describe('Main dialog', () => {
             expect(await events('лопату')).toContainEqual(
                 expect.objectContaining({
                     event_type: 'Call Thing',
-                    event_properties: { name: 'лопата' },
+                    event_properties: { $command: 'лопату', name: 'лопата' },
                 })
             );
         });
@@ -462,51 +462,31 @@ describe('Main dialog', () => {
             expect(await events('что где когда')).toContainEqual(
                 expect.objectContaining({
                     event_type: 'Unrecognized',
-                    event_properties: { command: 'что где когда' },
+                    event_properties: { $command: 'что где когда' },
                 })
             );
         });
 
         test('Experiments', async () => {
-            eventsMock = new EventsBatch(
-                0,
-                requestMock,
-                sessionMock,
-                new ExperimentsResolver().resolve('FFFFFFFF')
-            );
+            setUserId('FFFFFFFF');
 
-            expect(await events('котика')).toContainEqual(
+            expect(await events('')).toContainEqual(
                 expect.objectContaining({ user_properties: { Experiments: [] } })
             );
 
-            eventsMock = new EventsBatch(
-                0,
-                requestMock,
-                sessionMock,
-                new ExperimentsResolver().resolve('0FFFFFFF')
-            );
+            setUserId('0FFFFFFF');
 
             expect(await events('')).toContainEqual(
                 expect.objectContaining({ user_properties: { Experiments: ['Cities'] } })
             );
 
-            eventsMock = new EventsBatch(
-                0,
-                requestMock,
-                sessionMock,
-                new ExperimentsResolver().resolve('4FFFFFFFF')
-            );
+            setUserId('4FFFFFFFF');
 
             expect(await events('')).toContainEqual(
                 expect.objectContaining({ user_properties: { Experiments: ['Things'] } })
             );
 
-            eventsMock = new EventsBatch(
-                0,
-                requestMock,
-                sessionMock,
-                new ExperimentsResolver().resolve('8FFFFFFFF')
-            );
+            setUserId('8FFFFFFFF');
 
             expect(await events('')).toContainEqual(
                 expect.objectContaining({ user_properties: { Experiments: ['Rhymes'] } })
@@ -654,7 +634,22 @@ describe('Main dialog', () => {
     let eventsMock: EventsBatch;
     let stemmer: Stemmer = new DumpingStemmer(new MystemStemmer());
 
+    function setUserId(userId: string) {
+        requestMock.session.user_id = userId;
+    }
+
     async function act(command: string, random100 = 0): Promise<DialogResult> {
+        requestMock.request.command = command;
+        requestMock.request.original_utterance = command;
+        requestMock.request.nlu.tokens = command.split(' ');
+
+        eventsMock = new EventsBatch(
+            0,
+            requestMock,
+            sessionMock,
+            new ExperimentsResolver().resolve(requestMock.session.user_id)
+        );
+
         const dialogResult = await mainDialog(command, sessionMock, eventsMock, {
             stemmer,
             random100,
@@ -711,13 +706,6 @@ describe('Main dialog', () => {
         };
 
         sessionMock = new Session([], new ScenarioClassic(), 0);
-
-        eventsMock = new EventsBatch(
-            0,
-            requestMock,
-            sessionMock,
-            new ExperimentsResolver().resolve(requestMock.session.user_id)
-        );
     });
     //#endregion
 });

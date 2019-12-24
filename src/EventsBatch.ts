@@ -32,8 +32,8 @@ export class EventsBatch {
         return this.addEvent({ eventType: 'Call Thing', eventProps: { name } });
     }
 
-    addUnrecognized(command: string): EventsBatch {
-        return this.addEvent({ eventType: 'Unrecognized', eventProps: { command } });
+    addUnrecognized(): EventsBatch {
+        return this.addEvent({ eventType: 'Unrecognized', eventProps: {} });
     }
 
     private addEvent({
@@ -57,8 +57,22 @@ export class EventsBatch {
             this.session,
             this.experiments,
             this.events.concat(
-                new Event(eventType, this.time, this.request, this.session, eventProps, userProps)
+                new Event(
+                    eventType,
+                    this.time,
+                    this.request,
+                    this.session,
+                    this.addDefaultEventProps(eventProps),
+                    userProps
+                )
             )
         );
+    }
+
+    private addDefaultEventProps(addingProps: EventProps): EventProps {
+        return {
+            $command: this.request.request.command,
+            ...addingProps,
+        };
     }
 }
