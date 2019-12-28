@@ -1,6 +1,7 @@
 const readline = require('readline');
 const fs = require('fs');
 const path = require('path');
+const _ = require('lodash');
 
 /**
  * Выполняет запрошенную команду
@@ -12,6 +13,7 @@ const path = require('path');
         'build-endings': buildEndingsCommand,
         'build-rhymes': buildRhymesCommand,
         'print-inan-homonyms': buildInanHomonymsCommand,
+        'print-nomn-accs': printNomnAccsCommand,
     };
 
     const commandName = process.argv[2];
@@ -238,6 +240,123 @@ async function buildInanHomonymsCommand() {
             console.log(`"${word}":"${phon}",`);
         }
     });
+}
+
+/**
+ * Печатает словарь склонений в вин.падеж одушевленных.
+ * Исключает склонения '' -> 'а' и 'а' -> 'у'
+ */
+async function printNomnAccsCommand(openCorporaFilename, anim, masc) {
+    if (!['anim', 'inan'].includes(anim)) {
+        throw new Error(`Ожидаю второй параметр anim или inan. Получен ${anim}`);
+    }
+
+    if (masc && !['masc', 'femn'].includes(masc)) {
+        throw new Error(`Ожидаю третий параметр anim или femn. Получен ${masc}`);
+    }
+
+    let nomn = '';
+    let nomnGrs = '';
+    let accs = '';
+    let words = [];
+
+    await readLines(openCorporaFilename, line => {
+        const [lemma, grs] = line.split('\t');
+
+        if (isOcBeginOfWord(line)) {
+            nomn = '';
+            nomnGrs = '';
+            accs = '';
+
+            return;
+        }
+
+        if (isOcEndOfWord(line)) {
+            if (!(nomn && accs)) {
+                return;
+            }
+
+            const basis = getBasis([nomn, accs]);
+            const nomnEnding = nomn.slice(basis.length);
+            const accsEnding = accs.slice(basis.length);
+
+            const s = nomnGrs.includes('masc')
+                ? 'm'
+                : nomnGrs.includes('femn')
+                ? 'f'
+                : nomnGrs.includes('neut')
+                ? 'n'
+                : 'mf';
+
+            words.push(`${s},${basis},${nomnEnding},${accsEnding}`);
+
+            return;
+        }
+
+        if (lemma.includes('-')) {
+            return;
+        }
+
+        if (!grs.includes('NOUN') || !grs.includes(anim)) {
+            return;
+        }
+
+        if (masc && !grs.includes(masc)) {
+            return;
+        }
+
+        if (grs.includes('sing') && grs.includes('nomn')) {
+            nomn = normalizeWord(lemma);
+            nomnGrs = grs;
+
+            return;
+        }
+
+        if (grs.includes('sing') && grs.includes('accs')) {
+            accs = normalizeWord(lemma);
+            return;
+        }
+    });
+
+    words.sort((a, b) => {
+        const [as_, abasis, anomnEnding] = a.split(',');
+        const [bs, bbasis, bnomnEnding] = b.split(',');
+
+        if (as_ < bs) return -1;
+        if (as_ > bs) return 1;
+
+        const akey = `${abasis}${anomnEnding}`;
+        const bkey = `${bbasis}${bnomnEnding}`;
+        return akey === bkey ? 0 : akey > bkey ? 1 : -1;
+    });
+
+    // console.log(JSON.stringify(words, null, 2));
+
+    let i = 0;
+
+    for (let word of _.shuffle(words)) {
+        i++;
+        if (i % 1000 === 0) {
+            console.log(`//`);
+            console.log(`// ${i}`);
+            console.log(`//`);
+        }
+
+        const [s, b, n, a] = word.split(',');
+
+        if (s === 'f') {
+            console.log(`expect(Morpher.animFemnNomnToAccs('${b + n}')).toBe('${b + a}');`);
+        }
+        if (s === 'm') {
+            console.log(`expect(Morpher.animMascNomnToAccs('${b + n}')).toBe('${b + a}');`);
+        }
+        if (s === 'mf') {
+            console.log(`expect(Morpher.animMascFemnNomnToAccs('${b + n}')).toBe('${b + a}');`);
+        }
+        if (s === 'n') {
+            console.log(`expect(Morpher.animNeutNomnToAccs('${b + n}')).toBe('${b + a}');`);
+        }
+    }
 }
 
 /**
