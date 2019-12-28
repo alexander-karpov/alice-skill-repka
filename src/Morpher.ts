@@ -17,10 +17,8 @@ export class Morpher {
     static animMascFemnNomnToAccs(nomn: string): string {
         return Morpher.animNomnToAccs(nomn, 'mf');
     }
-    static animNeutNomnToAccs(nomn: string): string {
-        return Morpher.animNomnToAccs(nomn, 'n');
-    }
-    private static animNomnToAccs(nomn: string, sex: 'm' | 'f' | 'mf' | 'n'): string {
+
+    private static animNomnToAccs(nomn: string, sex: 'm' | 'f' | 'mf'): string {
         const dictRecord = binarySearch(nomnToAccs, record => {
             const [s, basis, nomnEnding] = record.split(',');
 

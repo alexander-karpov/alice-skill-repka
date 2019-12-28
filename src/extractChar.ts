@@ -5,6 +5,7 @@ import { last } from './utils';
 import { Gender } from './Gender';
 import { Word } from './Word';
 import { CharacterType } from './CharacterType';
+import { Morpher } from './Morpher';
 
 /**
  * Mystem возвращает бесконтекстную вероятность леммы.
@@ -215,125 +216,29 @@ function AToAccMale(lex: string) {
 }
 
 function SToAccCnsistent(lexeme: Lexeme, consistentWith: Lexeme): string {
+    const isMaleFamela = isLexemeAccept(lexeme, [Gr.Unisex]);
     const isFamela = isLexemeAccept(consistentWith, [Gr.Famela]);
     const isMale = isLexemeAccept(consistentWith, [Gr.Male]);
     const isNeuter = isLexemeAccept(consistentWith, [Gr.Neuter]);
-    const isA = isLexemeAccept(lexeme, [Gr.A]);
 
     // Чудище -> чудище
     if (isNeuter) {
         return lexeme.lex;
     }
 
-    /**
-     * Для существительных от прилагательных (напр. черный)
-     * нужно использовать правила склонения как для пригалат.
-     */
-    if (isA) {
-        return AToCnsistent(lexeme, lexeme).accusative;
+    if (isMaleFamela) {
+        return Morpher.animMascFemnNomnToAccs(lexeme.lex);
     }
 
     if (isMale) {
-        return SToAccMale(lexeme.lex);
+        return Morpher.animMascNomnToAccs(lexeme.lex);
     }
 
     if (isFamela) {
-        return SToAccFamela(lexeme.lex);
+        return Morpher.animFemnNomnToAccs(lexeme.lex);
     }
 
     return lexeme.lex;
-}
-
-function SToAccFamela(lex: string) {
-    const endsWith = (end: string) => lex.endsWith(end);
-    const changeOne = (end: string) => `${lex.substring(0, lex.length - 1)}${end}`;
-
-    // мама -> маму
-    if (endsWith('а')) {
-        return changeOne('у');
-    }
-
-    // Маня -> маню
-    if (endsWith('я')) {
-        return changeOne('ю');
-    }
-
-    // Дочь, лошадь?
-    if (endsWith('ь')) {
-        return lex;
-    }
-
-    return lex;
-}
-
-function SToAccMale(lex: string) {
-    const endsWith = (end: string) => lex.endsWith(end);
-    const changeOne = (end: string) => `${lex.substring(0, lex.length - 1)}${end}`;
-    const changeTwo = (end: string) => `${lex.substring(0, lex.length - 2)}${end}`;
-    const add = (end: string) => `${lex}${end}`;
-
-    // Чёрный -> чёрного
-    if (endsWith('ый')) {
-        return changeTwo('ого');
-    }
-
-    // Папа -> папу
-    if (endsWith('а')) {
-        return changeOne('у');
-    }
-
-    // Отец -> отца, кузнец -> кузнеца
-    if (endsWith('ец')) {
-        return changeTwo('ца');
-    }
-
-    // Богатырь -> богатыря, конь -> коня.
-    if (endsWith('ь')) {
-        return changeOne('я');
-    }
-
-    // Евгений -> евгения, злодей -> злодея
-    if (endsWith('й')) {
-        return changeOne('я');
-    }
-
-    // Буратино
-    if (endsWith('о')) {
-        return lex;
-    }
-
-    // Внучок -> внучка, дружок -> дружка
-    if (endsWith('ок')) {
-        return changeTwo('ка');
-    }
-
-    // Гарри
-    if (endsWith('и')) {
-        return lex;
-    }
-
-    // Пес -> пса
-    if (endsWith('ес')) {
-        return changeTwo('са');
-    }
-
-    // Осел -> осла, дятел -> дятла.
-    if (endsWith('ел')) {
-        return changeTwo('ла');
-    }
-
-    // Лев -> льва
-    if (endsWith('ев')) {
-        return changeTwo('ьва');
-    }
-
-    // Петя -> петю
-    if (endsWith('я')) {
-        return changeOne('ю');
-    }
-
-    // Человек -> человека, кролик -> кролика.
-    return add('а');
 }
 
 function extractGender(lexeme: Lexeme): Gender {
@@ -368,7 +273,7 @@ export function extractThing(tokens: Token[]): Character | undefined {
             CharacterType.Thing,
             {
                 nominative: char.lex,
-                accusative: isFamela ? SToAccFamela(char.lex) : char.lex,
+                accusative: isFamela ? Morpher.animFemnNomnToAccs(char.lex) : char.lex,
             },
             extractGender(char),
             char.lex
