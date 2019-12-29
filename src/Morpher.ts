@@ -1,7 +1,7 @@
 import { binarySearch } from './binarySearch';
 
 //@ts-ignore
-const nomnToAccs: string[] = require('./nomnToAccs.json');
+import nomnToAccs = require('./nomnToAccs.json');
 
 /**
  * Склонение слов по подежам (в винительный падеж)
