@@ -6,6 +6,5 @@ describe('Morpher', () => {
         expect(Morpher.animMascNomnToAccs('юнец')).toBe('юнца');
         expect(Morpher.animFemnNomnToAccs('радонежская')).toBe('радонежскую');
         expect(Morpher.animMascFemnNomnToAccs('бебешка')).toBe('бебешку');
-        expect(Morpher.animNeutNomnToAccs('чудило')).toBe('чудило');
     });
 });

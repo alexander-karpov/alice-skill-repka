@@ -196,11 +196,15 @@ function AToAccMale(lex: string) {
     const endsWith = (end: string) => lex.endsWith(end);
     const changeTwo = (end: string) => `${lex.substring(0, lex.length - 2)}${end}`;
 
+    if (endsWith('кий')) {
+        return changeTwo('ого');
+    }
+
     if (endsWith('ий') || endsWith('ие')) {
         return changeTwo('его');
     }
 
-    if (endsWith('ый') || endsWith('ые')) {
+    if (endsWith('ый') || endsWith('ой') || endsWith('ые')) {
         return changeTwo('ого');
     }
 

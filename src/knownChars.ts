@@ -178,7 +178,7 @@ const knownChars = {
         image: '1030494/941a763ac0fcc18e2be8',
     } as KnownChar,
     harryPotter: {
-        button: '🧙‍♂️ Гарри Поттер',
+        button: '🧙‍♂️ Гарри Поттера',
         normal: 'гарри поттер',
         trigger: intents.harryPotter,
         answer: answers.chars.harryPotter,
