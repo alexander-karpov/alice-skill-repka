@@ -17,6 +17,10 @@ export function harryPotter(char: Character) {
     return char.nominative.toLocaleLowerCase() === 'гарри поттер';
 }
 
+export function rat(char: Character) {
+    return char.nominative.toLocaleLowerCase() === 'крыса';
+}
+
 export function cat(char: Character) {
     return char.startsWith('кош', 'кот', 'киск', 'мурк');
 }
@@ -39,6 +43,14 @@ export function crow(char: Character) {
 
 export function cow(char: Character) {
     return char.startsWith('коров');
+}
+
+export function crocodile(char: Character) {
+    return char.startsWith('крокодил');
+}
+
+export function tiger(char: Character) {
+    return char.startsWith('тигр');
 }
 
 export function chicken(char: Character) {
@@ -79,7 +91,7 @@ export function fox(char: Character) {
 }
 
 export function girl(char: Character) {
-    return char.equals('внучка', 'девочка', 'маша');
+    return char.equals('внучка', 'девочка', 'дочка', 'маша');
 }
 
 export function zombie(char: Character) {

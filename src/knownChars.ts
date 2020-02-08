@@ -184,4 +184,32 @@ const knownChars = {
         answer: answers.chars.harryPotter,
         image: '',
     } as KnownChar,
+    rat: {
+        button: '🐁 Крысу',
+        normal: 'крыса',
+        trigger: intents.rat,
+        answer: answers.chars.rat,
+        image: '',
+    } as KnownChar,
+    cow: {
+        button: '🐮 Коровушку',
+        normal: 'коровушка',
+        trigger: intents.cow,
+        answer: answers.chars.cow,
+        image: '',
+    },
+    crocodile: {
+        button: '🐊 Крокодила',
+        normal: 'крокодил',
+        trigger: intents.crocodile,
+        answer: answers.chars.crocodile,
+        image: '',
+    } as KnownChar,
+    tiger: {
+        button: '🐯 Тигра',
+        normal: 'тигр',
+        trigger: intents.tiger,
+        answer: answers.chars.tiger,
+        image: '',
+    } as KnownChar,
 };

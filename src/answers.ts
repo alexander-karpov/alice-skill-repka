@@ -125,6 +125,19 @@ export const chars = {
             `${come} ${char.nominative} - <speaker audio="alice-music-violin-b-1.opus">.`,
         ]);
     },
+    rat(char: Character, previousChar: Character, random100: number) {
+        const come = comeRunningCapitalized(char);
+
+        const sound = sample(
+            [
+                '<speaker audio="dialogs-upload/d72eedce-c6f5-412b-8ed7-93cdccd9b716/01ae230e-69f3-4f76-93e8-8da388f7cf65.opus">',
+                '<speaker audio="dialogs-upload/d72eedce-c6f5-412b-8ed7-93cdccd9b716/7f7c2a7d-b8bc-4a13-ad74-c1d0bf5f5797.opus">',
+            ],
+            random100
+        );
+
+        return speak([`${come} ${char.nominative}.`, `${come} ${char.nominative} - ${sound}.`]);
+    },
     cat(char: Character, previousChar: Character, random100: number) {
         const famelaMeow = [3, 4];
         const maleMeow = char.nominative.includes('котен') ? famelaMeow : [1, 2];
@@ -225,6 +238,22 @@ export const chars = {
             `${come} ${char.nominative} - <speaker audio="alice-sounds-animals-cow-2.opus">.`
         );
     },
+    crocodile(char: Character) {
+        const come = crawledCapitalized(char);
+
+        return createSpeech(
+            `${come} ${char.nominative}.`,
+            `${come} ${char.nominative} - <speaker audio="dialogs-upload/d72eedce-c6f5-412b-8ed7-93cdccd9b716/38d9977f-9dd8-421d-866c-14900749f7cd.opus">.`
+        );
+    },
+    tiger(char: Character) {
+        const come = comeRunningCapitalized(char);
+
+        return createSpeech(
+            `${come} ${char.nominative}.`,
+            `${come} ${char.nominative} - <speaker audio="dialogs-upload/d72eedce-c6f5-412b-8ed7-93cdccd9b716/29479c2a-e251-495a-a387-1473c5422aff.opus">.`
+        );
+    },
     horse(char: Character, _prev: Character, random100: number) {
         const come = riddenCapitalized(char);
         const soundNumber = (random100 % 2) + 1;
@@ -314,4 +343,8 @@ function riddenCapitalized(char: Character) {
 
 function flownCapitalized(char: Character) {
     return char.byGender('Прилетел', 'Прилетела', 'Прилетело');
+}
+
+function crawledCapitalized(char: Character) {
+    return char.byGender('Приполз', 'Приползла', 'Приползло');
 }
