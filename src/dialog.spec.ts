@@ -90,7 +90,8 @@ describe('Main dialog', () => {
         expect(await text('Внучок')).toMatch('Внучок за богатыря');
         expect(await text('Царица')).toMatch('Царица за внучка');
         expect(await text('Лебедь')).toMatch('Лебедь 🦢 за царицу');
-        expect(await text('Врач')).toMatch('Врач за лебедя');
+        // Лебедь - фамилия
+        // expect(await text('Врач')).toMatch('Врач за Лебедь');
     });
 
     test('Приоритет вин. падежу', async () => {
@@ -100,6 +101,7 @@ describe('Main dialog', () => {
          */
         await text('');
         expect(await text('Внучка')).toMatch('Внучок за дедку');
+        expect(await text('Тырышкина')).toMatch('Тырышкин за внучка');
     });
 
     test('Специальная фраза для рыбки', async () => {

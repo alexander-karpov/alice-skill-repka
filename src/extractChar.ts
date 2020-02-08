@@ -44,8 +44,11 @@ const subjectPatterns: Predicate<Lexeme>[][] = [
     [x(Persn, Nom, Male), x(Famn, Nom)],
     [x(Persn, Nom, Famela), x(Famn, Nom)],
     [x(Persn, Nom, Unisex), x(Famn, Nom)],
-    // Имен.
+    // Имен имен.
     [x(S, Anim, Nom, NotTokenA), x(S, Nom, NotTokenA)],
+    // Фамилия вин
+    [x(Famn, Acc)],
+    // Имен
     [x(S, Anim, Nom, NotTokenA)],
     // Что угодно
     [x(S, Anim, Single)],
