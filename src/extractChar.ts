@@ -15,6 +15,7 @@ import { Morpher } from './Morpher';
 const LEXEME_PROBABILITY_BARRIER = 0.0001;
 
 // #region Gr patterns
+const Probably = (l: Lexeme) => l.weight >= 0.021;
 const S = (l: Lexeme) => isLexemeAccept(l, [Gr.S]);
 const Acc = (l: Lexeme) => isLexemeAccept(l, [Gr.Acc]);
 const Nom = (l: Lexeme) => isLexemeAccept(l, [Gr.Nom]);
@@ -39,7 +40,7 @@ const subjectPatterns: Predicate<Lexeme>[][] = [
     [x(Persn, Acc, Unisex), x(Famn, Acc)],
     // Вин.
     [x(S, Anim, Single, Acc, NotTokenA), x(S, Acc)],
-    [x(S, Anim, Single, Acc, NotTokenA, NotName)],
+    [x(S, Anim, Single, Acc, NotTokenA, NotName, Probably)],
     // Имена имен.
     [x(Persn, Nom, Male), x(Famn, Nom)],
     [x(Persn, Nom, Famela), x(Famn, Nom)],
