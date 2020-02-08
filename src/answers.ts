@@ -2,7 +2,6 @@ import { Character } from './Character';
 import { sample, upperFirst } from './utils';
 import { createSpeech, Speech, speak, tts } from './speech';
 import { emoji } from './emoji';
-import { alphabetLetter } from './alphabet';
 
 export type AnswerBuilder = (char: Character, previousChar: Character, random100: number) => Speech;
 
@@ -19,16 +18,6 @@ export function intro(): Speech {
         tts`Хотите ${'- -'} вместе ${'-'} сочинить сказку?${' - - '}`,
         tts`Вы слышали ${'-'} как посадил дед репку?${' - - '}`,
         tts`А кто помогал её тянуть? ${'- -'} Давайте придумаем вместе.${' - - - '}`,
-        storyBegin()
-    );
-}
-
-export function introCities(): Speech {
-    return speak(
-        ['Привет, ребята!', 'Привет - ребята! - '],
-        tts`Хотите ${'-'} поиграть ${'-'} и сочинить ${'-'} сказку?${' - - '}`,
-        tts`В нашей сказке каждый новый герой ${'-'} начинается на ту букву, ${'-'} на какую заканчивается предыдущий. Игра закончится, когда прибежит мышка. Готовы? ${' - - - '} `,
-        ['', '<speaker audio="alice-music-harp-1.opus">'],
         storyBegin()
     );
 }
@@ -53,19 +42,6 @@ export function wrongCommand(char: Character) {
         `Это не похоже на персонажа.`,
         tts`Для подсказки скажите ${'-'} "Помощь".`,
         whoCalled2(char)
-    );
-}
-
-export function citiesWrongChar(char: Character, previous: Character) {
-    return speak(
-        `${upperFirst(char.normal)} не подойдёт. ${upperFirst(heSheIt(char))} начинается на`,
-        ['букву', 'букву -'],
-        alphabetLetter(char.firstLetter),
-        tts`,${'-'} а ${previous.normal} заканчивается на букву ${'-'}`,
-        alphabetLetter(previous.lastLetter),
-        `.`,
-        whoCalled2(previous),
-        startsWithLetter(previous)
     );
 }
 
@@ -118,10 +94,6 @@ export function success() {
 
 export function cantPull(char: Character) {
     return speak(`Тянут-потянут — вытянуть не могут.`, whoCalled2(char));
-}
-
-export function startsWithLetter(previous: Character) {
-    return speak(tts`На букву ${'- -'}`, alphabetLetter(previous.lastLetter), ['.', '.']);
 }
 
 export const chars = {

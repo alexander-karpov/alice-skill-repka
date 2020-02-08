@@ -9,9 +9,6 @@ import { MystemStemmer } from './MystemStemmer';
 import { DumpingStemmer } from './DumpingStemmer';
 import { ExperimentsResolver } from './ExperimentsResolver';
 import { ScenarioClassic } from './ScenarioClassic';
-import { ScenarioThings } from './ScenarioThings';
-import { ScenarioCities } from './ScenarioCities';
-import { ScenarioRhymes } from './ScenarioRhymes';
 
 // за большой льва
 // внучок
@@ -490,69 +487,9 @@ describe('Main dialog', () => {
                 })
             );
         });
-
-        test('Experiments', async () => {
-            setUserId('FFFFFFFF');
-
-            expect(await events('')).toContainEqual(
-                expect.objectContaining({ user_properties: { Experiments: [] } })
-            );
-
-            setUserId('0FFFFFFF');
-
-            expect(await events('')).toContainEqual(
-                expect.objectContaining({ user_properties: { Experiments: ['Cities'] } })
-            );
-
-            setUserId('4FFFFFFFF');
-
-            expect(await events('')).toContainEqual(
-                expect.objectContaining({ user_properties: { Experiments: ['Things'] } })
-            );
-
-            setUserId('8FFFFFFFF');
-
-            expect(await events('')).toContainEqual(
-                expect.objectContaining({ user_properties: { Experiments: ['Rhymes'] } })
-            );
-        });
     });
 
-    describe('Эксперименты', () => {
-        test('Things', async () => {
-            sessionMock = new Session([], new ScenarioThings(), 0);
-
-            await text('');
-            expect(await tts('котик')).toMatch('котик за дедку');
-            expect(await tts('утюг')).toMatch('утюг за котика');
-            expect(await tts('сапог')).toMatch('сапог за утюг');
-            expect(await tts('вилка')).toMatch('вилка за сапог');
-            expect(await tts('ложка')).toMatch('ложка за вилку');
-        });
-
-        test('Cities', async () => {
-            sessionMock = new Session([], new ScenarioCities(), 0);
-
-            await text('');
-            expect(await tts('арап')).toMatch('арап за дедку');
-            expect(await tts('петя')).toMatch('петя за арапа');
-            expect(await tts('як')).toMatch('як за петю');
-            expect(await tts('капрал')).toMatch('капрал за яка');
-            expect(await tts('лось')).toMatch('лось за капрала');
-            expect(await tts('слон')).toMatch('слон за лося');
-
-            expect(await tts('котика')).toMatch(/котик не подойдёт/i);
-        });
-
-        test('Rhymes', async () => {
-            sessionMock = new Session([], new ScenarioRhymes('intro', []), 0);
-
-            await text('');
-            expect(await tts('медведь')).toMatch('У меня есть медь');
-            expect(await tts('медведь')).toMatch('У меня есть сеть');
-            expect(await tts('медведь')).toMatch('У меня есть плеть');
-        });
-    });
+    describe('Эксперименты', () => {});
 
     describe('Запросы пользователей', () => {
         test('жили были дед да баба…', async () => {

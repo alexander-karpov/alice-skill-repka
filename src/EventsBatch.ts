@@ -2,6 +2,7 @@ import { WebhookRequest } from './server';
 import { Event } from './Event';
 import { Session } from './Session';
 import { EventProps } from './EventProps';
+import { ExpFlag } from './ExpFlag';
 
 /**
  * Накапливает в себе события разных типов
@@ -12,7 +13,7 @@ export class EventsBatch {
         private readonly time: number,
         private readonly request: WebhookRequest,
         private readonly session: Session,
-        private readonly experiments: string[],
+        private readonly experiments: ExpFlag[],
         readonly events: readonly Event[] = []
     ) {}
 
@@ -40,7 +41,7 @@ export class EventsBatch {
         eventType,
         eventProps,
         userProps = {
-            Experiments: this.experiments,
+            Experiments: this.experiments.map(ef => String(ef)),
         },
     }: {
         eventType: string;
