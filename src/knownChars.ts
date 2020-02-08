@@ -212,4 +212,11 @@ const knownChars = {
         answer: answers.chars.tiger,
         image: '',
     } as KnownChar,
+    dino: {
+        button: '🦖 Динозавра',
+        normal: 'динозавр',
+        trigger: intents.dino,
+        answer: answers.chars.dino,
+        image: '',
+    } as KnownChar,
 };

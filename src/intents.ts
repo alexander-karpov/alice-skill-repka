@@ -53,6 +53,10 @@ export function tiger(char: Character) {
     return char.startsWith('тигр');
 }
 
+export function dino(char: Character) {
+    return char.startsWith('динозавр');
+}
+
 export function chicken(char: Character) {
     return char.startsWith('куриц', 'курочк');
 }
