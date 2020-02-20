@@ -144,7 +144,6 @@ export const chars = {
         const sound = sample(
             [
                 '<speaker audio="dialogs-upload/d72eedce-c6f5-412b-8ed7-93cdccd9b716/69921ea2-cc7c-46fa-9390-ad946e74da05.opus">',
-                '<speaker audio="dialogs-upload/d72eedce-c6f5-412b-8ed7-93cdccd9b716/dfa9a443-9e7a-4878-8e71-2b5e8e10fba9.opus">',
                 '<speaker audio="dialogs-upload/d72eedce-c6f5-412b-8ed7-93cdccd9b716/7f5e067f-f1c7-45c8-ac0e-136ed2946e48.opus">',
             ],
             random100
