@@ -1,5 +1,5 @@
 //#region types
-import { spawn } from 'child_process';
+import axios from 'axios';
 import { Gr, Lexeme, Token } from './tokens';
 import { Stemmer } from './Stemmer';
 
@@ -16,50 +16,23 @@ type MyStemLexeme = {
 //#endregion
 
 export class MystemStemmer implements Stemmer {
-    analyze(message: string): Promise<Token[]> {
+    async analyze(message: string): Promise<Token[]> {
         if (!message) {
-            return Promise.resolve([]);
+            return [];
         }
 
-        const mystem = spawn('mystem', ['--format=json', '--weight', '-i']);
+        const fixed = fixVoiceRecognitionDefects(message);
+        const encoded = encodeURIComponent(fixed);
 
-        const promise = new Promise<Token[]>((resolve, reject) => {
-            let outDate: Buffer | undefined;
+        const response = await axios.get<MyStemToken[]>(
+            `https://functions.yandexcloud.net/d4ei9qbjvd981dqfppnc?text=${encoded}`
+        );
 
-            mystem.stdout.on('data', data => {
-                outDate = data;
-            });
+        if (response.status !== 200 || !Array.isArray(response.data)) {
+            return [];
+        }
 
-            mystem.stderr.on('data', data => {
-                reject(data);
-            });
-
-            mystem.stdout.on('close', () => {
-                if (!outDate) {
-                    resolve([]);
-                    return;
-                }
-
-                try {
-                    // В ответ почему-то добавляются симовлы «[]»
-                    const json = outDate.toString().replace(/\[\]/gi, '');
-                    const parsed = JSON.parse(json);
-                    const tokens = parsed.map(preprocessToken);
-
-                    resolve(tokens);
-                } catch (e) {
-                    resolve([]);
-                }
-            });
-        });
-
-        const cyrillic = removeNonCyrillic(message);
-        const nluFixed = fixVoiceRecognitionDefects(cyrillic);
-
-        mystem.stdin.write(`${nluFixed}\n`);
-        mystem.stdin.end();
-
-        return promise;
+        return response.data.map(preprocessToken);
     }
 }
 
@@ -99,13 +72,4 @@ function fixVoiceRecognitionDefects(message: string) {
         .replace(/\sдетк[а|у]/, ' дедку')
         .replace(/\sночк[а|у]/, ' дочка')
         .replace(/\sбаку/, ' бабку');
-}
-
-/**
- * Оставляет в тексте только кирилические симводы и пробелы
- * Удаляет из текст то, что мы явно не можем обработать
- * @param message
- */
-function removeNonCyrillic(message: string) {
-    return message.replace(/[^а-яА-ЯёЁ ]+/g, '');
 }
